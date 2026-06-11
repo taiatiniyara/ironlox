@@ -38,6 +38,10 @@ export class ApiClient {
     this.config.refreshToken = undefined;
   }
 
+  setOnTokenRefresh(cb: (tokens: { accessToken: string; refreshToken: string }) => void): void {
+    this.config.onTokenRefresh = cb;
+  }
+
   // --- Auth ---
 
   async register(body: { email: string; authHash: string; authSalt: string; encryptionSalt: string; wrappedVaultKey: string }): Promise<LoginResponse> {
@@ -80,6 +84,10 @@ export class ApiClient {
     return this.post("/auth/recover", body, false);
   }
 
+  async revoke(): Promise<void> {
+    return this.post("/auth/revoke", {});
+  }
+
   // --- Vault ---
 
   async getVault(): Promise<{ vaultUrl: string; version: number }> {
@@ -94,6 +102,14 @@ export class ApiClient {
 
   async getAttachmentUrl(id: string): Promise<{ attachmentUrl: string }> {
     return this.get(`/vault/attachment/${id}`);
+  }
+
+  async putAttachment(id: string): Promise<PutVaultResponse> {
+    return this.put(`/vault/attachment/${id}`, { id });
+  }
+
+  async deleteAttachment(id: string): Promise<void> {
+    return this.del(`/vault/attachment/${id}`);
   }
 
   // --- Account ---
@@ -143,7 +159,7 @@ export class ApiClient {
     path: string,
     body?: unknown,
     auth = true,
-    _retry = true,
+    canRetry = true,
   ): Promise<T> {
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
@@ -166,6 +182,17 @@ export class ApiClient {
     const response = await fetch(`${this.config.baseUrl}${path}`, init);
 
     if (!response.ok) {
+      if (response.status === 401 && auth && canRetry && this.config.refreshToken) {
+        try {
+          const refreshed = await this.refresh();
+          this.setTokens(refreshed.accessToken, refreshed.refreshToken);
+          return this.request<T>(method, path, body, auth, false);
+        } catch {
+          this.clearTokens();
+          throw new ApiError(401, "Session expired. Please sign in again.");
+        }
+      }
+
       const error = await response.json().catch(() => ({ message: "Request failed" }));
       const data = error as { message?: string; code?: string };
       throw new ApiError(response.status, data.message ?? "Request failed", data.code);

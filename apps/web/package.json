@@ -12,7 +12,13 @@
     "url": "https://github.com/taiatiniyara/ironlox/issues"
   },
   "homepage": "https://ironlox.com",
-  "keywords": ["password-manager", "zero-knowledge", "nextjs", "react", "dashboard"],
+  "keywords": [
+    "password-manager",
+    "zero-knowledge",
+    "nextjs",
+    "react",
+    "dashboard"
+  ],
   "scripts": {
     "dev": "next dev --port 3001",
     "build": "next build",
@@ -23,28 +29,35 @@
     "clean": "rm -rf .next"
   },
   "dependencies": {
-    "@ironlox/schemas": "workspace:*",
-    "@ironlox/crypto": "workspace:*",
+    "@base-ui/react": "^1.5.0",
     "@ironlox/api-client": "workspace:*",
+    "@ironlox/crypto": "workspace:*",
+    "@ironlox/schemas": "workspace:*",
+    "@tailwindcss/postcss": "^4.1.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "fuse.js": "^7.0.0",
+    "i18next": "^26.3.1",
+    "lucide-react": "^1.17.0",
     "next": "^16.2.9",
+    "next-themes": "^0.4.6",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
-    "@tailwindcss/postcss": "^4.1.0",
-    "tailwindcss": "^4.1.0",
-    "lucide-react": "^1.17.0",
-    "i18next": "^26.3.1",
     "react-i18next": "^17.0.8",
-    "fuse.js": "^7.0.0",
-    "zxcvbn": "^4.4.2",
-    "sonner": "^2.0.0"
+    "shadcn": "^4.11.0",
+    "sonner": "^2.0.7",
+    "tailwind-merge": "^3.6.0",
+    "tailwindcss": "^4.1.0",
+    "tw-animate-css": "^1.4.0",
+    "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
     "@ironlox/tsconfig": "workspace:*",
+    "@testing-library/react": "^16.0.0",
     "@types/node": "^25.9.3",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.8",
-    "@testing-library/react": "^16.0.0"
+    "vitest": "^4.1.8"
   }
 }

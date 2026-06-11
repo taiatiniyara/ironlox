@@ -1,0 +1,117 @@
+"use client";
+
+import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
+import { useVault } from "@/lib/vault-context";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { ArrowLeft, Upload, Paperclip, Trash2, Download, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+
+interface AttachedFile { id: string; name: string; size: number; }
+
+export default function AttachmentsPage() {
+  const { apiClient } = useVault();
+  const router = useRouter();
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [quota, setQuota] = useState({ used: 0, total: 250 });
+  const [files, setFiles] = useState<AttachedFile[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+
+  useEffect(() => {
+    if (!apiClient) return;
+    apiClient.getAccount().then((acct) => {
+      setQuota({ used: acct.attachmentUsed || 0, total: acct.attachmentQuota || 250 });
+    }).catch(() => {});
+  }, [apiClient]);
+
+  async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file || !apiClient) return;
+    if (file.size > 25 * 1024 * 1024) { toast.error("File exceeds 25MB limit"); return; }
+    setUploading(true);
+    setUploadProgress(0);
+    try {
+      const id = crypto.randomUUID();
+      const { uploadUrl } = await apiClient.putAttachment(id);
+      await new Promise<void>((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.upload.onprogress = (ev) => { if (ev.lengthComputable) setUploadProgress(Math.round((ev.loaded / ev.total) * 100)); };
+        xhr.onload = () => { if (xhr.status >= 200 && xhr.status < 300) resolve(); else reject(new Error("Upload failed")); };
+        xhr.onerror = () => reject(new Error("Upload failed"));
+        xhr.open("PUT", uploadUrl);
+        xhr.setRequestHeader("Content-Type", file.type || "application/octet-stream");
+        xhr.send(file);
+      });
+      setFiles((prev) => [...prev, { id, name: file.name, size: file.size }]);
+      setQuota((prev) => ({ ...prev, used: prev.used + Math.round(file.size / (1024 * 1024)) }));
+      toast.success(`${file.name} uploaded`);
+    } catch { toast.error("Upload failed"); }
+    finally { setUploading(false); setUploadProgress(0); if (fileRef.current) fileRef.current.value = ""; }
+  }
+
+  async function handleDelete(id: string, name: string, size: number) {
+    if (!apiClient) return;
+    try {
+      await apiClient.deleteAttachment(id);
+      setFiles((prev) => prev.filter((f) => f.id !== id));
+      setQuota((prev) => ({ ...prev, used: Math.max(0, prev.used - Math.round(size / (1024 * 1024))) }));
+      toast.success(`${name} deleted`);
+    } catch { toast.error("Delete failed"); }
+  }
+
+  async function handleDownload(id: string) {
+    if (!apiClient) return;
+    try {
+      const { attachmentUrl } = await apiClient.getAttachmentUrl(id);
+      window.open(attachmentUrl, "_blank");
+    } catch { toast.error("Download failed"); }
+  }
+
+  const usagePercent = quota.total > 0 ? Math.round((quota.used / quota.total) * 100) : 0;
+
+  return (
+    <div className="max-w-lg mx-auto p-4 space-y-4">
+      <div className="flex items-center gap-3">
+        <Button variant="ghost" size="icon" onClick={() => router.push("/vault")}><ArrowLeft className="size-4" /></Button>
+        <h1 className="text-lg font-semibold">File Attachments</h1>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Storage</CardTitle>
+          <CardDescription>{quota.used}MB of {quota.total}MB used</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <Progress value={usagePercent} className="h-2" />
+          {uploading && <p className="text-xs text-muted-foreground">Uploading... {uploadProgress}%</p>}
+          <input ref={fileRef} type="file" onChange={handleUpload} className="hidden" />
+          <Button variant="outline" className="w-full gap-2" onClick={() => fileRef.current?.click()} disabled={uploading}>
+            {uploading ? <><Loader2 className="size-4 animate-spin" />Uploading...</> : <><Upload className="size-4" />Upload File (max 25MB)</>}
+          </Button>
+        </CardContent>
+      </Card>
+
+      {files.length > 0 ? (
+        <Card>
+          <CardContent className="pt-4">
+            <div className="space-y-1">
+              {files.map((f) => (
+                <div key={f.id} className="flex items-center gap-3 py-2 border-b border-border last:border-0">
+                  <Paperclip className="size-4 text-muted-foreground shrink-0" />
+                  <div className="flex-1 min-w-0"><p className="text-sm truncate">{f.name}</p><p className="text-xs text-muted-foreground">{(f.size / 1024 / 1024).toFixed(1)} MB</p></div>
+                  <Button variant="ghost" size="icon" className="size-7" onClick={() => handleDownload(f.id)}><Download className="size-3.5" /></Button>
+                  <Button variant="ghost" size="icon" className="size-7 text-destructive" onClick={() => handleDelete(f.id, f.name, f.size)}><Trash2 className="size-3.5" /></Button>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card><CardContent className="py-8 text-center"><Paperclip className="size-10 text-muted-foreground mx-auto mb-3" /><p className="text-sm text-muted-foreground">No file attachments yet.</p><p className="text-xs text-muted-foreground mt-1">Attach files up to 25MB each. 250MB free, 2GB with Premium.</p></CardContent></Card>
+      )}
+    </div>
+  );
+}

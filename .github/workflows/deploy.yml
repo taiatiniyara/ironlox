@@ -19,6 +19,8 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm run build --filter=@ironlox/schemas
+      - run: pnpm run build --filter=@ironlox/crypto
       - run: pnpm --filter=@ironlox/worker run deploy
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

@@ -34,7 +34,7 @@ jobs:
         env:
           PLASMO_PUBLIC_API_URL: ${{ secrets.PLASMO_PUBLIC_API_URL }}
       - run: pnpm run package --filter=@ironlox/extension
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: extension-builds
           path: apps/extension/build/*.zip

@@ -1,64 +1,107 @@
 ---
 import Layout from "../layouts/Layout.astro";
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://ironlox.com/" },
+    { "@type": "ListItem", position: 2, name: "Privacy Policy", item: "https://ironlox.com/privacy" },
+  ],
+};
 ---
 
-<main class="max-w-2xl mx-auto px-6 py-16 text-sm leading-relaxed">
-  <h1 class="text-2xl font-bold mb-6">Privacy Policy</h1>
+<Layout title="Privacy Policy — Ironlox" canonicalURL="https://ironlox.com/privacy">
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)}></script>
+  <nav class="border-b border-white/[0.04] bg-surface-950/80 backdrop-blur-xl">
+    <div class="max-w-3xl mx-auto px-6 h-16 flex items-center justify-between">
+      <a href="/" class="flex items-center shrink-0" aria-label="Ironlox home">
+        <img src="/logo.svg" alt="Ironlox" class="h-8 w-auto" />
+      </a>
+      <a href="/" class="text-sm text-surface-200 hover:text-white transition-colors">&larr; Back home</a>
+    </div>
+  </nav>
 
-  <p class="text-gray-400 mb-4">Last updated: 2025</p>
+  <main class="max-w-3xl mx-auto px-6 py-16">
+    <h1 class="text-3xl font-bold text-white mb-3">Privacy Policy</h1>
+    <p class="text-sm text-surface-700 mb-10">Last updated: 2025</p>
 
-  <section class="mb-8">
-    <h2 class="text-lg font-semibold mb-2">Zero-Knowledge Architecture</h2>
-    <p class="text-gray-400">
-      Ironlox is designed with a zero-knowledge architecture. All encryption and decryption
-      of your vault data happens on your device. Your master password, encryption keys,
-      and plaintext vault contents never leave your device.
-    </p>
-  </section>
+    <section class="mb-10">
+      <h2 class="text-xl font-semibold text-white mb-3">Zero-Knowledge Architecture</h2>
+      <p class="text-surface-200 leading-relaxed text-sm">
+        Ironlox is designed with a zero-knowledge architecture. All encryption and decryption
+        of your vault data happens on your device. Your master password, encryption keys,
+        and plaintext vault contents never leave your device.
+      </p>
+    </section>
 
-  <section class="mb-8">
-    <h2 class="text-lg font-semibold mb-2">What We Store</h2>
-    <ul class="text-gray-400 mt-3 space-y-2 list-disc list-inside">
-      <li>Your email address (for account identification)</li>
-      <li>An encrypted version of your vault (AES-256-GCM, encrypted on your device)</li>
-      <li>A server-side hashed authentication token (never your master password)</li>
-      <li>Login event metadata (IP hash, timestamp, user agent) for security auditing</li>
-    </ul>
-  </section>
+    <section class="mb-10">
+      <h2 class="text-xl font-semibold text-white mb-3">What We Store</h2>
+      <ul class="text-surface-200 mt-3 space-y-2.5 text-sm list-disc list-inside leading-relaxed">
+        <li>Your email address (for account identification and communication)</li>
+        <li>An encrypted version of your vault (AES-256-GCM, encrypted on your device before transmission)</li>
+        <li>A server-side hashed authentication token (derived from your master password with a different salt)</li>
+        <li>Login event metadata (IP hash, timestamp, user agent) for security auditing and abuse prevention</li>
+        <li>Subscription status (free or premium) and billing history through Stripe</li>
+      </ul>
+    </section>
 
-  <section class="mb-8">
-    <h2 class="text-lg font-semibold mb-2">What We Never See</h2>
-    <ul class="text-gray-400 mt-3 space-y-2 list-disc list-inside">
-      <li>Your master password</li>
-      <li>Your encryption keys</li>
-      <li>Plaintext vault contents (passwords, credit cards, notes, identities)</li>
-      <li>Your authentication hash in plaintext (server-side hashed)</li>
-    </ul>
-  </section>
+    <section class="mb-10">
+      <h2 class="text-xl font-semibold text-white mb-3">What We Never See</h2>
+      <ul class="text-surface-200 mt-3 space-y-2.5 text-sm list-disc list-inside leading-relaxed">
+        <li>Your master password</li>
+        <li>Your encryption keys</li>
+        <li>Plaintext vault contents (passwords, credit cards, notes, identities)</li>
+        <li>Your authentication hash in plaintext form</li>
+        <li>Your browsing activity or which sites you use</li>
+      </ul>
+    </section>
 
-  <section class="mb-8">
-    <h2 class="text-lg font-semibold mb-2">Analytics and Tracking</h2>
-    <p class="text-gray-400">
-      We do not use any third-party analytics, tracking cookies, or advertising.
-      Server-side operational metrics (request counts, error rates) are collected
-      via Cloudflare Analytics Engine for service reliability.
-    </p>
-  </section>
+    <section class="mb-10">
+      <h2 class="text-xl font-semibold text-white mb-3">Analytics and Tracking</h2>
+      <p class="text-surface-200 leading-relaxed text-sm">
+        We do not use any third-party analytics, tracking cookies, or advertising technologies.
+        Server-side operational metrics (request counts, error rates, D1 query volume) are collected
+        via Cloudflare Analytics Engine for service reliability only. These metrics never contain
+        personal information.
+      </p>
+    </section>
 
-  <section class="mb-8">
-    <h2 class="text-lg font-semibold mb-2">Data Retention and Deletion</h2>
-    <p class="text-gray-400">
-      Your data is retained for the lifetime of your account. When you delete your
-      account, all data is permanently removed after a 7-day grace period. You may
-      cancel deletion during this period.
-    </p>
-  </section>
+    <section class="mb-10">
+      <h2 class="text-xl font-semibold text-white mb-3">Data Retention and Deletion</h2>
+      <p class="text-surface-200 leading-relaxed text-sm">
+        Your vault data and account information are retained for the lifetime of your account.
+        When you initiate account deletion, your data enters a 7-day grace period (during which
+        you may cancel deletion). After the grace period, all data is permanently and irreversibly
+        purged from D1, R2, and all backups.
+      </p>
+    </section>
 
-  <section>
-    <h2 class="text-lg font-semibold mb-2">Contact</h2>
-    <p class="text-gray-400">
-      For privacy-related inquiries, contact
-      <a href="mailto:privacy@ironlox.com" class="text-blue-400 hover:underline">privacy@ironlox.com</a>.
-    </p>
-  </section>
-</main>
+    <section class="mb-10">
+      <h2 class="text-xl font-semibold text-white mb-3">Third-Party Services</h2>
+      <p class="text-surface-200 leading-relaxed text-sm">
+        We use Stripe for payment processing. Your payment information is handled directly by Stripe
+        and never touches our servers. We use Cloudflare for infrastructure (Workers, D1, R2, KV).
+        We do not share your data with any other third parties.
+      </p>
+    </section>
+
+    <section class="mb-10">
+      <h2 class="text-xl font-semibold text-white mb-3">Legal Disclosures</h2>
+      <p class="text-surface-200 leading-relaxed text-sm">
+        We will only disclose user information if required by a valid legal process (court order,
+        subpoena, or warrant). However, due to our zero-knowledge architecture, the only data we
+        can disclose is your email address, subscription status, and an encrypted vault blob that
+        we cannot decrypt. We will notify affected users before disclosure unless prohibited by law.
+      </p>
+    </section>
+
+    <section>
+      <h2 class="text-xl font-semibold text-white mb-3">Contact</h2>
+      <p class="text-surface-200 leading-relaxed text-sm">
+        For privacy-related inquiries, contact
+        <a href="mailto:privacy@ironlox.com" class="text-brand-400 hover:underline">privacy@ironlox.com</a>.
+      </p>
+    </section>
+  </main>
+</Layout>

@@ -5,11 +5,11 @@
   "description": "Typed Hono RPC client for the Ironlox API",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ironlox/ironlox.git",
+    "url": "https://github.com/taiatiniyara/ironlox.git",
     "directory": "packages/api-client"
   },
   "bugs": {
-    "url": "https://github.com/ironlox/ironlox/issues"
+    "url": "https://github.com/taiatiniyara/ironlox/issues"
   },
   "homepage": "https://ironlox.com",
   "keywords": ["password-manager", "zero-knowledge", "hono", "rpc", "api-client"],

@@ -91,7 +91,7 @@ function AuthScreen({
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold tracking-tight">Ironlox</h1>
+          <img src="/logo.svg" alt="Ironlox" className="h-10 w-auto mx-auto mb-2" />
           <p className="text-[var(--color-text-muted)] text-sm mt-1">
             Zero-knowledge password manager
           </p>
@@ -208,7 +208,7 @@ function AppShell() {
     <div className="min-h-screen flex flex-col max-w-4xl mx-auto">
       {/* Header */}
       <header className="flex items-center justify-between px-6 py-3 border-b border-[var(--color-border)]">
-        <h1 className="text-lg font-bold">Ironlox</h1>
+        <img src="/logo.svg" alt="Ironlox" className="h-7 w-auto" />
         <div className="flex items-center gap-3">
           <button
             onClick={() => setTab("settings")}

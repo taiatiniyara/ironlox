@@ -4,6 +4,7 @@ import { createEmptyVault, generatePassword, generatePassphrase } from "@ironlox
 import { generateTotp } from "@ironlox/crypto";
 import type { Vault, VaultItem } from "@ironlox/schemas";
 import { vaultSync } from "./sync";
+import logoUrl from "data-url:~assets/logo.svg";
 
 function App() {
   const [locked, setLocked] = useState(true);
@@ -126,7 +127,7 @@ function App() {
   if (locked) {
     return (
       <div className="flex flex-col items-center justify-center h-full p-4 bg-gray-950 text-white">
-        <h1 className="text-xl font-bold mb-4">Ironlox</h1>
+        <img src={logoUrl} alt="Ironlox" className="h-8 w-auto mb-4" />
         {usePin ? (
           <>
             <p className="text-sm text-gray-400 mb-4">Enter your PIN</p>
@@ -335,7 +336,7 @@ function App() {
   return (
     <div className="flex flex-col h-full bg-gray-950 text-white">
       <div className="p-3 border-b border-gray-800 flex items-center justify-between">
-        <h1 className="text-sm font-bold">Ironlox</h1>
+        <img src={logoUrl} alt="Ironlox" className="h-5 w-auto" />
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowGenerator(true)}

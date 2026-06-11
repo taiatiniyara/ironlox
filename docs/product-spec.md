@@ -436,8 +436,12 @@ Premium-tier feature. All client-side computation.
 
 ### 18.9 Marketing Site
 
-- Separate Astro static site at `ironlox.com` (Cloudflare Pages).
-- Pages: home, privacy, security, terms, features, pricing, blog, docs/knowledge base, download (first 4 implemented).
+- Separate Astro static site at `ironlox.com` (Cloudflare Pages — deployment pending).
+- Pages implemented: Home (14-section landing with hero, features grid, how it works, social proof, security deep dive, audit & trust, comparison table, pricing toggle, FAQ, roadmap, CTA + footer), Privacy (7 sections), Terms of Service (9 sections), Security (5 sections: vulnerability disclosure, infrastructure security, supply chain).
+- Pages pending: Blog, Docs/Knowledge Base, Download (Chrome + Firefox links), Migration guides.
+- SEO complete: meta tags, Open Graph, Twitter Cards, sitemap.xml, robots.txt, structured data (Organization, SoftwareApplication, FAQPage, BreadcrumbList).
+- `.well-known/security.txt` deployed — RFC 9116 compliant.
+- Design: dark theme, Plus Jakarta Sans font, Tailwind CSS v4 with custom tokens, scroll-triggered reveal animations, responsive (mobile hamburger nav, responsive grids, responsive comparison table), accessible (skip-to-content, aria labels, prefers-reduced-motion, semantic HTML). Zero JS framework — pure Astro static output.
 - Web app at `app.ironlox.com`.
 - API at `api.ironlox.com`.
 

@@ -1,41 +1,86 @@
 ---
 import Layout from "../layouts/Layout.astro";
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://ironlox.com/" },
+    { "@type": "ListItem", position: 2, name: "Security Policy", item: "https://ironlox.com/security" },
+  ],
+};
 ---
 
-<main class="max-w-2xl mx-auto px-6 py-16 text-sm leading-relaxed">
-  <h1 class="text-2xl font-bold mb-6">Security Policy</h1>
+<Layout title="Security Policy — Ironlox" canonicalURL="https://ironlox.com/security">
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)}></script>
+  <nav class="border-b border-white/[0.04] bg-surface-950/80 backdrop-blur-xl">
+    <div class="max-w-3xl mx-auto px-6 h-16 flex items-center justify-between">
+      <a href="/" class="flex items-center shrink-0" aria-label="Ironlox home">
+        <img src="/logo.svg" alt="Ironlox" class="h-8 w-auto" />
+      </a>
+      <a href="/" class="text-sm text-surface-200 hover:text-white transition-colors">&larr; Back home</a>
+    </div>
+  </nav>
 
-  <section class="mb-8">
-    <h2 class="text-lg font-semibold mb-2">Reporting a Vulnerability</h2>
-    <p class="text-gray-400">
-      We take security seriously. If you discover a vulnerability in Ironlox,
-      please report it to
-      <a href="mailto:security@ironlox.com" class="text-blue-400 hover:underline">
-        security@ironlox.com
-      </a>.
-    </p>
-    <ul class="text-gray-400 mt-3 space-y-2 list-disc list-inside">
-      <li>Do not file a public issue.</li>
-      <li>Provide detailed steps to reproduce.</li>
-      <li>We will acknowledge your report within 48 hours.</li>
-      <li>We follow a 90-day disclosure policy.</li>
-      <li>Credit is given on our Hall of Fame for valid reports.</li>
-    </ul>
-  </section>
+  <main class="max-w-3xl mx-auto px-6 py-16">
+    <h1 class="text-3xl font-bold text-white mb-3">Security Policy</h1>
 
-  <section class="mb-8">
-    <h2 class="text-lg font-semibold mb-2">Encryption</h2>
-    <p class="text-gray-400">
-      All vault data is encrypted with AES-256-GCM before leaving the client.
-      We use Argon2id for key derivation. The server never sees plaintext data,
-      master passwords, or encryption keys.
-    </p>
-  </section>
+    <section class="mb-10">
+      <h2 class="text-xl font-semibold text-white mb-3">Reporting a Vulnerability</h2>
+      <p class="text-surface-200 leading-relaxed text-sm mb-3">
+        We take security seriously. If you discover a vulnerability in Ironlox,
+        please report it to
+        <a href="mailto:security@ironlox.com" class="text-brand-400 hover:underline">security@ironlox.com</a>.
+      </p>
+      <ul class="text-surface-200 mt-3 space-y-2.5 text-sm list-disc list-inside leading-relaxed">
+        <li>Do not file a public issue for security vulnerabilities.</li>
+        <li>Provide a detailed description with steps to reproduce.</li>
+        <li>Include any relevant proof-of-concept code or screenshots.</li>
+        <li>We will acknowledge your report within 48 hours.</li>
+        <li>We follow a 90-day coordinated disclosure policy.</li>
+        <li>Credit is given on our Hall of Fame for valid reports (opt-in).</li>
+        <li>We do not offer a bug bounty program at this time.</li>
+      </ul>
+    </section>
 
-  <section>
-    <h2 class="text-lg font-semibold mb-2">PGP Key</h2>
-    <p class="text-gray-400">
-      You may encrypt sensitive reports to our PGP key (coming soon).
-    </p>
-  </section>
-</main>
+    <section class="mb-10">
+      <h2 class="text-xl font-semibold text-white mb-3">Encryption Standards</h2>
+      <p class="text-surface-200 leading-relaxed text-sm">
+        All vault data is encrypted with AES-256-GCM before leaving the client device.
+        Key derivation uses Argon2id (memory-hard, GPU-resistant). The server receives
+        only encrypted blobs and a separate authentication hash derived with a different
+        salt. The server never has access to plaintext data, master passwords, or encryption
+        keys under any circumstances.
+      </p>
+    </section>
+
+    <section class="mb-10">
+      <h2 class="text-xl font-semibold text-white mb-3">Infrastructure Security</h2>
+      <ul class="text-surface-200 mt-3 space-y-2.5 text-sm list-disc list-inside leading-relaxed">
+        <li>All traffic is encrypted in transit via TLS 1.3.</li>
+        <li>API runs on Cloudflare Workers, benefiting from Cloudflare's DDoS protection and WAF.</li>
+        <li>Database (D1) and blob storage (R2) are encrypted at rest by Cloudflare.</li>
+        <li>Authentication uses short-lived JWT tokens (15-minute access, 7-day refresh).</li>
+        <li>Rate limiting prevents brute-force and credential-stuffing attacks.</li>
+        <li>Turnstile CAPTCHA protects signup and login endpoints from bots.</li>
+      </ul>
+    </section>
+
+    <section class="mb-10">
+      <h2 class="text-xl font-semibold text-white mb-3">Supply Chain</h2>
+      <p class="text-surface-200 leading-relaxed text-sm">
+        We minimize third-party dependencies, particularly in the crypto package.
+        All encryption uses the Web Crypto API (SubtleCrypto) &mdash; no third-party crypto
+        libraries. Dependencies are pinned to exact versions and reviewed during updates.
+      </p>
+    </section>
+
+    <section>
+      <h2 class="text-xl font-semibold text-white mb-3">PGP Key</h2>
+      <p class="text-surface-200 leading-relaxed text-sm">
+        You may encrypt sensitive reports to our PGP key (coming soon).
+        For now, use <a href="mailto:security@ironlox.com" class="text-brand-400 hover:underline">security@ironlox.com</a>.
+      </p>
+    </section>
+  </main>
+</Layout>

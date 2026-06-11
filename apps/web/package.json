@@ -5,11 +5,11 @@
   "description": "Ironlox web dashboard (React/Next.js CSR)",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ironlox/ironlox.git",
+    "url": "https://github.com/taiatiniyara/ironlox.git",
     "directory": "apps/web"
   },
   "bugs": {
-    "url": "https://github.com/ironlox/ironlox/issues"
+    "url": "https://github.com/taiatiniyara/ironlox/issues"
   },
   "homepage": "https://ironlox.com",
   "keywords": ["password-manager", "zero-knowledge", "nextjs", "react", "dashboard"],

@@ -5,11 +5,11 @@
   "description": "Zero-knowledge encryption, key derivation, and TOTP for Ironlox",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ironlox/ironlox.git",
+    "url": "https://github.com/taiatiniyara/ironlox.git",
     "directory": "packages/crypto"
   },
   "bugs": {
-    "url": "https://github.com/ironlox/ironlox/issues"
+    "url": "https://github.com/taiatiniyara/ironlox/issues"
   },
   "homepage": "https://ironlox.com",
   "keywords": ["password-manager", "zero-knowledge", "encryption", "aes-gcm", "argon2id", "totp", "security"],

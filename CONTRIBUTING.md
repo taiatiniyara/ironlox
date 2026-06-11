@@ -59,7 +59,7 @@ Add `Signed-off-by: Your Name <your@email.com>` to your commit messages.
 ### Setup
 
 ```bash
-git clone https://github.com/ironlox/ironlox.git
+git clone https://github.com/taiatiniyara/ironlox.git
 cd ironlox
 pnpm install
 cp .env.example .env

@@ -5,11 +5,11 @@
   "description": "Ironlox Cloudflare Workers API (Hono + Hono RPC)",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ironlox/ironlox.git",
+    "url": "https://github.com/taiatiniyara/ironlox.git",
     "directory": "apps/worker"
   },
   "bugs": {
-    "url": "https://github.com/ironlox/ironlox/issues"
+    "url": "https://github.com/taiatiniyara/ironlox/issues"
   },
   "homepage": "https://ironlox.com",
   "keywords": ["password-manager", "zero-knowledge", "cloudflare-workers", "hono", "api"],

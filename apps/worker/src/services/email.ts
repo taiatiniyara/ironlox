@@ -52,6 +52,7 @@ export function getVerificationEmail(
     htmlBody: `
       <html>
         <body style="font-family: Inter, sans-serif; background: #111; color: #eee; padding: 20px;">
+          <img src="https://ironlox.com/logo.svg" alt="Ironlox" style="height: 28px; margin-bottom: 16px;" />
           <h1 style="color: #fff;">Welcome to Ironlox</h1>
           <p>Your verification code is:</p>
           <p style="font-size: 24px; font-family: JetBrains Mono, monospace; letter-spacing: 4px; color: #fff;">${code}</p>
@@ -71,6 +72,7 @@ export function getLoginAlertEmail(
     htmlBody: `
       <html>
         <body style="font-family: Inter, sans-serif; background: #111; color: #eee; padding: 20px;">
+          <img src="https://ironlox.com/logo.svg" alt="Ironlox" style="height: 28px; margin-bottom: 16px;" />
           <h1 style="color: #fff;">New Login Detected</h1>
           <p style="color: #ff6b6b; font-weight: bold;">A new device logged into your Ironlox account.</p>
           <table style="color: #ccc;">
@@ -94,6 +96,7 @@ export function getDeletionEmail(
     htmlBody: `
       <html>
         <body style="font-family: Inter, sans-serif; background: #111; color: #eee; padding: 20px;">
+          <img src="https://ironlox.com/logo.svg" alt="Ironlox" style="height: 28px; margin-bottom: 16px;" />
           <h1 style="color: #ff6b6b;">Account Deletion Initiated</h1>
           <p>Your Ironlox account will be permanently deleted in <strong>${daysRemaining} days</strong>.</p>
           <p>To cancel the deletion, log into your account before the grace period expires.</p>

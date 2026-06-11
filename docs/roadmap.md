@@ -2,7 +2,7 @@
 
 > **Status key**: ✅ complete &nbsp; 🔶 partial / stub &nbsp; ❌ not started
 >
-> **Overall**: Foundation (Phase 0) done. Core Backend (Phase 1) done except MFA/recovery (all 501 stubs). Web app and extension in early prototype — single-file implementations with working UIs. Marketing site has 4 pages. No deployment infra filled in yet (Cloudflare resource IDs, secrets all blank).
+> **Overall**: Foundation (Phase 0) done. Core Backend (Phase 1) done except MFA/recovery (all 501 stubs). Web app and extension in early prototype — single-file implementations with working UIs. Marketing site is content-complete with polished landing page, legal pages, SEO, and security.txt. No deployment infra filled in yet (Cloudflare resource IDs, secrets all blank).
 
 ---
 
@@ -216,17 +216,26 @@
 
 ### Astro Static Site (`apps/marketing`)
 - [ ] Deploy to Cloudflare Pages (`ironlox.com`) ❌
-- [x] Home page ✅
-- [ ] Features page ❌
-- [ ] Pricing page ❌
+- [x] Home page — 14-section landing: hero, features grid, how it works, social proof, security deep dive, audit & trust, comparison table, pricing toggle, FAQ, roadmap, CTA + footer ✅
+- [x] Features grid — inline on home page (6 cards + comparison table + trust bar + security deep dive) 🔶
+- [x] Pricing — inline on home page with monthly/annual toggle ✅
 - [ ] Blog ❌
 - [ ] Docs/Knowledge Base ❌
 - [ ] Download (Chrome + Firefox extension links) ❌
-- [ ] SEO: meta tags, Open Graph, sitemap.xml, robots.txt ❌
-- [ ] `security.txt` at `.well-known/security.txt` ❌
-- [x] Privacy policy ✅
-- [x] Terms of Service ✅
+- [x] SEO — meta tags, Open Graph, Twitter Cards, sitemap.xml, robots.txt, structured data (Organization, SoftwareApplication, FAQPage, BreadcrumbList) ✅
+- [x] `security.txt` at `.well-known/security.txt` — RFC 9116 compliant ✅
+- [x] Privacy policy — 7 sections, dark theme, breadcrumb schema ✅
+- [x] Terms of Service — 9 sections, dark theme, breadcrumb schema ✅
+- [x] Security policy — 5 sections (vulnerability disclosure, infrastructure security, supply chain) ✅
 - [ ] Migration guides: 1Password, Bitwarden, LastPass, Chrome ❌
+
+### Design & Quality
+- [x] Dark theme with brand color palette (Plus Jakarta Sans font) ✅
+- [x] Scroll-triggered reveal animations (IntersectionObserver) ✅
+- [x] Responsive: mobile hamburger nav, responsive grid cards, responsive comparison table ✅
+- [x] Accessibility: skip-to-content, aria labels, prefers-reduced-motion, semantic HTML ✅
+- [x] Tailwind CSS v4 with custom theme tokens ✅
+- [x] Zero JS framework — pure Astro static, inline scripts only for animations + billing toggle ✅
 
 ---
 

@@ -2,7 +2,7 @@
 
 Zero-knowledge consumer password manager. Encryption happens client-side only — the server never sees your plaintext.
 
-[![CI](https://github.com/ironlox/ironlox/actions/workflows/ci.yml/badge.svg)](https://github.com/ironlox/ironlox/actions/workflows/ci.yml)
+[![CI](https://github.com/taiatiniyara/ironlox/actions/workflows/ci.yml/badge.svg)](https://github.com/taiatiniyara/ironlox/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 ## Features

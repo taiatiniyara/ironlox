@@ -5,14 +5,20 @@
   "description": "Ironlox marketing site (Astro static)",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ironlox/ironlox.git",
+    "url": "https://github.com/taiatiniyara/ironlox.git",
     "directory": "apps/marketing"
   },
   "bugs": {
-    "url": "https://github.com/ironlox/ironlox/issues"
+    "url": "https://github.com/taiatiniyara/ironlox/issues"
   },
   "homepage": "https://ironlox.com",
-  "keywords": ["password-manager", "zero-knowledge", "astro", "marketing", "landing-page"],
+  "keywords": [
+    "password-manager",
+    "zero-knowledge",
+    "astro",
+    "marketing",
+    "landing-page"
+  ],
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
@@ -22,7 +28,9 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "astro": "^6.4.6"
+    "@tailwindcss/vite": "^4.3.0",
+    "astro": "^6.4.6",
+    "tailwindcss": "^4.1.0"
   },
   "devDependencies": {
     "@ironlox/tsconfig": "workspace:*",

@@ -23,4 +23,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Crypto test suite: unit tests + property-based tests (fast-check) + known-vector tests (AES-GCM, Argon2id, TOTP RFC 6238)
 - Zero-knowledge architecture: client-side encryption only, server never sees plaintext
 
-[Unreleased]: https://github.com/ironlox/ironlox/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/taiatiniyara/ironlox/compare/v0.1.0...HEAD

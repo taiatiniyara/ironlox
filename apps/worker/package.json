@@ -33,7 +33,7 @@
   },
   "devDependencies": {
     "@ironlox/tsconfig": "workspace:*",
-    "@cloudflare/workers-types": "^4.20250403.0",
+    "@cloudflare/workers-types": "^4.20260611.1",
     "wrangler": "^4.6.0",
     "vitest": "^4.1.8",
     "miniflare": "^4.20250403.0",

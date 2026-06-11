@@ -1,11 +1,18 @@
 // Ironlox — Content Script
-// Injected into every page to detect login forms and autofill credentials.
 
 import { detectLoginForm } from "@ironlox/autofill";
 import type { DetectedForm } from "@ironlox/autofill";
 
-// Listen for autofill requests from popup or keyboard shortcut
-chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+interface AutofillMessage {
+  type: "DETECT_FORMS" | "AUTOFILL";
+  username?: string;
+  password?: string;
+  totp?: string;
+}
+
+chrome.runtime.onMessage.addListener(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (message: AutofillMessage, _sender: chrome.runtime.MessageSender, sendResponse: (response: any) => void) => {
   if (message.type === "DETECT_FORMS") {
     const forms = detectLoginForm();
     sendResponse({ forms: serializeForms(forms) });
@@ -56,7 +63,7 @@ function fillForm(form: DetectedForm, username: string, password: string, totp?:
             totpInput.dispatchEvent(new Event("input", { bubbles: true }));
           }
         }
-        (el as HTMLButtonElement).click();
+        (el as unknown as HTMLButtonElement).click();
       }, 200);
     }
   }
@@ -106,12 +113,12 @@ function setNativeValue(el: HTMLInputElement, value: string): void {
 
 function serializeForms(
   forms: DetectedForm[],
-): Array<{ confidence: number; fields: Array<{ type: string; name?: string }> }> {
+): Array<{ confidence: number; fields: Array<{ type: string; name: string | undefined }> }> {
   return forms.map((f) => ({
     confidence: f.confidence,
     fields: f.fields.map((field) => ({
       type: field.type,
-      name: field.name,
+      name: field.name ?? undefined,
     })),
   }));
 }

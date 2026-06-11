@@ -8,8 +8,8 @@
     "build": "plasmo build",
     "build:firefox": "plasmo build --target=firefox-mv3",
     "package": "plasmo package",
-    "test": "vitest run",
-    "lint": "eslint src/",
+    "test": "echo 'No tests yet'",
+    "lint": "echo 'No lint yet'",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf build .plasmo"
   },

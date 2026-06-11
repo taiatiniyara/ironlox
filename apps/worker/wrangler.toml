@@ -5,7 +5,7 @@ compatibility_date = "2025-04-01"
 [[d1_databases]]
 binding = "DB"
 database_name = "ironlox"
-database_id = ""
+database_id = "e5913e09-0ba6-40bb-8e9d-bccc4c012f49"
 
 [[r2_buckets]]
 binding = "VAULT"
@@ -13,19 +13,26 @@ bucket_name = "ironlox-vault"
 
 [[kv_namespaces]]
 binding = "KV"
-id = ""
+id = "0521df9480d94268bc30b19c6f8a5c41"
 
 [vars]
-JWT_SECRET = ""
-TURNSTILE_SECRET_KEY = ""
-STRIPE_SECRET_KEY = ""
-STRIPE_WEBHOOK_SECRET = ""
-MAILCHANNELS_API_KEY = ""
-SENTRY_DSN = ""
 API_URL = "https://api.ironlox.com"
 CORS_ORIGINS = "https://app.ironlox.com,https://ironlox.com"
 
 [env.production]
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "ironlox"
+database_id = "e5913e09-0ba6-40bb-8e9d-bccc4c012f49"
+
+[[env.production.r2_buckets]]
+binding = "VAULT"
+bucket_name = "ironlox-vault"
+
+[[env.production.kv_namespaces]]
+binding = "KV"
+id = "0521df9480d94268bc30b19c6f8a5c41"
+
 [env.production.vars]
 API_URL = "https://api.ironlox.com"
 CORS_ORIGINS = "https://app.ironlox.com,https://ironlox.com"

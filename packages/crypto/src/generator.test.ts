@@ -12,7 +12,7 @@ describe("Password generator", () => {
     expect(pw).toMatch(/[A-Z]/);
     expect(pw).toMatch(/[a-z]/);
     expect(pw).toMatch(/[0-9]/);
-    expect(pw).toMatch(/[!@#$%^&*()_+\-=\[\]{}|;:,.<>?]/);
+    expect(pw).toMatch(/[\]!@#$%^&*()_+=[{}|;:,.<>?-]/);
   });
 
   it("generates lowercase-only password", () => {

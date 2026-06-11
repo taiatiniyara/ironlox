@@ -66,12 +66,20 @@ export function generatePassword(options: PasswordOptions = {}): string {
 
   const password = Array.from(chars, (byte) => charset[byte % charset.length]!);
 
-  // Replace first N characters with one from each selected set
-  let pos = 0;
-  if (uppercase) password[pos++] = randomChar(UPPERCASE);
-  if (lowercase) password[pos++] = randomChar(LOWERCASE);
-  if (numbers) password[pos++] = randomChar(NUMBERS);
-  if (symbols) password[pos++] = randomChar(SYMBOLS);
+  // Ensure at least one of each requested set at positions 0-3
+  let idx = 0;
+  const sets: Array<{ enabled: boolean; chars: string }> = [
+    { enabled: uppercase, chars: UPPERCASE },
+    { enabled: lowercase, chars: LOWERCASE },
+    { enabled: numbers, chars: NUMBERS },
+    { enabled: symbols, chars: SYMBOLS },
+  ];
+  for (const set of sets) {
+    if (set.enabled) {
+      password[idx] = randomChar(set.chars);
+      idx++;
+    }
+  }
 
   // Shuffle to randomize guaranteed character positions
   return fisherYatesShuffle(password).join("");

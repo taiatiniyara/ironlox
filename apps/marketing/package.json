@@ -11,10 +11,10 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "astro": "^5.5.0"
+    "astro": "^6.4.6"
   },
   "devDependencies": {
     "@ironlox/tsconfig": "workspace:*",
-    "typescript": "^5.8.3"
+    "typescript": "^6.0.3"
   }
 }

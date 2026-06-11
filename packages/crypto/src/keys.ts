@@ -31,7 +31,7 @@ export async function deriveEncryptionKey(
   masterPassword: string,
   salt: Uint8Array,
 ): Promise<Uint8Array> {
-  const { argon2id } = await import("@noble/hashes/argon2");
+  const { argon2id } = await import("@noble/hashes/argon2.js");
   const encoder = new TextEncoder();
 
   const hash = argon2id(encoder.encode(masterPassword), salt, {
@@ -61,7 +61,7 @@ export async function deriveAuthHash(
   email: string,
   salt: Uint8Array,
 ): Promise<Uint8Array> {
-  const { argon2id } = await import("@noble/hashes/argon2");
+  const { argon2id } = await import("@noble/hashes/argon2.js");
   const encoder = new TextEncoder();
 
   const input = encoder.encode(`${email.toLowerCase()}:${masterPassword}`);

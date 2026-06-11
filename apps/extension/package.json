@@ -18,18 +18,18 @@
     "@ironlox/crypto": "workspace:*",
     "@ironlox/autofill": "workspace:*",
     "@ironlox/api-client": "workspace:*",
-    "plasmo": "^0.90.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "tailwindcss": "^4.0.0",
+    "plasmo": "^0.90.5",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "tailwindcss": "^4.1.0",
     "fuse.js": "^7.0.0"
   },
   "devDependencies": {
     "@ironlox/tsconfig": "workspace:*",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "@types/chrome": "^0.0.300",
-    "typescript": "^5.8.3",
-    "vitest": "^3.0.0"
+    "@types/chrome": "^0.1.43",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.8"
   }
 }

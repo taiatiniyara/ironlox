@@ -1,8 +1,7 @@
 // Ironlox Browser Extension — Background Service Worker
-// Handles autofill requests and sync
 
 chrome.runtime.onInstalled.addListener(() => {
-  console.log("Ironlox extension installed");
+  // Extension installed successfully
 });
 
 // Listen for messages from popup

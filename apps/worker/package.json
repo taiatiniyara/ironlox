@@ -17,15 +17,15 @@
     "@ironlox/schemas": "workspace:*",
     "@ironlox/crypto": "workspace:*",
     "hono": "^4.7.0",
-    "@hono/zod-openapi": "^0.18.0",
-    "zod": "^3.24.0"
+    "@hono/zod-openapi": "^1.4.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@ironlox/tsconfig": "workspace:*",
     "@cloudflare/workers-types": "^4.20250403.0",
     "wrangler": "^4.6.0",
-    "vitest": "^3.0.0",
+    "vitest": "^4.1.8",
     "miniflare": "^4.20250403.0",
-    "typescript": "^5.8.3"
+    "typescript": "^6.0.3"
   }
 }

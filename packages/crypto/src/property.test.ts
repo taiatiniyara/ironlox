@@ -19,9 +19,9 @@ describe("AES-GCM property-based tests", () => {
     );
   });
 
-  it("decrypt(encrypt(x)) === x for unicode strings", async () => {
+  it("decrypt(encrypt(x)) === x for all character types", async () => {
     await fc.assert(
-      fc.asyncProperty(fc.fullUnicodeString(), async (plaintext) => {
+      fc.asyncProperty(fc.string({ unit: "binary" }), async (plaintext) => {
         const encrypted = await aesEncrypt(plaintext, key);
         const decrypted = await aesDecrypt(encrypted, key);
         return decrypted === plaintext;

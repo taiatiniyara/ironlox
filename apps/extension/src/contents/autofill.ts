@@ -53,18 +53,13 @@ function fillForm(form: DetectedForm, username: string, password: string, totp?:
     }
 
     if (field.type === "submit") {
-      setTimeout(() => {
-        // Submit after a short delay to let React/Angular catch up
-        if (totp) {
-          // Find the next input after the password field (likely TOTP)
-          const totpInput = findTotpField();
-          if (totpInput) {
-            setNativeValue(totpInput, totp);
-            totpInput.dispatchEvent(new Event("input", { bubbles: true }));
-          }
+      if (totp) {
+        const totpInput = findTotpField();
+        if (totpInput) {
+          setNativeValue(totpInput, totp);
+          totpInput.dispatchEvent(new Event("input", { bubbles: true }));
         }
-        (el as unknown as HTMLButtonElement).click();
-      }, 200);
+      }
     }
   }
 }

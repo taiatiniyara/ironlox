@@ -1,0 +1,7 @@
+Contact: mailto:security@ironlox.com
+Expires: 2026-12-31T23:59:59Z
+Preferred-Languages: en
+Canonical: https://ironlox.com/.well-known/security.txt
+Policy: https://ironlox.com/security
+Encryption: https://ironlox.com/security
+Acknowledgments: https://ironlox.com/security

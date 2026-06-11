@@ -1,0 +1,41 @@
+name: Release Extension
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Extension version bump (patch, minor, major)"
+        required: true
+        default: "patch"
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run typecheck --filter=@ironlox/extension
+      - run: pnpm run build --filter=@ironlox/extension
+        env:
+          PLASMO_PUBLIC_API_URL: ${{ secrets.PLASMO_PUBLIC_API_URL }}
+      - run: pnpm run build:firefox --filter=@ironlox/extension
+        env:
+          PLASMO_PUBLIC_API_URL: ${{ secrets.PLASMO_PUBLIC_API_URL }}
+      - run: pnpm run package --filter=@ironlox/extension
+      - uses: actions/upload-artifact@v4
+        with:
+          name: extension-builds
+          path: apps/extension/build/*.zip
+          retention-days: 30

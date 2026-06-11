@@ -5,9 +5,11 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 
 // Listen for messages from popup
-chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (!sender.id || sender.id !== chrome.runtime.id) {
+    return;
+  }
   if (message.type === "AUTOFILL") {
-    // The autofill logic will be handled by the content script
     sendResponse({ success: true });
   }
   return true;

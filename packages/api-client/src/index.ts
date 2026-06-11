@@ -44,12 +44,40 @@ export class ApiClient {
     return this.post("/auth/register", body);
   }
 
-  async login(body: { email: string; authHash: string }): Promise<LoginResponse> {
+  async login(body: { email: string; authHash: string; turnstileToken?: string }): Promise<LoginResponse> {
     return this.post("/auth/login", body);
   }
 
-  async refresh(body: { refreshToken: string }): Promise<LoginResponse> {
-    return this.post("/auth/refresh", body, false);
+  async refresh(): Promise<LoginResponse> {
+    if (!this.config.refreshToken) {
+      throw new ApiError(401, "No refresh token available");
+    }
+    try {
+      const result = await this.post<LoginResponse>("/auth/refresh", { refreshToken: this.config.refreshToken }, false);
+      if (this.config.onTokenRefresh) {
+        this.config.onTokenRefresh({ accessToken: result.accessToken, refreshToken: result.refreshToken });
+      }
+      return result;
+    } catch (error) {
+      this.clearTokens();
+      throw error;
+    }
+  }
+
+  async mfaEnable(body: { secret: string; code: string }): Promise<void> {
+    return this.post("/auth/mfa/enable", body);
+  }
+
+  async mfaVerify(body: { code: string; email: string }): Promise<LoginResponse> {
+    return this.post("/auth/mfa/verify", body, false);
+  }
+
+  async changeEmail(body: { newEmail: string; authHash: string }): Promise<void> {
+    return this.post("/account/email", body);
+  }
+
+  async recover(body: { recoveryKey: string; email: string }): Promise<LoginResponse> {
+    return this.post("/auth/recover", body, false);
   }
 
   // --- Vault ---
@@ -115,6 +143,7 @@ export class ApiClient {
     path: string,
     body?: unknown,
     auth = true,
+    _retry = true,
   ): Promise<T> {
     const headers: Record<string, string> = {
       "Content-Type": "application/json",

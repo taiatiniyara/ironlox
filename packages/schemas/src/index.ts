@@ -4,19 +4,19 @@ export const LoginFieldsSchema = z.object({
   uris: z.array(z.string().url()).max(3).optional(),
   username: z.string(),
   password: z.string(),
-  previousPasswords: z.array(z.string()).max(5).optional(),
-  totpSecret: z.string().optional(),
-  notes: z.string().optional(),
+  previousPasswords: z.array(z.string().max(256)).max(5).optional(),
+  totpSecret: z.string().max(256).optional(),
+  notes: z.string().max(10000).optional(),
 });
 
 export const CardFieldsSchema = z.object({
-  cardholder: z.string(),
-  number: z.string(),
-  expiryMonth: z.string(),
-  expiryYear: z.string(),
-  cvv: z.string(),
-  brand: z.string().optional(),
-  notes: z.string().optional(),
+  cardholder: z.string().max(200),
+  number: z.string().max(32),
+  expiryMonth: z.string().max(2),
+  expiryYear: z.string().max(4),
+  cvv: z.string().max(4),
+  brand: z.string().max(50).optional(),
+  notes: z.string().max(10000).optional(),
 });
 
 export const NoteFieldsSchema = z.object({
@@ -63,16 +63,16 @@ export const VaultSchema = z.object({
 
 // API request/response schemas
 export const RegisterRequestSchema = z.object({
-  email: z.string().email(),
-  authHash: z.string(),
-  authSalt: z.string(),
-  encryptionSalt: z.string(),
-  wrappedVaultKey: z.string(),
+  email: z.string().email().max(320),
+  authHash: z.string().min(64).max(128),
+  authSalt: z.string().min(16).max(128),
+  encryptionSalt: z.string().min(16).max(128),
+  wrappedVaultKey: z.string().min(1).max(2048),
 });
 
 export const LoginRequestSchema = z.object({
-  email: z.string().email(),
-  authHash: z.string(),
+  email: z.string().email().max(320),
+  authHash: z.string().min(64).max(128),
 });
 
 export const LoginResponseSchema = z.object({
@@ -100,12 +100,12 @@ export const MfaVerifyRequestSchema = z.object({
 });
 
 export const WebAuthnRegisterRequestSchema = z.object({
-  credential: z.unknown(),
+  credential: z.object({}).passthrough(),
 });
 
 export const WebAuthnVerifyRequestSchema = z.object({
-  credential: z.unknown(),
-  email: z.string().email(),
+  credential: z.object({}).passthrough(),
+  email: z.string().email().max(320),
 });
 
 export const RecoveryRequestSchema = z.object({
@@ -143,11 +143,11 @@ export const AccountInfoResponseSchema = z.object({
 });
 
 export const ChangePasswordRequestSchema = z.object({
-  currentEncryptionSalt: z.string(),
-  newEncryptionSalt: z.string(),
-  newWrappedVaultKey: z.string(),
-  newAuthHash: z.string(),
-  newAuthSalt: z.string(),
+  currentEncryptionSalt: z.string().min(16).max(128),
+  newEncryptionSalt: z.string().min(16).max(128),
+  newWrappedVaultKey: z.string().min(1).max(2048),
+  newAuthHash: z.string().min(64).max(128),
+  newAuthSalt: z.string().min(16).max(128),
 });
 
 export const ChangeEmailRequestSchema = z.object({

@@ -12,8 +12,8 @@ Zero-knowledge consumer password manager. Encryption happens client-side only �
 - **Argon2id** key derivation with separate salts for auth and encryption
 - Browser extension with autofill support (Chrome + Firefox)
 - Web dashboard for vault management
-- TOTP 2FA support
-- Secure credential sharing with zero-knowledge guarantees
+- TOTP generator (client-side, API MFA endpoints planned)
+- Password/passphrase generator
 - Import/export from other password managers
 
 ## Architecture
@@ -28,7 +28,7 @@ User → Marketing Site (Astro, static) → ironlox.com
 Cloudflare Workers (Hono) → D1 (metadata) + R2 (blobs) + KV (flags/limits)
 ```
 
-All client-server communication uses typed [Hono RPC](https://hono.dev/docs/guides/rpc) with [Zod](https://zod.dev/) validation.
+All client-server communication uses [Hono](https://hono.dev/) with [Zod](https://zod.dev/) validation (typed Hono RPC client planned).
 
 ## Project Structure
 
@@ -43,7 +43,8 @@ ironlox/
 │   ├── crypto/          # Encryption, key derivation, TOTP
 │   ├── schemas/         # Zod schemas, shared types
 │   ├── autofill/        # Form detection, URL matching
-│   └── api-client/      # Typed Hono RPC client
+│   ├── api-client/      # Typed HTTP client (Hono RPC planned)
+│   └── tsconfig/        # Shared TypeScript base config
 └── docs/                 # Product spec, roadmap
 ```
 

@@ -117,7 +117,13 @@ export function exportVaultToCsv(vault: Vault): string {
       "notes" in fields ? (fields.notes ?? "") : "",
       item.tags.join(";"),
     ];
-    return row.map((v) => `"${v.replace(/"/g, '""')}"`).join(",");
+    return row.map((v) => {
+      const escaped = v.replace(/"/g, '""');
+      const safe = escaped.startsWith("=") || escaped.startsWith("+") || escaped.startsWith("-") || escaped.startsWith("@")
+        ? "'" + escaped
+        : escaped;
+      return `"${safe}"`;
+    }).join(",");
   });
 
   return [headers.join(","), ...rows].join("\n");

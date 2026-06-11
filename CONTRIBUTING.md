@@ -96,7 +96,7 @@ The most critical package. Changes must be reviewed carefully:
 - Constant-time comparison for all secret values
 - Every function must have: unit tests with known vectors, property-based tests, and JSDoc with algorithm reference
 
-**Crypto tests must maintain 100% branch coverage. CI will reject any drop.**
+**Crypto tests must maintain 100% branch coverage (coverage gate not yet enforced in CI).**
 
 ### Worker (`apps/worker`)
 

@@ -6,6 +6,7 @@ import { vaultRoutes } from "./routes/vault.js";
 import { accountRoutes } from "./routes/account.js";
 import { healthRoute } from "./routes/health.js";
 import { webhookRoutes } from "./routes/webhooks.js";
+import { mfaRoutes } from "./routes/mfa.js";
 import { errorHandler } from "./middleware/error.js";
 import { logger } from "./middleware/logger.js";
 import { securityHeaders } from "./middleware/security.js";
@@ -44,10 +45,13 @@ app.use("*", cors({
 app.use("*", securityHeaders);
 app.use("*", logger);
 app.use("/auth/*", rateLimitMiddleware);
+app.use("/vault/*", rateLimitMiddleware);
+app.use("/account/*", rateLimitMiddleware);
 app.onError(errorHandler);
 
 app.route("/health", healthRoute);
 app.route("/auth", authRoutes);
+app.route("/auth", mfaRoutes);
 app.route("/vault", vaultRoutes);
 app.route("/account", accountRoutes);
 app.route("/webhooks", webhookRoutes);

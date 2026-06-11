@@ -7,12 +7,6 @@ interface SendEmailParams {
   textBody: string;
 }
 
-/**
- * Send transactional email via MailChannels from Cloudflare Workers.
- * MailChannels is free for Cloudflare Workers with a special header.
- *
- * @see https://blog.cloudflare.com/sending-email-from-workers-with-mailchannels/
- */
 export async function sendEmail(
   env: Env,
   params: SendEmailParams,
@@ -28,9 +22,6 @@ export async function sendEmail(
         personalizations: [
           {
             to: [{ email: params.to, name: params.to.split("@")[0] }],
-            dkim_domain: "ironlox.com",
-            dkim_selector: "mailchannels",
-            dkim_private_key: env.MAILCHANNELS_API_KEY,
           },
         ],
         from: {
@@ -46,8 +37,7 @@ export async function sendEmail(
     });
 
     return response.ok;
-  } catch (error) {
-    console.error("Failed to send email:", error);
+  } catch {
     return false;
   }
 }

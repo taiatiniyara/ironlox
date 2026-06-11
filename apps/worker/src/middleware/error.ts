@@ -4,14 +4,6 @@ import type { ContentfulStatusCode } from "hono/utils/http-status";
 type AppContext = Context;
 
 export function errorHandler(err: Error, c: AppContext): Response {
-  const sanitizedMessage = err.message.replace(/[A-Za-z0-9+/]{32,}/g, "[REDACTED]");
-
-  console.error("API Error:", {
-    message: sanitizedMessage,
-    path: c.req.path,
-    method: c.req.method,
-  });
-
   if (err instanceof ValidationError) {
     return c.json({ message: "Invalid request", code: "VALIDATION_ERROR" }, 400);
   }

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 
 import { createEmptyVault, generatePassword, generatePassphrase } from "@ironlox/crypto";
+import { generateTotp } from "@ironlox/crypto";
 import type { Vault, VaultItem } from "@ironlox/schemas";
 import { vaultSync } from "./sync";
 
@@ -17,6 +18,8 @@ function App() {
   const [showGenerator, setShowGenerator] = useState(false);
   const [, setVaultVersion] = useState(1);
   const [lastSynced, setLastSynced] = useState<number | null>(null);
+  const [totpCode, setTotpCode] = useState("");
+  const [, setTotpRemaining] = useState(30);
 
   // Generate password state
   const [genType, setGenType] = useState<"random" | "passphrase">("random");
@@ -47,6 +50,33 @@ function App() {
   useEffect(() => {
     regen();
   }, [regen]);
+
+  useEffect(() => {
+    if (!selectedItem || !("totpSecret" in selectedItem.fields) || !selectedItem.fields.totpSecret) {
+      setTotpCode("");
+      return;
+    }
+    const secret = selectedItem.fields.totpSecret;
+    let cancelled = false;
+
+    async function refreshTotp(): Promise<void> {
+      const code = await generateTotp(secret);
+      if (cancelled) return;
+      setTotpCode(code);
+      const seconds = new Date().getSeconds();
+      setTotpRemaining(30 - (seconds % 30));
+    }
+
+    void refreshTotp();
+    const interval = setInterval(() => {
+      void refreshTotp();
+    }, 1000);
+
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [selectedItem]);
 
   const unlock = useCallback(async () => {
     if (!masterPassword) return;
@@ -279,8 +309,15 @@ function App() {
           {"totpSecret" in fields && fields.totpSecret && (
             <div className="bg-gray-900 rounded p-2">
               <p className="text-xs text-gray-500">2FA Code</p>
-              <p className="text-lg font-mono tracking-widest">------</p>
-              <p className="text-xs text-gray-500 mt-1">Copy code</p>
+              <p className="text-lg font-mono tracking-widest">
+                {totpCode || "------"}
+              </p>
+              <button
+                onClick={() => totpCode && handleCopy(totpCode)}
+                className="text-xs text-gray-500 hover:text-white mt-1"
+              >
+                Copy code
+              </button>
             </div>
           )}
 
@@ -358,10 +395,12 @@ function App() {
 
       <div className="p-2 border-t border-gray-800">
         <button
-          onClick={() => {}}
+          onClick={() => {
+            navigator.clipboard.writeText(generatedValue || generatePassword());
+          }}
           className="w-full py-2 bg-white text-black rounded text-sm font-medium hover:bg-gray-200"
         >
-          + Add Item
+          + Copy Generated Password
         </button>
       </div>
     </div>

@@ -4,14 +4,15 @@ import { authMiddleware } from "../middleware/auth.js";
 import { ConflictError, ValidationError, QuotaError } from "../middleware/error.js";
 import { PutVaultRequestSchema } from "@ironlox/schemas";
 
+const MAX_VAULT_SIZE = 10 * 1024 * 1024; // 10MB max vault blob
+
 const app = new Hono<{ Bindings: Env; Variables: Variables }>();
 
 app.use("*", authMiddleware);
 
 /**
  * GET /vault
- * Returns a signed URL to download the encrypted vault blob from R2,
- * plus the current vault version for optimistic locking.
+ * Returns the encrypted vault blob URL and current vault version.
  */
 app.get("/", async (c) => {
   const userId = c.get("userId") as string;
@@ -43,59 +44,97 @@ app.get("/", async (c) => {
 /**
  * PUT /vault
  * Upload an encrypted vault blob to R2.
- * Optimistic locking: client must send the version they're overwriting.
- * If the server's version is higher, the request is rejected (409 Conflict).
+ * Uses optimistic locking: client sends current version, server checks for conflicts.
+ * Body is a JSON envelope with { version } followed by a vaultBlob field.
  */
 app.put("/", async (c) => {
   const userId = c.get("userId") as string;
 
-  const body = await c.req.json();
-  const parsed = PutVaultRequestSchema.safeParse(body);
-  if (!parsed.success) {
-    throw new ValidationError("Invalid vault upload data");
+  const contentLength = parseInt(c.req.header("Content-Length") ?? "0");
+  if (contentLength > MAX_VAULT_SIZE) {
+    throw new ValidationError("Vault blob exceeds maximum size");
   }
 
-  const { version } = parsed.data;
-
-  // Optimistic locking: verify client version matches server version
-  const current = await c.env.DB.prepare(
-    "SELECT vault_version FROM users WHERE id = ?",
-  )
-    .bind(userId)
-    .first<{ vault_version: number }>();
-
-  if (!current) {
-    throw new ValidationError("User not found");
+  const rawBody = await c.req.text();
+  if (rawBody.length > MAX_VAULT_SIZE) {
+    throw new ValidationError("Vault blob exceeds maximum size");
   }
 
-  if (version !== current.vault_version) {
-    throw new ConflictError(
-      "Vault version conflict. Pull the latest vault before uploading.",
-    );
+  let version: number;
+  let vaultBlob: string;
+
+  try {
+    const parsed = JSON.parse(rawBody);
+    const validated = PutVaultRequestSchema.safeParse(parsed);
+    if (!validated.success) {
+      throw new ValidationError("Invalid vault upload data");
+    }
+    version = validated.data.version;
+    vaultBlob = parsed.vaultBlob ?? rawBody;
+  } catch {
+    vaultBlob = rawBody;
+    const headerVersion = c.req.header("X-Vault-Version");
+    if (!headerVersion) {
+      throw new ValidationError("Missing vault version");
+    }
+    version = parseInt(headerVersion);
+    if (isNaN(version)) {
+      throw new ValidationError("Invalid vault version");
+    }
   }
 
-  const newVersion = current.vault_version + 1;
+  const key = `vault-lock:${userId}`;
+  const locked = await c.env.KV.get(key);
+  if (locked) {
+    throw new ConflictError("Another vault upload is in progress. Please retry.");
+  }
 
-  // Store vault blob directly from request body
-  const vaultContent = await c.req.text();
-  await c.env.VAULT.put(`${userId}/vault`, vaultContent);
+  await c.env.KV.put(key, "1", { expirationTtl: 30 });
 
-  await c.env.DB.prepare(
-    "UPDATE users SET vault_version = ?, updated_at = ? WHERE id = ?",
-  )
-    .bind(newVersion, new Date().toISOString(), userId)
-    .run();
+  try {
+    const current = await c.env.DB.prepare(
+      "SELECT vault_version FROM users WHERE id = ?",
+    )
+      .bind(userId)
+      .first<{ vault_version: number }>();
 
-  return c.json({ version: newVersion });
+    if (!current) {
+      throw new ValidationError("User not found");
+    }
+
+    if (version !== current.vault_version) {
+      throw new ConflictError(
+        "Vault version conflict. Pull the latest vault before uploading.",
+      );
+    }
+
+    const newVersion = current.vault_version + 1;
+
+    await c.env.VAULT.put(`${userId}/vault`, vaultBlob);
+
+    await c.env.DB.prepare(
+      "UPDATE users SET vault_version = ?, updated_at = ? WHERE id = ? AND vault_version = ?",
+    )
+      .bind(newVersion, new Date().toISOString(), userId, current.vault_version)
+      .run();
+
+    return c.json({ version: newVersion });
+  } finally {
+    await c.env.KV.delete(key);
+  }
 });
 
 /**
  * GET /vault/attachment/:id
- * Get a signed URL for an attachment download.
+ * Get an attachment download URL.
  */
 app.get("/attachment/:id", async (c) => {
   const userId = c.get("userId") as string;
   const attachmentId = c.req.param("id");
+
+  if (!/^[a-zA-Z0-9_-]+$/.test(attachmentId)) {
+    throw new ValidationError("Invalid attachment ID");
+  }
 
   const object = await c.env.VAULT.get(`${userId}/attachments/${attachmentId}`);
 
@@ -112,27 +151,32 @@ app.get("/attachment/:id", async (c) => {
 
 /**
  * PUT /vault/attachment/:id
- * Upload an encrypted attachment to R2.
- * Checks quota before accepting.
+ * Upload an encrypted attachment to R2 with quota enforcement.
  */
 app.put("/attachment/:id", async (c) => {
   const userId = c.get("userId") as string;
   const attachmentId = c.req.param("id");
   const tier = (c.get("tier") as string) ?? "free";
 
-  // Check quota
-  const quota = tier === "premium" ? 2 * 1024 * 1024 * 1024 : 250 * 1024 * 1024; // 2GB or 250MB
-  const { usage } = await getAttachmentUsage(c.env, userId);
-  const bodySize = parseInt(c.req.header("Content-Length") ?? "0");
+  if (!/^[a-zA-Z0-9_-]+$/.test(attachmentId)) {
+    throw new ValidationError("Invalid attachment ID");
+  }
 
-  if (usage + bodySize > quota) {
+  const quota = tier === "premium" ? 2 * 1024 * 1024 * 1024 : 250 * 1024 * 1024;
+  const { actualUsage } = await getAttachmentUsage(c.env, userId);
+
+  const content = await c.req.arrayBuffer();
+  const actualSize = content.byteLength;
+
+  if (actualUsage + actualSize > quota) {
     throw new QuotaError("Storage quota exceeded. Upgrade to premium for more space.");
   }
 
-  const content = await c.req.arrayBuffer();
-  await c.env.VAULT.put(`${userId}/attachments/${attachmentId}`, content);
+  await c.env.VAULT.put(`${userId}/attachments/${attachmentId}`, content, {
+    customMetadata: { size: String(actualSize), uploadedAt: new Date().toISOString() },
+  });
 
-  return c.json({ success: true, id: attachmentId });
+  return c.json({ success: true, id: attachmentId, size: actualSize });
 });
 
 /**
@@ -143,12 +187,16 @@ app.delete("/attachment/:id", async (c) => {
   const userId = c.get("userId") as string;
   const attachmentId = c.req.param("id");
 
+  if (!/^[a-zA-Z0-9_-]+$/.test(attachmentId)) {
+    throw new ValidationError("Invalid attachment ID");
+  }
+
   await c.env.VAULT.delete(`${userId}/attachments/${attachmentId}`);
 
   return c.json({ success: true });
 });
 
-async function getAttachmentUsage(env: Env, userId: string): Promise<{ usage: number; count: number }> {
+async function getAttachmentUsage(env: Env, userId: string): Promise<{ usage: number; count: number; actualUsage: number }> {
   const objects = await env.VAULT.list({ prefix: `${userId}/attachments/` });
   let usage = 0;
 
@@ -156,7 +204,7 @@ async function getAttachmentUsage(env: Env, userId: string): Promise<{ usage: nu
     usage += obj.size;
   }
 
-  return { usage, count: objects.objects.length };
+  return { usage, count: objects.objects.length, actualUsage: usage };
 }
 
 export const vaultRoutes = app;

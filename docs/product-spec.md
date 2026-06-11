@@ -50,8 +50,8 @@ Consumer password/secrets manager. Not an infrastructure secrets manager (no mac
 |-----------|---------|------------|
 | Vault blob | R2 | AES-256-GCM (vault key) |
 | Vault key (wrapped) | D1 | AES-256-GCM (master-password-derived key) |
-| Auth hash | D1 | bcrypt + salt |
-| Recovery key hash | D1 | bcrypt + salt |
+| Auth hash | D1 | Argon2id + salt |
+| Recovery key hash | D1 | SHA-256 + salt |
 | TOTP seeds | Inside vault blob | Inherits vault encryption |
 | File attachments | R2 | AES-256-GCM (vault key) |
 
@@ -70,7 +70,7 @@ Consumer password/secrets manager. Not an infrastructure secrets manager (no mac
 
 - During onboarding, generate a one-time recovery key (random 32-character string).
 - User MUST acknowledge saving it before proceeding (no "skip" button).
-- Recovery key is hashed and stored server-side (bcrypt).
+- Recovery key is hashed and stored server-side (SHA-256 + salt).
 - Recovery key re-derives the vault key.
 - Both master password AND recovery key lost = data irretrievably gone.
 - Account reset available: nuke vault, start over with same email.
@@ -157,7 +157,7 @@ interface IdentityFields {
 ### 6.3 Multi-Factor Authentication (v1)
 
 - TOTP (authenticator app) + recovery codes.
-- Recovery codes are mandatory. Stored as bcrypt hashes in D1.
+- Recovery codes are mandatory. Stored as SHA-256 hashes in D1.
 - No SMS. WebAuthn/Passkey supported as additional MFA option (v1).
 - Passkey gates server-side auth only — vault decryption still requires master password.
 
@@ -437,7 +437,7 @@ Premium-tier feature. All client-side computation.
 ### 18.9 Marketing Site
 
 - Separate Astro static site at `ironlox.com` (Cloudflare Pages).
-- Pages: home, features, pricing, blog, docs/knowledge base, download (Chrome + Firefox extension links).
+- Pages: home, privacy, security, terms, features, pricing, blog, docs/knowledge base, download (first 4 implemented).
 - Web app at `app.ironlox.com`.
 - API at `api.ironlox.com`.
 
@@ -505,12 +505,14 @@ ironlox/
 ├── apps/
 │   ├── extension/    # Plasmo browser extension
 │   ├── web/          # React/Next.js dashboard
-│   └── worker/       # Cloudflare Workers API
+│   ├── worker/       # Cloudflare Workers API
+│   └── marketing/    # Astro static site
 ├── packages/
 │   ├── crypto/       # Encryption, key derivation, TOTP
 │   ├── schemas/      # Zod schemas, shared types
 │   ├── autofill/     # Form detection, URL matching
-│   └── api-client/   # Typed Hono RPC client
+│   ├── api-client/   # Typed HTTP client (Hono RPC planned)
+│   └── tsconfig/     # Shared TypeScript base config
 └── docs/
 ```
 

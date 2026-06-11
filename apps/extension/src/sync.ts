@@ -107,12 +107,11 @@ export class VaultSync {
         lastSynced: Date.now(),
       };
 
-      // Cache encrypted blob + decrypted vault in IndexedDB
+      // Cache only the encrypted blob in IndexedDB, not the decrypted vault
       await setInCache("encrypted-vault", {
         blob: encryptedBlob,
         version: data.version,
       });
-      await setInCache("decrypted-vault", state);
 
       return state;
     }
@@ -158,8 +157,15 @@ export class VaultSync {
    * Returns null if no cached vault exists.
    */
   async loadOffline(): Promise<SyncState | null> {
-    const cached = await getFromCache("decrypted-vault");
-    return cached as SyncState | null;
+    const cached = await getFromCache("encrypted-vault");
+    if (!cached || !this.vaultKey) return null;
+    try {
+      const data = cached as { blob: string; version: number };
+      const vault = await decryptVault(data.blob, this.vaultKey);
+      return { vault, version: data.version, lastSynced: Date.now() };
+    } catch {
+      return null;
+    }
   }
 }
 

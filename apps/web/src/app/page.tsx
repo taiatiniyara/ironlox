@@ -3,6 +3,8 @@
 import { Providers } from "@/components/providers";
 import { useVault } from "@/lib/vault-context";
 import { useState } from "react";
+import { createApiClient } from "@ironlox/api-client";
+import { deriveAuthHash, deriveEncryptionKey, generateSalt, generateVaultKey, wrapVaultKey } from "@ironlox/crypto";
 
 function HomeContent() {
   const { auth } = useVault();
@@ -29,20 +31,49 @@ function AuthScreen({
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const apiClient = createApiClient(process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8787");
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
     setLoading(true);
 
     try {
+      const authSalt = generateSalt();
+      const encryptionSalt = generateSalt();
+      const vaultKey = generateVaultKey();
+
+      const authHashRaw = await deriveAuthHash(masterPassword, email, authSalt);
+      const authHash = Array.from(new Uint8Array(authHashRaw))
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("");
+
+      const encryptionKey = await deriveEncryptionKey(masterPassword, encryptionSalt);
+      const wrappedVaultKey = await wrapVaultKey(vaultKey, encryptionKey);
+
+      const toHex = (buf: Uint8Array): string =>
+        Array.from(new Uint8Array(buf))
+          .map((b) => b.toString(16).padStart(2, "0"))
+          .join("");
+
       if (view === "login") {
-        login(email, `temp-token-${Date.now()}`);
+        const response = await apiClient.login({ email, authHash });
+        login(email, response.accessToken);
+        apiClient.setTokens(response.accessToken, response.refreshToken);
       } else {
-        // Signup: derive auth hash + encryption key, register with API
-        login(email, `temp-token-${Date.now()}`);
+        const response = await apiClient.register({
+          email,
+          authHash,
+          authSalt: toHex(authSalt),
+          encryptionSalt: toHex(encryptionSalt),
+          wrappedVaultKey,
+        });
+        login(email, response.accessToken);
+        apiClient.setTokens(response.accessToken, response.refreshToken);
       }
-    } catch {
-      setError(view === "login" ? "Invalid email or password" : "Registration failed");
+    } catch (err) {
+      const apiErr = err as { message?: string };
+      setError(apiErr.message ?? (view === "login" ? "Invalid email or password" : "Registration failed"));
     } finally {
       setLoading(false);
     }
@@ -312,7 +343,7 @@ function AddItem({ onDone }: { onDone: () => void }) {
       updatedAt: new Date().toISOString(),
       fields:
         type === "login"
-          ? { username, password, uris: uri ? [uri] : undefined, notes: notes || undefined }
+          ? { username, password, uris: uri ? [uri] : undefined, notes: notes || undefined, previousPasswords: [] }
           : type === "card"
             ? { cardholder: username, number: password, expiryMonth: "", expiryYear: "", cvv: "", notes: notes || undefined }
             : type === "note"

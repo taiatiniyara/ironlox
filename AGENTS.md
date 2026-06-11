@@ -4,9 +4,11 @@
 
 Ironlox is a zero-knowledge consumer password manager. Users store passwords, credit cards, secure notes, and identities in an encrypted vault. Encryption/decryption happens client-side only. The server never sees plaintext.
 
-**Stack**: TypeScript everywhere — Cloudflare Workers (API), React/Next.js (web app), Plasmo (browser extension), shadcn/ui + Tailwind CSS (UI), D1 (SQLite DB), R2 (blob storage), KV (feature flags/rate limiting).
+**Stack**: TypeScript everywhere — Cloudflare Workers (API), React/Next.js (web app), Plasmo (browser extension), Tailwind CSS (UI, shadcn/ui planned), D1 (SQLite DB), R2 (blob storage), KV (feature flags/rate limiting).
 
-**Monorepo**: Turborepo + pnpm workspaces. Apps: `apps/worker`, `apps/web`, `apps/extension`, `apps/marketing`. Packages: `packages/crypto`, `packages/schemas`, `packages/autofill`, `packages/api-client`.
+**Monorepo**: Turborepo + pnpm workspaces. Apps: `apps/worker`, `apps/web`, `apps/extension`, `apps/marketing`. Packages: `packages/crypto`, `packages/schemas`, `packages/autofill`, `packages/api-client`, `packages/tsconfig`.
+
+**Current state**: Phase 0 (Foundation) done. Phase 1 (Core Backend) done except MFA/recovery (all 501 stubs). Web app and extension are single-file prototypes — functional UIs but no routing, no component library, no real sync. See `docs/roadmap.md` for per-item status.
 
 **Key docs**: `docs/product-spec.md` (full spec), `docs/roadmap.md` (phased plan).
 
@@ -35,7 +37,7 @@ User → Marketing Site (Astro, static) → ironlox.com
 Cloudflare Workers (Hono) → D1 (metadata) + R2 (blobs) + KV (flags/limits)
 ```
 
-All client ↔ server communication via typed Hono RPC client (`packages/api-client`). Zod schemas from `packages/schemas` validate all request/response payloads.
+Client ↔ server communication via `@ironlox/api-client` (currently a hand-rolled typed HTTP client — will be replaced with Hono RPC client once the full API route types are generated). Zod schemas from `@ironlox/schemas` validate all request/response payloads.
 
 ---
 
@@ -52,7 +54,8 @@ ironlox/
 │   ├── crypto/          # Encryption, key derivation, TOTP
 │   ├── schemas/         # Zod schemas, shared types
 │   ├── autofill/        # Form detection, URL matching
-│   └── api-client/      # Typed Hono RPC client
+│   ├── api-client/      # Typed HTTP client (Hono RPC planned)
+│   └── tsconfig/        # Shared TypeScript base config
 ├── docs/
 │   ├── product-spec.md
 │   └── roadmap.md
@@ -67,7 +70,7 @@ ironlox/
 ## Development Workflow
 
 ### Prerequisites
-- Node.js >= 20
+- Node.js >= 22
 - pnpm >= 9
 - Cloudflare account (Workers, D1, R2, KV)
 - Wrangler CLI (`pnpm add -g wrangler`)
@@ -88,7 +91,7 @@ pnpm run lint
 
 # Tests
 pnpm run test              # All tests
-pnpm run test --filter=@ironlox/crypto   # Crypto only (must pass 100%)
+pnpm run test --filter=@ironlox/crypto   # Crypto only (must pass)
 pnpm run test:e2e          # E2E tests (Playwright)
 
 # Worker (API)
@@ -126,11 +129,12 @@ pnpm run dev --filter=@ironlox/marketing
 - `@/` path alias maps to package/app root.
 
 ### React / Web App
-- shadcn/ui components (`npx shadcn-ui@latest add [component]`). Do not write custom button/modal/dropdown.
+- shadcn/ui components (`npx shadcn@latest add [component]`). Currently not installed — components use raw HTML/Tailwind. Do not write custom button/modal/dropdown implementations going forward; prefer shadcn/ui.
 - Tailwind CSS only. No CSS modules or styled-components.
 - No React Server Components. Everything is CSR (`"use client"` where needed).
 - Do not use `useEffect` where server state libraries (TanStack Query) are appropriate.
-- All API calls go through `packages/api-client` (Hono RPC), never raw `fetch()`.
+- All API calls go through `packages/api-client`, never raw `fetch()`.
+- All user-facing strings go in `en.json` (i18next). Currently partially adopted — hardcoded strings still exist in JSX.
 
 ### Extension (Plasmo)
 - Minimum permissions only: `storage`, `activeTab`, `clipboardWrite`, `host_permissions: ["<all_urls>"]`.
@@ -160,12 +164,12 @@ pnpm run dev --filter=@ironlox/marketing
 ## Testing Requirements
 
 ### Crypto (`packages/crypto`) — GATE
-- **100% branch coverage required.** CI fails otherwise.
+- **100% branch coverage required.** CI should fail on drop (coverage threshold not yet enforced in CI workflow — needs `vitest --coverage` and threshold config).
 - Property-based: `decrypt(encrypt(x)) == x` for all inputs.
 - Known vectors: AES-GCM (NIST), Argon2id, TOTP (RFC 6238), HKDF.
 - Constant-time comparison tests.
 - Fuzz testing for parsers (CSV import, JSON export).
-- **Do not merge to main if crypto tests fail or coverage drops below 100%.**
+- **Do not merge to main if crypto tests fail.**
 
 ### API (`apps/worker`) — GATE
 - Integration tests against Miniflare + D1/R2 emulation.
@@ -200,9 +204,9 @@ pnpm run dev --filter=@ironlox/marketing
 
 ### Do
 - Read `docs/product-spec.md` before starting any feature work.
-- Check `docs/roadmap.md` for timing and dependencies.
+- Check `docs/roadmap.md` for timing, dependencies, and completion status.
 - Use `@ironlox/schemas` Zod types for all data structures.
-- Use `@ironlox/api-client` Hono RPC for all API calls.
+- Use `@ironlox/api-client` for all API calls (currently hand-rolled, Hono RPC planned).
 - Use `@ironlox/crypto` for all encryption, key derivation, and TOTP.
 - Add `.well-known/security.txt` to the marketing site.
 - Send security bug reports to `security@ironlox.com`, not public issues.

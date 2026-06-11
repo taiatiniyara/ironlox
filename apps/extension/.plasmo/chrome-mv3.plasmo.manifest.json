@@ -14,8 +14,24 @@
       "48": "./gen-assets/icon48.plasmo.png",
       "64": "./gen-assets/icon64.plasmo.png",
       "128": "./gen-assets/icon128.plasmo.png"
-    }
+    },
+    "default_popup": "./popup.html"
   },
   "version": "0.1.0",
-  "name": ""
+  "name": "",
+  "description": "Ironlox browser extension (Plasmo — Chrome + Firefox)",
+  "homepage_url": "https://ironlox.com",
+  "background": {
+    "service_worker": "./static/background/index.ts"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "..\\src\\contents\\autofill.ts"
+      ]
+    }
+  ]
 }

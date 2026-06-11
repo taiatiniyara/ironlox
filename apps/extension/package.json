@@ -12,7 +12,13 @@
     "url": "https://github.com/ironlox/ironlox/issues"
   },
   "homepage": "https://ironlox.com",
-  "keywords": ["password-manager", "zero-knowledge", "browser-extension", "plasmo", "autofill"],
+  "keywords": [
+    "password-manager",
+    "zero-knowledge",
+    "browser-extension",
+    "plasmo",
+    "autofill"
+  ],
   "scripts": {
     "dev": "plasmo dev",
     "dev:firefox": "plasmo dev --target=firefox-mv3",
@@ -25,21 +31,22 @@
     "clean": "rm -rf build .plasmo"
   },
   "dependencies": {
-    "@ironlox/schemas": "workspace:*",
-    "@ironlox/crypto": "workspace:*",
-    "@ironlox/autofill": "workspace:*",
     "@ironlox/api-client": "workspace:*",
+    "@ironlox/autofill": "workspace:*",
+    "@ironlox/crypto": "workspace:*",
+    "@ironlox/schemas": "workspace:*",
+    "fuse.js": "^7.0.0",
     "plasmo": "^0.90.5",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
-    "tailwindcss": "^4.1.0",
-    "fuse.js": "^7.0.0"
+    "tailwindcss": "^4.1.0"
   },
   "devDependencies": {
     "@ironlox/tsconfig": "workspace:*",
+    "@types/chrome": "^0.1.43",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "@types/chrome": "^0.1.43",
+    "sharp": "^0.33.0",
     "typescript": "^6.0.3",
     "vitest": "^4.1.8"
   }

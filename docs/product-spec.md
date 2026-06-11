@@ -516,6 +516,8 @@ ironlox/
 └── docs/
 ```
 
+- **Graphify** — knowledge graph tool for dependency/architecture visualization. Run `pnpm run graphify` to generate an interactive graph of the monorepo (nodes = source files/concepts, edges = imports/calls/references). Output in `graphify-out/`.
+
 ### 22.3 API Design
 
 - Hono + Hono RPC for end-to-end type safety.

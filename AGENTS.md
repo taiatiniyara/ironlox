@@ -115,6 +115,14 @@ pnpm run package --filter=@ironlox/extension
 
 # Marketing site
 pnpm run dev --filter=@ironlox/marketing
+
+# Graphify — knowledge graph for codebase navigation
+pnpm run graphify                            # Full pipeline on .
+pnpm run graphify:update                     # Incremental — re-extract only new/changed files
+pnpm run graphify:watch                      # Watch for changes, auto-rebuild graph
+pnpm run graphify:query "<question>"         # BFS traversal of knowledge graph
+pnpm run graphify:explain "<node>"           # Plain-language explanation of a node
+pnpm run graphify:path "<nodeA>" "<nodeB>"   # Shortest path between two concepts
 ```
 
 ---
@@ -197,6 +205,7 @@ pnpm run dev --filter=@ironlox/marketing
 - [ ] No secrets/keys in code (use environment variables)
 - [ ] No `console.log` in production code (use Sentry for errors)
 - [ ] PR references spec section(s) from `docs/product-spec.md`
+- [ ] Graphify graph is up to date (`pnpm run graphify:update` if files changed)
 
 ---
 

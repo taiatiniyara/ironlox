@@ -65,9 +65,21 @@ pnpm install
 cp .env.example .env
 # Edit .env with development values
 pnpm run dev
+pnpm run graphify                 # Generate knowledge graph
 ```
 
 See [DEPLOY.md](DEPLOY.md) for Cloudflare-specific setup.
+
+### Tooling
+
+- **Graphify** — dependency and architecture knowledge graph for the monorepo.
+  - `pnpm run graphify` — full pipeline (extract → cluster → visualize)
+  - `pnpm run graphify:update` — incremental re-extraction for changed files
+  - `pnpm run graphify:watch` — auto-rebuild graph on file changes
+  - `pnpm run graphify:query "<q>"` — BFS/DFS traversal of the graph
+  - `pnpm run graphify:explain "<n>"` — plain-language node explanation
+  - `pnpm run graphify:path "<a>" "<b>"` — shortest path between two concepts
+  - Outputs in `graphify-out/`: `graph.html` (interactive), `GRAPH_REPORT.md` (audit), `graph.json` (raw data)
 
 ## Project Structure
 
@@ -127,6 +139,7 @@ The most critical package. Changes must be reviewed carefully:
 - [ ] No `console.log` in production code
 - [ ] PR references spec section(s) from `docs/product-spec.md`
 - [ ] Commits signed off with DCO
+- [ ] Graphify graph is up to date (`pnpm run graphify:update` if files changed)
 
 ## Commit Convention
 

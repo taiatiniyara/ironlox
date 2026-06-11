@@ -17,3 +17,5 @@ coverage/
 playwright-report/
 test-results/
 *.tsbuildinfo
+nul
+graphify-out/

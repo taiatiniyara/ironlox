@@ -13,6 +13,7 @@
 - [x] Configure TypeScript base config (`@ironlox/tsconfig`) ✅
 - [x] Configure ESLint + Prettier across all packages ✅
 - [ ] Set up Husky pre-commit hooks (lint-staged) ❌
+- [x] Set up Graphify for dependency/architecture visualization ✅
 
 ### Shared Packages
 - [x] `packages/crypto` — AES-256-GCM encrypt/decrypt, Argon2id key derivation, TOTP (RFC 6238), envelope encryption ✅

@@ -19,7 +19,13 @@
     "lint": "turbo lint",
     "typecheck": "turbo typecheck",
     "clean": "turbo clean",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "graphify": "python3 -m graphify .",
+    "graphify:update": "python3 -m graphify . --update",
+    "graphify:watch": "python3 -m graphify . --watch",
+    "graphify:query": "python3 -m graphify query",
+    "graphify:explain": "python3 -m graphify explain",
+    "graphify:path": "python3 -m graphify path"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

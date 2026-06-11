@@ -41,9 +41,39 @@
     "react-dom": "^19.2.7",
     "tailwindcss": "^4.1.0"
   },
+  "manifest": {
+    "permissions": [
+      "storage",
+      "activeTab",
+      "clipboardWrite",
+      "alarms",
+      "idle"
+    ],
+    "host_permissions": [
+      "<all_urls>"
+    ],
+    "commands": {
+      "_execute_action": {
+        "suggested_key": { "default": "Ctrl+Shift+L", "mac": "Command+Shift+L" }
+      },
+      "copy-password": {
+        "description": "Copy password of first matching login",
+        "suggested_key": { "default": "Ctrl+Shift+C", "mac": "Command+Shift+C" }
+      },
+      "copy-username": {
+        "description": "Copy username of first matching login",
+        "suggested_key": { "default": "Ctrl+Shift+U", "mac": "Command+Shift+U" }
+      },
+      "lock-vault": {
+        "description": "Lock the vault",
+        "suggested_key": { "default": "Ctrl+Shift+K", "mac": "Command+Shift+K" }
+      }
+    }
+  },
   "devDependencies": {
     "@ironlox/tsconfig": "workspace:*",
     "@types/chrome": "^0.1.43",
+    "@types/node": "^25.9.3",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "sharp": "^0.33.0",

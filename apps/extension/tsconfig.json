@@ -16,7 +16,8 @@
       ]
     },
     "types": [
-      "chrome"
+      "chrome",
+      "node"
     ]
   },
   "include": [

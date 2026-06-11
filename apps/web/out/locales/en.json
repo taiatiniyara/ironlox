@@ -1,0 +1,98 @@
+{
+  "app": {
+    "name": "Ironlox",
+    "tagline": "Zero-knowledge password manager"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "createAccount": "Create Account",
+    "email": "Email",
+    "masterPassword": "Master Password",
+    "unlockVault": "Unlock Vault",
+    "noAccount": "No account?",
+    "createOne": "Create one",
+    "haveAccount": "Have an account?",
+    "signInAction": "Sign in",
+    "invalidEmailOrPassword": "Invalid email or password",
+    "registrationFailed": "Registration failed",
+    "loading": "Loading...",
+    "emailPlaceholder": "you@example.com",
+    "passwordPlaceholder": "Your master password",
+    "passwordStrength": {
+      "weak": "Weak",
+      "fair": "Fair",
+      "strong": "Strong"
+    }
+  },
+  "vault": {
+    "title": "Vault",
+    "search": "Search items...",
+    "noItems": "No items in your vault yet",
+    "addFirstPassword": "Add your first password",
+    "noMatches": "No matches",
+    "copy": "Copy",
+    "copied": "Copied",
+    "type": {
+      "login": "login",
+      "card": "card",
+      "note": "note",
+      "identity": "identity"
+    }
+  },
+  "addItem": {
+    "title": "Add Item",
+    "name": "Name",
+    "websiteUrl": "Website URL",
+    "username": "Username",
+    "password": "Password",
+    "cardholderName": "Cardholder Name",
+    "fullName": "Full Name",
+    "cardNumber": "Card Number",
+    "notes": "Notes",
+    "cancel": "Cancel",
+    "save": "Save"
+  },
+  "settings": {
+    "title": "Settings",
+    "security": "Security",
+    "autoLock": "Auto-lock timeout",
+    "clipboardClear": "Clipboard clear",
+    "account": "Account",
+    "deleteAccount": "Delete Account",
+    "fiveMin": "5 minutes",
+    "fifteenMin": "15 minutes",
+    "oneHour": "1 hour",
+    "thirtySec": "30 seconds",
+    "sixtySec": "60 seconds",
+    "twoMin": "2 minutes"
+  },
+  "nav": {
+    "vault": "Vault",
+    "add": "Add",
+    "settings": "Settings",
+    "lock": "Lock"
+  },
+  "security": {
+    "locked": "Locked",
+    "enterPin": "Enter your PIN",
+    "enterPassword": "Enter your master password",
+    "usePasswordInstead": "Use master password instead",
+    "unlock": "Unlock",
+    "unlocking": "Unlocking..."
+  },
+  "password": {
+    "generate": "Generate",
+    "regenerate": "Regenerate",
+    "random": "Random",
+    "passphrase": "Passphrase",
+    "length": "Length",
+    "words": "Words",
+    "back": "Back",
+    "copyGenerated": "Copy Generated Password",
+    "addItem": "Add Item"
+  },
+  "totp": {
+    "code": "2FA Code",
+    "copyCode": "Copy code"
+  }
+}

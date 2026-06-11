@@ -2,35 +2,24 @@
   "extends": "@ironlox/tsconfig/base.json",
   "compilerOptions": {
     "outDir": "./dist",
-    "lib": [
-      "ES2022",
-      "DOM",
-      "DOM.Iterable"
-    ],
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "jsx": "preserve",
     "moduleResolution": "bundler",
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
+      "@/*": ["./src/*"]
     },
     "allowJs": true,
     "noEmit": true,
     "incremental": true,
     "esModuleInterop": true,
+    "ignoreDeprecations": "6.0",
     "plugins": [
       {
         "name": "next"
       }
     ]
   },
-  "include": [
-    "next-env.d.ts",
-    "src",
-    ".next/types/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["next-env.d.ts", "src", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
 }

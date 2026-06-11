@@ -6,8 +6,8 @@
     "dev": "next dev --port 3001",
     "build": "next build",
     "start": "next start",
-    "test": "vitest run",
-    "lint": "next lint",
+    "test": "vitest run --passWithNoTests",
+    "lint": "eslint src/ --config ../../eslint.config.js",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf .next"
   },

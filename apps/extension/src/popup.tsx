@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 
-import { decryptVault, createEmptyVault, generatePassword, generatePassphrase } from "@ironlox/crypto";
+import { createEmptyVault, generatePassword, generatePassphrase } from "@ironlox/crypto";
 import type { Vault, VaultItem } from "@ironlox/schemas";
 import { vaultSync } from "./sync";
 
@@ -15,8 +15,7 @@ function App() {
   const [unlocking, setUnlocking] = useState(false);
   const [error, setError] = useState("");
   const [showGenerator, setShowGenerator] = useState(false);
-  const [showAdd, setShowAdd] = useState(false);
-  const [vaultVersion, setVaultVersion] = useState(1);
+  const [, setVaultVersion] = useState(1);
   const [lastSynced, setLastSynced] = useState<number | null>(null);
 
   // Generate password state
@@ -28,14 +27,6 @@ function App() {
   const [genSymbols, setGenSymbols] = useState(true);
   const [genWordCount, setGenWordCount] = useState(4);
   const [generatedValue, setGeneratedValue] = useState("");
-
-  // Add item state
-  const [addType, setAddType] = useState<"login" | "card" | "note" | "identity">("login");
-  const [addName, setAddName] = useState("");
-  const [addUsername, setAddUsername] = useState("");
-  const [addPassword, setAddPassword] = useState("");
-  const [addUri, setAddUri] = useState("");
-  const [addNotes, setAddNotes] = useState("");
 
   const regen = useCallback(() => {
     if (genType === "random") {
@@ -88,8 +79,8 @@ function App() {
     if (tab?.id) {
       chrome.tabs.sendMessage(tab.id, {
         type: "AUTOFILL",
-        username: "username" in selectedItem?.fields ? selectedItem.fields.username : "",
-        password: "password" in selectedItem?.fields ? selectedItem.fields.password : "",
+        username: selectedItem && "username" in selectedItem.fields ? selectedItem.fields.username : "",
+        password: selectedItem && "password" in selectedItem.fields ? selectedItem.fields.password : "",
       });
     }
   }, [selectedItem]);
@@ -197,18 +188,18 @@ function App() {
                 className="w-24"
               />
             </label>
-            {[
+            {([
               ["A-Z", genUppercase, setGenUppercase],
               ["a-z", genLowercase, setGenLowercase],
               ["0-9", genNumbers, setGenNumbers],
               ["!@#$", genSymbols, setGenSymbols],
-            ].map(([label, val, set]) => (
-              <label key={label as string} className="flex items-center justify-between text-sm">
+            ] as const).map(([label, val, set]) => (
+              <label key={label} className="flex items-center justify-between text-sm">
                 {label}
                 <input
                   type="checkbox"
-                  checked={val as boolean}
-                  onChange={(e) => (set as (v: boolean) => void)(e.target.checked)}
+                  checked={val}
+                  onChange={(e) => set(e.target.checked)}
                 />
               </label>
             ))}

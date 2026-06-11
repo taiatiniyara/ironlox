@@ -24,7 +24,7 @@ chrome.runtime.onMessage.addListener(
 
     if (forms.length > 0) {
       const form = forms[0]!;
-      fillForm(form, username, password, totp);
+      fillForm(form, username ?? "", password ?? "", totp);
       sendResponse({ success: true });
     } else {
       sendResponse({ success: false, error: "No login form detected" });

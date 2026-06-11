@@ -82,7 +82,7 @@ export class VaultSync {
     const client = createApiClient(this.apiUrl);
     client.setTokens(this.accessToken, "");
 
-    const { vaultUrl, version } = await client.getVault();
+    const { vaultUrl, version: _version } = await client.getVault();
 
     if (!vaultUrl) {
       // No vault yet — create empty

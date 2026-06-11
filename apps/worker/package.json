@@ -1,0 +1,31 @@
+{
+  "name": "@ironlox/worker",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "build": "tsc",
+    "test": "vitest run --passWithNoTests",
+    "lint": "eslint src/",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist",
+    "migrations:apply": "wrangler d1 migrations apply",
+    "migrations:create": "wrangler d1 migrations create"
+  },
+  "dependencies": {
+    "@ironlox/schemas": "workspace:*",
+    "@ironlox/crypto": "workspace:*",
+    "hono": "^4.7.0",
+    "@hono/zod-openapi": "^0.18.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@ironlox/tsconfig": "workspace:*",
+    "@cloudflare/workers-types": "^4.20250403.0",
+    "wrangler": "^4.6.0",
+    "vitest": "^3.0.0",
+    "miniflare": "^4.20250403.0",
+    "typescript": "^5.8.3"
+  }
+}

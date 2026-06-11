@@ -1,0 +1,20 @@
+{
+  "name": "@ironlox/marketing",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "lint": "eslint src/",
+    "typecheck": "astro check",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "astro": "^5.5.0"
+  },
+  "devDependencies": {
+    "@ironlox/tsconfig": "workspace:*",
+    "typescript": "^5.8.3"
+  }
+}

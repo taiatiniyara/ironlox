@@ -1,0 +1,110 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<main class="min-h-screen">
+  <section class="max-w-3xl mx-auto px-6 py-24 text-center">
+    <h1 class="text-5xl font-bold tracking-tight mb-4">
+      Your passwords,<br /><span class="text-blue-400">zero knowledge.</span>
+    </h1>
+    <p class="text-lg text-gray-400 mb-8 max-w-xl mx-auto">
+      Ironlox encrypts everything on your device. We never see your passwords,
+      credit cards, or notes. Open source. Privacy first.
+    </p>
+    <div class="flex gap-4 justify-center">
+      <a
+        href="https://chrome.google.com/webstore"
+        class="px-6 py-3 bg-white text-black rounded-lg font-medium hover:bg-gray-200 transition-colors"
+      >
+        Add to Chrome
+      </a>
+      <a
+        href="https://addons.mozilla.org"
+        class="px-6 py-3 border border-gray-700 rounded-lg font-medium hover:bg-gray-800 transition-colors"
+      >
+        Add to Firefox
+      </a>
+    </div>
+    <p class="text-xs text-gray-600 mt-4">iOS and Android coming soon</p>
+  </section>
+
+  <section class="max-w-4xl mx-auto px-6 py-16">
+    <h2 class="text-2xl font-bold text-center mb-12">How it works</h2>
+    <div class="grid grid-cols-3 gap-8">
+      <div class="text-center">
+        <div class="text-3xl mb-3">🔐</div>
+        <h3 class="font-semibold mb-2">Client-Side Encryption</h3>
+        <p class="text-sm text-gray-400">
+          AES-256-GCM encryption happens on your device. Your master password never leaves your browser.
+        </p>
+      </div>
+      <div class="text-center">
+        <div class="text-3xl mb-3">⚡</div>
+        <h3 class="font-semibold mb-2">Instant Autofill</h3>
+        <p class="text-sm text-gray-400">
+          One click fills username, password, and 2FA codes. Works on any website.
+        </p>
+      </div>
+      <div class="text-center">
+        <div class="text-3xl mb-3">🛡️</div>
+        <h3 class="font-semibold mb-2">Vault Health Reports</h3>
+        <p class="text-sm text-gray-400">
+          Find weak, reused, and breached passwords. Premium feature.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="max-w-2xl mx-auto px-6 py-16 text-center">
+    <h2 class="text-2xl font-bold mb-4">Open Source</h2>
+    <p class="text-gray-400 mb-4">
+      Every line of encryption code is public. Read it, audit it, trust it.
+    </p>
+    <a
+      href="https://github.com/ironlox/ironlox"
+      class="text-blue-400 hover:underline text-sm"
+    >
+      View on GitHub →
+    </a>
+  </section>
+
+  <section class="max-w-3xl mx-auto px-6 py-16">
+    <h2 class="text-2xl font-bold text-center mb-8">Pricing</h2>
+    <div class="grid grid-cols-2 gap-6 max-w-lg mx-auto">
+      <div class="border border-gray-800 rounded-lg p-6">
+        <h3 class="font-semibold mb-1">Free</h3>
+        <p class="text-3xl font-bold mb-4">$0</p>
+        <ul class="text-sm text-gray-400 space-y-2">
+          <li>Unlimited passwords</li>
+          <li>Unlimited devices</li>
+          <li>Autofill</li>
+          <li>Password generator</li>
+        </ul>
+      </div>
+      <div class="border border-blue-500 rounded-lg p-6 relative">
+        <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-500 text-xs px-2 py-0.5 rounded-full">
+          Premium
+        </div>
+        <h3 class="font-semibold mb-1 mt-1">Premium</h3>
+        <p class="text-3xl font-bold mb-4">$3<span class="text-sm text-gray-400">/mo</span></p>
+        <ul class="text-sm text-gray-400 space-y-2">
+          <li>Everything in Free</li>
+          <li>TOTP 2FA codes</li>
+          <li>File attachments (2GB)</li>
+          <li>Vault health reports</li>
+          <li>Priority support</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer class="border-t border-gray-800 py-8 px-6 text-center text-xs text-gray-600">
+    <p>Ironlox &copy; 2025. Zero-knowledge password manager.</p>
+    <div class="flex gap-4 justify-center mt-2">
+      <a href="/privacy" class="hover:text-gray-400">Privacy</a>
+      <a href="/terms" class="hover:text-gray-400">Terms</a>
+      <a href="https://github.com/ironlox/ironlox" class="hover:text-gray-400">GitHub</a>
+      <a href="mailto:security@ironlox.com" class="hover:text-gray-400">Security</a>
+    </div>
+  </footer>
+</main>

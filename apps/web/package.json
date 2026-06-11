@@ -1,0 +1,39 @@
+{
+  "name": "@ironlox/web",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "next dev --port 3001",
+    "build": "next build",
+    "start": "next start",
+    "test": "vitest run",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf .next"
+  },
+  "dependencies": {
+    "@ironlox/schemas": "workspace:*",
+    "@ironlox/crypto": "workspace:*",
+    "@ironlox/api-client": "workspace:*",
+    "next": "^15.2.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "@tailwindcss/postcss": "^4.0.0",
+    "tailwindcss": "^4.0.0",
+    "lucide-react": "^0.460.0",
+    "i18next": "^24.0.0",
+    "react-i18next": "^15.0.0",
+    "fuse.js": "^7.0.0",
+    "zxcvbn": "^4.4.2",
+    "sonner": "^2.0.0"
+  },
+  "devDependencies": {
+    "@ironlox/tsconfig": "workspace:*",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "typescript": "^5.8.3",
+    "vitest": "^3.0.0",
+    "@testing-library/react": "^16.0.0"
+  }
+}

@@ -1,0 +1,41 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<main class="max-w-2xl mx-auto px-6 py-16 text-sm leading-relaxed">
+  <h1 class="text-2xl font-bold mb-6">Security Policy</h1>
+
+  <section class="mb-8">
+    <h2 class="text-lg font-semibold mb-2">Reporting a Vulnerability</h2>
+    <p class="text-gray-400">
+      We take security seriously. If you discover a vulnerability in Ironlox,
+      please report it to
+      <a href="mailto:security@ironlox.com" class="text-blue-400 hover:underline">
+        security@ironlox.com
+      </a>.
+    </p>
+    <ul class="text-gray-400 mt-3 space-y-2 list-disc list-inside">
+      <li>Do not file a public issue.</li>
+      <li>Provide detailed steps to reproduce.</li>
+      <li>We will acknowledge your report within 48 hours.</li>
+      <li>We follow a 90-day disclosure policy.</li>
+      <li>Credit is given on our Hall of Fame for valid reports.</li>
+    </ul>
+  </section>
+
+  <section class="mb-8">
+    <h2 class="text-lg font-semibold mb-2">Encryption</h2>
+    <p class="text-gray-400">
+      All vault data is encrypted with AES-256-GCM before leaving the client.
+      We use Argon2id for key derivation. The server never sees plaintext data,
+      master passwords, or encryption keys.
+    </p>
+  </section>
+
+  <section>
+    <h2 class="text-lg font-semibold mb-2">PGP Key</h2>
+    <p class="text-gray-400">
+      You may encrypt sensitive reports to our PGP key (coming soon).
+    </p>
+  </section>
+</main>

@@ -1,0 +1,33 @@
+{
+  "name": "@ironlox/crypto",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest run",
+    "lint": "eslint src/",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@ironlox/schemas": "workspace:*",
+    "@noble/hashes": "^1.7.0"
+  },
+  "devDependencies": {
+    "@ironlox/tsconfig": "workspace:*",
+    "eslint": "^9.0.0",
+    "vitest": "^3.0.0",
+    "@vitest/coverage-v8": "^3.0.0",
+    "fast-check": "^3.0.0",
+    "typescript": "^5.8.3"
+  }
+}

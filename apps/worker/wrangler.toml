@@ -1,0 +1,29 @@
+name = "ironlox-api"
+main = "src/index.ts"
+compatibility_date = "2025-04-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "ironlox"
+database_id = ""
+
+[[r2_buckets]]
+binding = "VAULT"
+bucket_name = "ironlox-vault"
+
+[[kv_namespaces]]
+binding = "KV"
+id = ""
+
+[vars]
+JWT_SECRET = ""
+TURNSTILE_SECRET_KEY = ""
+STRIPE_SECRET_KEY = ""
+STRIPE_WEBHOOK_SECRET = ""
+MAILCHANNELS_API_KEY = ""
+SENTRY_DSN = ""
+API_URL = "https://api.ironlox.com"
+
+[env.production]
+[env.production.vars]
+API_URL = "https://api.ironlox.com"

@@ -2,6 +2,17 @@
   "name": "@ironlox/web",
   "version": "0.1.0",
   "type": "module",
+  "description": "Ironlox web dashboard (React/Next.js CSR)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ironlox/ironlox.git",
+    "directory": "apps/web"
+  },
+  "bugs": {
+    "url": "https://github.com/ironlox/ironlox/issues"
+  },
+  "homepage": "https://ironlox.com",
+  "keywords": ["password-manager", "zero-knowledge", "nextjs", "react", "dashboard"],
   "scripts": {
     "dev": "next dev --port 3001",
     "build": "next build",

@@ -2,6 +2,17 @@
   "name": "@ironlox/autofill",
   "version": "0.1.0",
   "type": "module",
+  "description": "Form detection and credential autofill for Ironlox browser extension",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ironlox/ironlox.git",
+    "directory": "packages/autofill"
+  },
+  "bugs": {
+    "url": "https://github.com/ironlox/ironlox/issues"
+  },
+  "homepage": "https://ironlox.com",
+  "keywords": ["password-manager", "zero-knowledge", "autofill", "form-detection", "browser-extension"],
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {

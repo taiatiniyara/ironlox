@@ -23,7 +23,9 @@ STRIPE_WEBHOOK_SECRET = ""
 MAILCHANNELS_API_KEY = ""
 SENTRY_DSN = ""
 API_URL = "https://api.ironlox.com"
+CORS_ORIGINS = "https://app.ironlox.com,https://ironlox.com"
 
 [env.production]
 [env.production.vars]
 API_URL = "https://api.ironlox.com"
+CORS_ORIGINS = "https://app.ironlox.com,https://ironlox.com"

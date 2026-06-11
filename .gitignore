@@ -6,9 +6,14 @@ build/
 .env
 .env.local
 .env.*.local
+.dev.vars
 *.log
 .DS_Store
 coverage/
 .wrangler/
 .vercel/
+.plasmo/
+.astro/
+playwright-report/
+test-results/
 *.tsbuildinfo

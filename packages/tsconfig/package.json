@@ -2,5 +2,11 @@
   "name": "@ironlox/tsconfig",
   "version": "0.1.0",
   "private": true,
+  "description": "Shared TypeScript configuration for Ironlox packages",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ironlox/ironlox.git",
+    "directory": "packages/tsconfig"
+  },
   "files": ["base.json"]
 }

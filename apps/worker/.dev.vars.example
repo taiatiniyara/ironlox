@@ -1,0 +1,10 @@
+# Ironlox Worker — Dev Environment Variables
+# Place this file at apps/worker/.dev.vars for local development with wrangler
+
+JWT_SECRET="dev-secret-change-in-production"
+TURNSTILE_SECRET_KEY="1x0000000000000000000000000000000AA"
+STRIPE_SECRET_KEY="sk_test_placeholder"
+STRIPE_WEBHOOK_SECRET="whsec_placeholder"
+MAILCHANNELS_API_KEY=""
+SENTRY_DSN=""
+API_URL="http://localhost:8787"

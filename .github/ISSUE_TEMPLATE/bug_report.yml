@@ -1,0 +1,66 @@
+name: Bug Report
+description: Report a bug in Ironlox
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Do not report security vulnerabilities here.** Email [security@ironlox.com](mailto:security@ironlox.com) instead.
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What happened? What did you expect to happen?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: Provide a step-by-step description of how to reproduce the issue.
+      placeholder: |
+        1. Go to ...
+        2. Click on ...
+        3. See error
+    validations:
+      required: true
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      description: Which part of Ironlox is affected?
+      options:
+        - Web App (Next.js dashboard)
+        - Browser Extension (Chrome)
+        - Browser Extension (Firefox)
+        - API / Backend
+        - Crypto library
+        - Marketing site
+        - Documentation
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Which version are you using?
+      placeholder: "0.1.0"
+  - type: input
+    id: browser
+    attributes:
+      label: Browser
+      description: Which browser and version?
+      placeholder: "Chrome 125, Firefox 126"
+  - type: input
+    id: os
+    attributes:
+      label: Operating System
+      description: Which OS and version?
+      placeholder: "macOS 14.5, Windows 11"
+  - type: textarea
+    id: logs
+    attributes:
+      label: Console Output
+      description: Paste any relevant console output (redact personal information).
+      render: shell

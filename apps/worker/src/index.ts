@@ -21,6 +21,7 @@ export type Env = {
   STRIPE_WEBHOOK_SECRET: string;
   MAILCHANNELS_API_KEY: string;
   SENTRY_DSN: string;
+  CORS_ORIGINS?: string;
 };
 
 export type Variables = JwtVariables<{ tier: string }> & {
@@ -31,7 +32,13 @@ export type Variables = JwtVariables<{ tier: string }> & {
 const app = new Hono<{ Bindings: Env; Variables: Variables }>();
 
 app.use("*", cors({
-  origin: ["https://app.ironlox.com", "https://ironlox.com"],
+  origin: (origin, c) => {
+    const allowed = (c.env.CORS_ORIGINS ?? "http://localhost:3001,http://localhost:3000")
+      .split(",")
+      .map((s: string) => s.trim());
+    if (!origin || allowed.includes(origin)) return origin;
+    return null;
+  },
   credentials: true,
 }));
 app.use("*", securityHeaders);

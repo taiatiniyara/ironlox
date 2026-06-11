@@ -2,6 +2,15 @@
   "name": "ironlox",
   "private": true,
   "type": "module",
+  "description": "Zero-knowledge consumer password manager — monorepo root",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ironlox/ironlox.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ironlox/ironlox/issues"
+  },
+  "homepage": "https://ironlox.com",
   "scripts": {
     "dev": "turbo dev",
     "build": "turbo build",

@@ -2,6 +2,17 @@
   "name": "@ironlox/crypto",
   "version": "0.1.0",
   "type": "module",
+  "description": "Zero-knowledge encryption, key derivation, and TOTP for Ironlox",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ironlox/ironlox.git",
+    "directory": "packages/crypto"
+  },
+  "bugs": {
+    "url": "https://github.com/ironlox/ironlox/issues"
+  },
+  "homepage": "https://ironlox.com",
+  "keywords": ["password-manager", "zero-knowledge", "encryption", "aes-gcm", "argon2id", "totp", "security"],
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {

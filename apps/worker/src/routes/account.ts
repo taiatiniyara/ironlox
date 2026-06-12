@@ -16,7 +16,7 @@ app.get("/", authMiddleware, async (c) => {
   const userId = c.get("userId") as string;
 
   const user = await c.env.DB.prepare(
-    "SELECT id, email, tier, vault_version, attachment_used, created_at FROM users WHERE id = ? AND deleted_at IS NULL",
+    "SELECT id, email, tier, vault_version, attachment_used, created_at, encryption_salt, wrapped_vault_key FROM users WHERE id = ? AND deleted_at IS NULL",
   )
     .bind(userId)
     .first<{
@@ -26,6 +26,8 @@ app.get("/", authMiddleware, async (c) => {
       vault_version: number;
       attachment_used: number;
       created_at: string;
+      encryption_salt: string;
+      wrapped_vault_key: string;
     }>();
 
   if (!user) {
@@ -49,6 +51,8 @@ app.get("/", authMiddleware, async (c) => {
     email: user.email,
     tier: user.tier,
     vaultVersion: user.vault_version,
+    encryptionSalt: user.encryption_salt,
+    wrappedVaultKey: user.wrapped_vault_key,
     attachmentQuota: quota,
     attachmentUsed: user.attachment_used,
     createdAt: user.created_at,

@@ -124,6 +124,8 @@ export const AccountInfoResponseSchema = z.object({
   email: z.string().email(),
   tier: z.enum(["free", "premium"]),
   vaultVersion: z.number(),
+  encryptionSalt: z.string().optional(),
+  wrappedVaultKey: z.string().optional(),
   attachmentQuota: z.number(),
   attachmentUsed: z.number(),
   createdAt: z.string(),

@@ -53,6 +53,7 @@ interface VaultContextType {
   login: (email: string, masterPassword: string) => Promise<boolean>;
   register: (email: string, masterPassword: string) => Promise<void>;
   logout: () => Promise<void>;
+  unlockVault: (masterPassword: string) => Promise<void>;
   addItem: (item: VaultItem) => Promise<void>;
   bulkAddItems: (items: VaultItem[]) => Promise<void>;
   removeItem: (id: string) => Promise<void>;
@@ -94,6 +95,7 @@ export function VaultProvider({ children }: { children: ReactNode }) {
       setEmail(storedEmail);
       setIsAuthenticated(true);
     }
+    setIsVaultLoaded(true);
     setIsAuthRestored(true);
   }, []);
 
@@ -264,6 +266,40 @@ export function VaultProvider({ children }: { children: ReactNode }) {
     clearSession();
   }, [clearSession]);
 
+  const unlockVault = useCallback(async (masterPassword: string): Promise<void> => {
+    const client = apiClientRef.current;
+    if (!client) throw new Error("Not authenticated");
+
+    setIsVaultLoaded(false);
+    try {
+      const blob = await client.getVaultBlob();
+      if (!blob) {
+        setVaultState(createEmptyVault());
+        setIsVaultLoaded(true);
+        return;
+      }
+
+      const account = await client.getAccount();
+      if (!account.encryptionSalt || !account.wrappedVaultKey) {
+        throw new Error("Account not fully initialized");
+      }
+      const encryptionKey = await deriveEncryptionKey(
+        masterPassword,
+        hexToBytes(account.encryptionSalt),
+      );
+      const vaultKey = await unwrapVaultKey(account.wrappedVaultKey, encryptionKey);
+      vaultKeyRef.current = vaultKey;
+      vaultVersionRef.current = account.vaultVersion;
+
+      const decrypted = await decryptVault(blob, vaultKey);
+      setVaultState(decrypted);
+      setIsVaultLoaded(true);
+    } catch {
+      setIsVaultLoaded(true);
+      throw new Error("Failed to unlock vault. Check your master password.");
+    }
+  }, []);
+
   const addItem = useCallback(
     async (item: VaultItem) => {
       const updated = addItemToVault(vault ?? createEmptyVault(), item);
@@ -326,6 +362,7 @@ export function VaultProvider({ children }: { children: ReactNode }) {
       login,
       register,
       logout,
+      unlockVault,
       addItem,
       bulkAddItems,
       removeItem,

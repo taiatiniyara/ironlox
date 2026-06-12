@@ -93,10 +93,12 @@ const fuseOptions = {
 
 export default function VaultPage() {
   usePageTitle("Vault");
-  const { vault } = useVault();
+  const { vault, isAuthenticated, unlockVault } = useVault();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [search, setSearch] = useState("");
+  const [unlockPass, setUnlockPass] = useState("");
+  const [unlocking, setUnlocking] = useState(false);
   const debouncedSearch = useDebounce(search, 200);
   const [category, setCategory] = useState<Category>("all");
   const [tagFilter, setTagFilter] = useState<string | null>(null);
@@ -176,6 +178,43 @@ export default function VaultPage() {
   }
 
   if (!vault) {
+    if (isAuthenticated) {
+      return (
+        <div className="flex flex-col items-center justify-center h-full py-16 px-4">
+          <div className="rounded-full bg-muted p-4 mb-3">
+            <Key className="size-6 text-muted-foreground" />
+          </div>
+          <p className="text-muted-foreground text-sm mb-4">
+            Vault locked — enter your master password to unlock
+          </p>
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
+              setUnlocking(true);
+              try {
+                await unlockVault(unlockPass);
+                setUnlockPass("");
+              } catch (err) {
+                toast.error((err as Error).message ?? "Unlock failed");
+              } finally {
+                setUnlocking(false);
+              }
+            }}
+            className="flex flex-col gap-2 w-full max-w-xs"
+          >
+            <Input
+              type="password"
+              placeholder="Master password"
+              value={unlockPass}
+              onChange={(e) => setUnlockPass(e.target.value)}
+            />
+            <Button type="submit" disabled={!unlockPass || unlocking}>
+              {unlocking ? "Unlocking..." : "Unlock Vault"}
+            </Button>
+          </form>
+        </div>
+      );
+    }
     return (
       <div className="flex flex-col h-full p-4 space-y-3">
         <Skeleton className="h-10 w-full" />

@@ -68,7 +68,7 @@ app.put("/", async (c) => {
     throw new ConflictError("Another vault upload is in progress. Please retry.");
   }
 
-  await c.env.KV.put(key, "1", { expirationTtl: 30 });
+  await c.env.KV.put(key, "1", { expirationTtl: 60 });
 
   try {
     const current = await c.env.DB.prepare(

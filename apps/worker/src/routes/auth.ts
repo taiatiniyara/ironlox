@@ -60,9 +60,6 @@ app.post("/register", async (c) => {
     ).bind(userId, email, serverAuthHash, authSalt, encryptionSalt, wrappedVaultKey, now, now),
   ]);
 
-  const vaultBlob = JSON.stringify({ version: 1, items: [] });
-  await c.env.VAULT.put(`${userId}/vault`, vaultBlob);
-
   const code = generateVerificationCode();
   await c.env.KV.put(`verify:${userId}`, code, { expirationTtl: 600 });
 

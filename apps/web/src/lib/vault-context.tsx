@@ -272,13 +272,6 @@ export function VaultProvider({ children }: { children: ReactNode }) {
 
     setIsVaultLoaded(false);
     try {
-      const blob = await client.getVaultBlob();
-      if (!blob) {
-        setVaultState(createEmptyVault());
-        setIsVaultLoaded(true);
-        return;
-      }
-
       const account = await client.getAccount();
       if (!account.encryptionSalt || !account.wrappedVaultKey) {
         throw new Error("Account not fully initialized");
@@ -291,8 +284,17 @@ export function VaultProvider({ children }: { children: ReactNode }) {
       vaultKeyRef.current = vaultKey;
       vaultVersionRef.current = account.vaultVersion;
 
-      const decrypted = await decryptVault(blob, vaultKey);
-      setVaultState(decrypted);
+      const blob = await client.getVaultBlob();
+      if (!blob) {
+        setVaultState(createEmptyVault());
+      } else {
+        try {
+          const decrypted = await decryptVault(blob, vaultKey);
+          setVaultState(decrypted);
+        } catch {
+          setVaultState(createEmptyVault());
+        }
+      }
       setIsVaultLoaded(true);
     } catch {
       setIsVaultLoaded(true);

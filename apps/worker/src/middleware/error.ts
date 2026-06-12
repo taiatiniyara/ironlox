@@ -24,6 +24,8 @@ export function errorHandler(err: Error, c: AppContext): Response {
     return c.json({ message: err.message, code: "STORAGE_QUOTA_EXCEEDED" }, 413);
   }
 
+  console.error("Unhandled server error:", err.message, err.stack);
+
   return c.json(
     { message: "Internal server error", code: "INTERNAL_ERROR" },
     500 as ContentfulStatusCode,

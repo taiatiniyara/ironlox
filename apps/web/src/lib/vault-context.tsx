@@ -36,19 +36,8 @@ const STORAGE_KEYS = {
   email: "ironlox_email",
 } as const;
 
-async function fetchVaultBlob(vaultUrl: string): Promise<string> {
-  const res = await fetch(vaultUrl);
-  if (!res.ok) throw new Error("Failed to download vault");
-  return res.text();
-}
-
-async function uploadVaultBlob(uploadUrl: string, blob: string): Promise<void> {
-  const res = await fetch(uploadUrl, {
-    method: "PUT",
-    body: blob,
-    headers: { "Content-Type": "application/octet-stream" },
-  });
-  if (!res.ok) throw new Error("Failed to upload vault");
+async function fetchVaultBlob(client: ApiClient): Promise<string> {
+  return client.getVaultBlob();
 }
 
 interface VaultContextType {
@@ -136,25 +125,24 @@ export function VaultProvider({ children }: { children: ReactNode }) {
       const encrypted = await encryptVault(updatedVault, vaultKey);
       const currentVersion = vaultVersionRef.current;
 
-      const { uploadUrl, version: newVersion } = await client.putVault({
+      const { version: newVersion } = await client.putVault({
         version: currentVersion,
+        vaultBlob: encrypted,
       });
 
-      await uploadVaultBlob(uploadUrl, encrypted);
       vaultVersionRef.current = newVersion;
       setVaultState((prev) => (prev ? { ...prev, version: newVersion } : prev));
     } catch (err) {
       if (err instanceof ApiError && err.code === "VAULT_VERSION_CONFLICT") {
-        const { vaultUrl } = await client.getVault();
-        if (vaultUrl && vaultKey) {
-          const blob = await fetchVaultBlob(vaultUrl);
+        if (vaultKey) {
+          const blob = await fetchVaultBlob(client!);
           const serverVault = await decryptVault(blob, vaultKey);
           const merged = mergeVaults(updatedVault, serverVault);
           const encrypted = await encryptVault(merged, vaultKey);
-          const { uploadUrl, version: retryVersion } = await client.putVault({
+          const { version: retryVersion } = await client.putVault({
             version: serverVault.version,
+            vaultBlob: encrypted,
           });
-          await uploadVaultBlob(uploadUrl, encrypted);
           vaultVersionRef.current = retryVersion;
           setVaultState(merged);
         }
@@ -189,10 +177,10 @@ export function VaultProvider({ children }: { children: ReactNode }) {
       vaultKeyRef.current = vaultKey;
       vaultVersionRef.current = loginResponse.vaultVersion;
 
-      const vaultUrl = loginResponse.vaultUrl ?? (await client.getVault()).vaultUrl;
+      const vaultBlob = await client.getVaultBlob().catch(() => null);
 
-      if (vaultUrl) {
-        const blob = await fetchVaultBlob(vaultUrl);
+      if (vaultBlob) {
+        const blob = vaultBlob;
         const decryptedVault = await decryptVault(blob, vaultKey);
         setVaultState(decryptedVault);
       } else {

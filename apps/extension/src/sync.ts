@@ -1,5 +1,14 @@
 import { createApiClient, type ApiClient, ApiError } from "@ironlox/api-client";
-import { encryptVault, decryptVault, createEmptyVault, deriveEncryptionKey, deriveAuthHash, unwrapVaultKey, toHex, mergeVaults } from "@ironlox/crypto";
+import {
+  encryptVault,
+  decryptVault,
+  createEmptyVault,
+  deriveEncryptionKey,
+  deriveAuthHash,
+  unwrapVaultKey,
+  toHex,
+  mergeVaults,
+} from "@ironlox/crypto";
 import type { Vault } from "@ironlox/schemas";
 
 const DB_NAME = "ironlox-vault-cache";
@@ -20,7 +29,9 @@ interface Credentials {
 function openDatabase(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
-    request.onupgradeneeded = () => { request.result.createObjectStore(STORE_NAME, { keyPath: "key" }); };
+    request.onupgradeneeded = () => {
+      request.result.createObjectStore(STORE_NAME, { keyPath: "key" });
+    };
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);
   });
@@ -59,20 +70,33 @@ export class VaultSync {
     this.apiClient.setOnTokenRefresh((tokens) => {
       this.accessToken = tokens.accessToken;
       this.apiClient.setTokens(tokens.accessToken, tokens.refreshToken);
-      chrome.storage.local.set({ ironlox_access: tokens.accessToken, ironlox_refresh: tokens.refreshToken });
+      chrome.storage.local.set({
+        ironlox_access: tokens.accessToken,
+        ironlox_refresh: tokens.refreshToken,
+      });
     });
   }
 
-  getEmail(): string | null { return this.email; }
-  isAuthenticated(): boolean { return !!(this.accessToken && this.vaultKey); }
-  getVaultKey(): Uint8Array | null { return this.vaultKey; }
+  getEmail(): string | null {
+    return this.email;
+  }
+  isAuthenticated(): boolean {
+    return !!(this.accessToken && this.vaultKey);
+  }
+  getVaultKey(): Uint8Array | null {
+    return this.vaultKey;
+  }
 
   setAuth(accessToken: string, _refreshToken: string, vaultKey: Uint8Array, email: string): void {
     this.accessToken = accessToken;
     this.vaultKey = vaultKey;
     this.email = email;
     this.apiClient.setTokens(accessToken, _refreshToken);
-    chrome.storage.local.set({ ironlox_access: accessToken, ironlox_refresh: _refreshToken, ironlox_email: email });
+    chrome.storage.local.set({
+      ironlox_access: accessToken,
+      ironlox_refresh: _refreshToken,
+      ironlox_email: email,
+    });
   }
 
   clearAuth(): void {
@@ -90,7 +114,9 @@ export class VaultSync {
 
     const loginResponse = await this.apiClient.login({ email, authHash });
 
-    const encSalt = new Uint8Array(loginResponse.encryptionSalt.match(/.{2}/g)!.map((b) => parseInt(b, 16)));
+    const encSalt = new Uint8Array(
+      loginResponse.encryptionSalt.match(/.{2}/g)!.map((b) => parseInt(b, 16)),
+    );
     const encryptionKey = await deriveEncryptionKey(masterPassword, encSalt);
     const vaultKey = await unwrapVaultKey(loginResponse.wrappedVaultKey, encryptionKey);
 
@@ -101,35 +127,37 @@ export class VaultSync {
   async pull(): Promise<SyncState> {
     if (!this.vaultKey) throw new Error("Not authenticated");
 
-    const { vaultUrl, version } = await this.apiClient.getVault();
-    if (!vaultUrl) {
+    const encryptedBlob = await this.apiClient.getVaultBlob().catch(() => null);
+    if (!encryptedBlob) {
       const vault = createEmptyVault();
       return { vault, version: 1, lastSynced: Date.now() };
     }
 
-    const blobResponse = await fetch(vaultUrl);
-    const encryptedBlob = await blobResponse.text();
     const vault = await decryptVault(encryptedBlob, this.vaultKey);
 
-    await setInCache("encrypted-vault", { blob: encryptedBlob, version });
+    await setInCache("encrypted-vault", { blob: encryptedBlob, version: vault.version });
 
-    return { vault, version, lastSynced: Date.now() };
+    return { vault, version: vault.version, lastSynced: Date.now() };
   }
 
   async push(vault: Vault, currentVersion: number): Promise<number> {
     if (!this.vaultKey) throw new Error("No vault key set");
     try {
       const encryptedBlob = await encryptVault(vault, this.vaultKey);
-      const { uploadUrl, version } = await this.apiClient.putVault({ version: currentVersion });
-      await fetch(uploadUrl, { method: "PUT", body: encryptedBlob, headers: { "Content-Type": "application/octet-stream" } });
+      const { version } = await this.apiClient.putVault({
+        version: currentVersion,
+        vaultBlob: encryptedBlob,
+      });
       return version;
     } catch (err) {
       if (err instanceof ApiError && err.code === "VAULT_VERSION_CONFLICT") {
         const serverState = await this.pull();
         const merged = mergeVaults(vault, serverState.vault);
         const encryptedBlob = await encryptVault(merged, this.vaultKey);
-        const { uploadUrl, version } = await this.apiClient.putVault({ version: serverState.version });
-        await fetch(uploadUrl, { method: "PUT", body: encryptedBlob, headers: { "Content-Type": "application/octet-stream" } });
+        const { version } = await this.apiClient.putVault({
+          version: serverState.version,
+          vaultBlob: encryptedBlob,
+        });
         return version;
       }
       throw err;
@@ -143,8 +171,12 @@ export class VaultSync {
       const data = cached as { blob: string; version: number };
       const vault = await decryptVault(data.blob, this.vaultKey);
       return { vault, version: data.version, lastSynced: Date.now() };
-    } catch { return null; }
+    } catch {
+      return null;
+    }
   }
 }
 
-export const vaultSync = new VaultSync(process.env.PLASMO_PUBLIC_API_URL ?? "http://localhost:8787");
+export const vaultSync = new VaultSync(
+  process.env.PLASMO_PUBLIC_API_URL ?? "http://localhost:8787",
+);

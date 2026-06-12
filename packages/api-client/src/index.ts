@@ -1,8 +1,4 @@
-import type {
-  LoginResponse,
-  AccountInfoResponse,
-  PutVaultResponse,
-} from "@ironlox/schemas";
+import type { LoginResponse, AccountInfoResponse, PutVaultResponse } from "@ironlox/schemas";
 
 /**
  * Ironlox API client.
@@ -44,11 +40,21 @@ export class ApiClient {
 
   // --- Auth ---
 
-  async register(body: { email: string; authHash: string; authSalt: string; encryptionSalt: string; wrappedVaultKey: string }): Promise<LoginResponse> {
+  async register(body: {
+    email: string;
+    authHash: string;
+    authSalt: string;
+    encryptionSalt: string;
+    wrappedVaultKey: string;
+  }): Promise<LoginResponse> {
     return this.post("/auth/register", body);
   }
 
-  async login(body: { email: string; authHash: string; turnstileToken?: string }): Promise<LoginResponse> {
+  async login(body: {
+    email: string;
+    authHash: string;
+    turnstileToken?: string;
+  }): Promise<LoginResponse> {
     return this.post("/auth/login", body);
   }
 
@@ -57,9 +63,16 @@ export class ApiClient {
       throw new ApiError(401, "No refresh token available");
     }
     try {
-      const result = await this.post<LoginResponse>("/auth/refresh", { refreshToken: this.config.refreshToken }, false);
+      const result = await this.post<LoginResponse>(
+        "/auth/refresh",
+        { refreshToken: this.config.refreshToken },
+        false,
+      );
       if (this.config.onTokenRefresh) {
-        this.config.onTokenRefresh({ accessToken: result.accessToken, refreshToken: result.refreshToken });
+        this.config.onTokenRefresh({
+          accessToken: result.accessToken,
+          refreshToken: result.refreshToken,
+        });
       }
       return result;
     } catch (error) {
@@ -94,8 +107,19 @@ export class ApiClient {
     return this.get("/vault");
   }
 
-  async putVault(body: { version: number }): Promise<PutVaultResponse> {
+  async putVault(body: { version: number; vaultBlob: string }): Promise<PutVaultResponse> {
     return this.put("/vault", body);
+  }
+
+  async getVaultBlob(): Promise<string> {
+    const response = await fetch(`${this.config.baseUrl}/vault/blob`, {
+      headers: { Authorization: `Bearer ${this.config.accessToken}` },
+    });
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      throw new ApiError(response.status, error.message ?? "Failed to download vault", error.code);
+    }
+    return response.text();
   }
 
   // --- Attachments ---
@@ -104,8 +128,28 @@ export class ApiClient {
     return this.get(`/vault/attachment/${id}`);
   }
 
-  async putAttachment(id: string): Promise<PutVaultResponse> {
+  async putAttachment(id: string): Promise<{ success: boolean; id: string; size: number }> {
     return this.put(`/vault/attachment/${id}`, { id });
+  }
+
+  async uploadAttachment(
+    id: string,
+    content: ArrayBuffer,
+  ): Promise<{ success: boolean; id: string; size: number }> {
+    const response = await fetch(`${this.config.baseUrl}/vault/attachment/${id}`, {
+      method: "PUT",
+      headers: { Authorization: `Bearer ${this.config.accessToken}` },
+      body: content,
+    });
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      throw new ApiError(
+        response.status,
+        error.message ?? "Failed to upload attachment",
+        error.code,
+      );
+    }
+    return response.json();
   }
 
   async deleteAttachment(id: string): Promise<void> {

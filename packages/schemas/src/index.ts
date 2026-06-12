@@ -48,12 +48,7 @@ export const VaultItemSchema = z.object({
   updatedAt: z.string().datetime(),
   deleted: z.boolean().optional(),
   customFields: z.array(CustomFieldSchema).max(50).optional(),
-  fields: z.union([
-    LoginFieldsSchema,
-    CardFieldsSchema,
-    NoteFieldsSchema,
-    IdentityFieldsSchema,
-  ]),
+  fields: z.union([LoginFieldsSchema, CardFieldsSchema, NoteFieldsSchema, IdentityFieldsSchema]),
 });
 
 export const VaultSchema = z.object({
@@ -115,12 +110,12 @@ export const RecoveryRequestSchema = z.object({
 
 export const PutVaultRequestSchema = z.object({
   version: z.number().int(),
-  vaultId: z.string().optional(),
+  vaultBlob: z.string(),
 });
 
 export const PutVaultResponseSchema = z.object({
-  uploadUrl: z.string(),
   version: z.number(),
+  vaultUrl: z.string(),
 });
 
 export const AccountInfoResponseSchema = z.object({
@@ -178,11 +173,15 @@ export type ChangeEmailRequest = z.infer<typeof ChangeEmailRequestSchema>;
 
 // Typed item helpers — narrow VaultItem.fields to the correct subtype
 export type TypedVaultItem<T extends VaultItem["type"]> = Omit<VaultItem, "fields"> & {
-  fields: T extends "login" ? LoginFields :
-          T extends "card" ? CardFields :
-          T extends "note" ? NoteFields :
-          T extends "identity" ? IdentityFields :
-          never;
+  fields: T extends "login"
+    ? LoginFields
+    : T extends "card"
+      ? CardFields
+      : T extends "note"
+        ? NoteFields
+        : T extends "identity"
+          ? IdentityFields
+          : never;
 };
 
 export function isLoginItem(item: VaultItem): item is TypedVaultItem<"login"> {

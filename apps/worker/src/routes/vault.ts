@@ -63,25 +63,20 @@ app.put("/", async (c) => {
   let version: number;
   let vaultBlob: string;
 
+  let validated;
   try {
     const parsed = JSON.parse(rawBody);
-    const validated = PutVaultRequestSchema.safeParse(parsed);
-    if (!validated.success) {
-      throw new ValidationError("Invalid vault upload data");
-    }
-    version = validated.data.version;
-    vaultBlob = parsed.vaultBlob ?? rawBody;
+    validated = PutVaultRequestSchema.safeParse(parsed);
   } catch {
-    vaultBlob = rawBody;
-    const headerVersion = c.req.header("X-Vault-Version");
-    if (!headerVersion) {
-      throw new ValidationError("Missing vault version");
-    }
-    version = parseInt(headerVersion);
-    if (isNaN(version)) {
-      throw new ValidationError("Invalid vault version");
-    }
+    throw new ValidationError("Invalid JSON body");
   }
+
+  if (!validated?.success) {
+    throw new ValidationError("Invalid vault upload data");
+  }
+
+  version = validated.data.version;
+  vaultBlob = validated.data.vaultBlob;
 
   const key = `vault-lock:${userId}`;
   const locked = await c.env.KV.get(key);
@@ -118,10 +113,31 @@ app.put("/", async (c) => {
       .bind(newVersion, new Date().toISOString(), userId, current.vault_version)
       .run();
 
-    return c.json({ version: newVersion });
+    return c.json({ version: newVersion, vaultUrl: `${userId}/vault` });
   } finally {
-    await c.env.KV.delete(key);
+    try {
+      await c.env.KV.delete(key);
+    } catch {
+      // KV delete failure should not suppress the original error
+    }
   }
+});
+
+/**
+ * GET /vault/blob
+ * Returns the raw encrypted vault blob content.
+ */
+app.get("/blob", async (c) => {
+  const userId = c.get("userId") as string;
+
+  const object = await c.env.VAULT.get(`${userId}/vault`);
+
+  if (!object) {
+    return c.body(null, 204);
+  }
+
+  const body = await object.text();
+  return c.text(body);
 });
 
 /**

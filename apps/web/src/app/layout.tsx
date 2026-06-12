@@ -5,6 +5,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Ironlox",
   description: "Zero-knowledge password manager",
+  icons: { icon: "/logo-icon.svg" },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

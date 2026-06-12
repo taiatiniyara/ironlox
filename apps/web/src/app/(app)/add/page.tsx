@@ -3,6 +3,7 @@
 import { useState, useReducer } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useVault } from "@/lib/vault-context";
+import { usePageTitle } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -26,7 +27,11 @@ const itemTypes: { value: ItemType; label: string }[] = [
   { value: "identity", label: "Identity" },
 ];
 
-interface CustomField { name: string; value: string; type: "text" | "hidden" }
+interface CustomField {
+  name: string;
+  value: string;
+  type: "text" | "hidden";
+}
 
 interface FormState {
   name: string;
@@ -50,57 +55,70 @@ function formReducer(state: FormState, action: FormAction): FormState {
 }
 
 const emptyForm: FormState = {
-  name: "", notes: "", username: "", password: "",
-  expiryMonth: "", expiryYear: "", cvv: "",
-  firstName: "", lastName: "", email: "", phone: "", address: "",
+  name: "",
+  notes: "",
+  username: "",
+  password: "",
+  expiryMonth: "",
+  expiryYear: "",
+  cvv: "",
+  firstName: "",
+  lastName: "",
+  email: "",
+  phone: "",
+  address: "",
 };
 
 function fieldsFromExisting(item: VaultItem): Partial<FormState> {
   const f = item.fields as Record<string, unknown>;
-  if (item.type === "login") return {
-    name: item.name,
-    username: (f.username as string) ?? "",
-    password: (f.password as string) ?? "",
-    notes: (f.notes as string) ?? "",
-  };
-  if (item.type === "card") return {
-    name: item.name,
-    username: (f.cardholder as string) ?? "",
-    password: (f.number as string) ?? "",
-    expiryMonth: (f.expiryMonth as string) ?? "",
-    expiryYear: (f.expiryYear as string) ?? "",
-    cvv: (f.cvv as string) ?? "",
-    notes: (f.notes as string) ?? "",
-  };
-  if (item.type === "note") return {
-    name: item.name,
-    notes: (f.content as string) ?? (f.notes as string) ?? "",
-  };
-  if (item.type === "identity") return {
-    name: item.name,
-    firstName: (f.firstName as string) ?? "",
-    lastName: (f.lastName as string) ?? "",
-    email: (f.email as string) ?? "",
-    phone: (f.phone as string) ?? "",
-    address: (f.address as string) ?? "",
-    notes: (f.notes as string) ?? "",
-  };
+  if (item.type === "login")
+    return {
+      name: item.name,
+      username: (f.username as string) ?? "",
+      password: (f.password as string) ?? "",
+      notes: (f.notes as string) ?? "",
+    };
+  if (item.type === "card")
+    return {
+      name: item.name,
+      username: (f.cardholder as string) ?? "",
+      password: (f.number as string) ?? "",
+      expiryMonth: (f.expiryMonth as string) ?? "",
+      expiryYear: (f.expiryYear as string) ?? "",
+      cvv: (f.cvv as string) ?? "",
+      notes: (f.notes as string) ?? "",
+    };
+  if (item.type === "note")
+    return {
+      name: item.name,
+      notes: (f.content as string) ?? (f.notes as string) ?? "",
+    };
+  if (item.type === "identity")
+    return {
+      name: item.name,
+      firstName: (f.firstName as string) ?? "",
+      lastName: (f.lastName as string) ?? "",
+      email: (f.email as string) ?? "",
+      phone: (f.phone as string) ?? "",
+      address: (f.address as string) ?? "",
+      notes: (f.notes as string) ?? "",
+    };
   return { name: item.name };
 }
 
 export default function AddPage() {
+  usePageTitle("Add Item");
   const { addItem, updateItem, vault } = useVault();
   const router = useRouter();
   const searchParams = useSearchParams();
   const editId = searchParams.get("edit");
 
-  const existingItem = editId
-    ? vault?.items.find((i) => i.id === editId && !i.deleted)
-    : null;
+  const existingItem = editId ? vault?.items.find((i) => i.id === editId && !i.deleted) : null;
 
   const [type, setType] = useState<ItemType>(existingItem?.type ?? "login");
   const [uris, setUris] = useState<string[]>(() => {
-    if (existingItem?.type === "login") return ((existingItem.fields as Record<string, unknown>).uris as string[]) ?? [];
+    if (existingItem?.type === "login")
+      return ((existingItem.fields as Record<string, unknown>).uris as string[]) ?? [];
     return [];
   });
   const [customFields, setCustomFields] = useState<CustomField[]>(
@@ -125,19 +143,32 @@ export default function AddPage() {
     const baseFields: Record<string, unknown> = { notes: form.notes || undefined };
 
     if (type === "login") {
-      const oldPasswords = (existingItem
-        ? ((existingItem.fields as Record<string, unknown>).previousPasswords as string[]) ?? []
-        : []) as string[];
+      const oldPasswords = (
+        existingItem
+          ? (((existingItem.fields as Record<string, unknown>).previousPasswords as string[]) ?? [])
+          : []
+      ) as string[];
       const oldPassword = existingItem
-        ? (existingItem.fields as Record<string, unknown>).password as string ?? ""
+        ? (((existingItem.fields as Record<string, unknown>).password as string) ?? "")
         : "";
       const passwordChanged = existingItem && oldPassword && form.password !== oldPassword;
       const previousPasswords = passwordChanged
         ? [oldPassword, ...oldPasswords].slice(0, 5)
         : oldPasswords;
-      Object.assign(baseFields, { username: form.username, password: form.password, uris: uris.length > 0 ? uris : undefined, previousPasswords });
+      Object.assign(baseFields, {
+        username: form.username,
+        password: form.password,
+        uris: uris.length > 0 ? uris : undefined,
+        previousPasswords,
+      });
     } else if (type === "card") {
-      Object.assign(baseFields, { cardholder: form.username, number: form.password, expiryMonth: form.expiryMonth, expiryYear: form.expiryYear, cvv: form.cvv });
+      Object.assign(baseFields, {
+        cardholder: form.username,
+        number: form.password,
+        expiryMonth: form.expiryMonth,
+        expiryYear: form.expiryYear,
+        cvv: form.cvv,
+      });
     } else if (type === "note") {
       Object.assign(baseFields, { content: form.notes || "" });
     } else if (type === "identity") {
@@ -177,9 +208,7 @@ export default function AddPage() {
         <Button variant="ghost" size="icon" onClick={() => router.push("/vault")}>
           <ArrowLeft className="size-4" />
         </Button>
-        <h1 className="text-lg font-semibold">
-          {existingItem ? "Edit Item" : "Add Item"}
-        </h1>
+        <h1 className="text-lg font-semibold">{existingItem ? "Edit Item" : "Add Item"}</h1>
       </div>
 
       <Card>
@@ -189,7 +218,9 @@ export default function AddPage() {
               <Tabs value={type} onValueChange={(v) => setType(v as ItemType)}>
                 <TabsList className="w-full">
                   {itemTypes.map((t) => (
-                    <TabsTrigger key={t.value} value={t.value} className="flex-1">{t.label}</TabsTrigger>
+                    <TabsTrigger key={t.value} value={t.value} className="flex-1">
+                      {t.label}
+                    </TabsTrigger>
                   ))}
                 </TabsList>
               </Tabs>
@@ -197,7 +228,13 @@ export default function AddPage() {
 
             <div className="space-y-2">
               <Label htmlFor="name">Name</Label>
-              <Input id="name" required value={form.name} onChange={(e) => setField("name")(e.target.value)} placeholder="Item name" />
+              <Input
+                id="name"
+                required
+                value={form.name}
+                onChange={(e) => setField("name")(e.target.value)}
+                placeholder="Item name"
+              />
             </div>
 
             {type === "login" && (
@@ -205,13 +242,22 @@ export default function AddPage() {
                 <UriManager uris={uris} onChange={setUris} />
                 <div className="space-y-2">
                   <Label htmlFor="user">Username</Label>
-                  <Input id="user" value={form.username} onChange={(e) => setField("username")(e.target.value)} placeholder="Username" />
+                  <Input
+                    id="user"
+                    value={form.username}
+                    onChange={(e) => setField("username")(e.target.value)}
+                    placeholder="Username"
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="pass">Password</Label>
                   <div className="flex gap-2">
                     <div className="flex-1">
-                      <PasswordInput id="pass" value={form.password} onChange={setField("password")} />
+                      <PasswordInput
+                        id="pass"
+                        value={form.password}
+                        onChange={setField("password")}
+                      />
                     </div>
                     <PasswordGenerator onSelect={setField("password")} />
                   </div>
@@ -221,12 +267,53 @@ export default function AddPage() {
 
             {type === "card" && (
               <>
-                <div className="space-y-2"><Label htmlFor="cardholder">Cardholder Name</Label><Input id="cardholder" value={form.username} onChange={(e) => setField("username")(e.target.value)} placeholder="Name on card" /></div>
-                <div className="space-y-2"><Label htmlFor="cardnum">Card Number</Label><Input id="cardnum" value={form.password} onChange={(e) => setField("password")(e.target.value)} placeholder="1234 5678 9012 3456" /></div>
+                <div className="space-y-2">
+                  <Label htmlFor="cardholder">Cardholder Name</Label>
+                  <Input
+                    id="cardholder"
+                    value={form.username}
+                    onChange={(e) => setField("username")(e.target.value)}
+                    placeholder="Name on card"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="cardnum">Card Number</Label>
+                  <Input
+                    id="cardnum"
+                    value={form.password}
+                    onChange={(e) => setField("password")(e.target.value)}
+                    placeholder="1234 5678 9012 3456"
+                  />
+                </div>
                 <div className="flex gap-2">
-                  <div className="flex-1 space-y-2"><Label>Expiry Month</Label><Input value={form.expiryMonth} onChange={(e) => setField("expiryMonth")(e.target.value)} placeholder="MM" maxLength={2} /></div>
-                  <div className="flex-1 space-y-2"><Label>Expiry Year</Label><Input value={form.expiryYear} onChange={(e) => setField("expiryYear")(e.target.value)} placeholder="YYYY" maxLength={4} /></div>
-                  <div className="flex-1 space-y-2"><Label>CVV</Label><Input value={form.cvv} onChange={(e) => setField("cvv")(e.target.value)} type="password" placeholder="123" maxLength={4} /></div>
+                  <div className="flex-1 space-y-2">
+                    <Label>Expiry Month</Label>
+                    <Input
+                      value={form.expiryMonth}
+                      onChange={(e) => setField("expiryMonth")(e.target.value)}
+                      placeholder="MM"
+                      maxLength={2}
+                    />
+                  </div>
+                  <div className="flex-1 space-y-2">
+                    <Label>Expiry Year</Label>
+                    <Input
+                      value={form.expiryYear}
+                      onChange={(e) => setField("expiryYear")(e.target.value)}
+                      placeholder="YYYY"
+                      maxLength={4}
+                    />
+                  </div>
+                  <div className="flex-1 space-y-2">
+                    <Label>CVV</Label>
+                    <Input
+                      value={form.cvv}
+                      onChange={(e) => setField("cvv")(e.target.value)}
+                      type="password"
+                      placeholder="123"
+                      maxLength={4}
+                    />
+                  </div>
                 </div>
               </>
             )}
@@ -248,13 +335,26 @@ export default function AddPage() {
 
             <div className="space-y-2">
               <Label htmlFor="notes">Notes</Label>
-              <Textarea id="notes" value={form.notes} onChange={(e) => setField("notes")(e.target.value)} placeholder="Optional notes" rows={3} />
+              <Textarea
+                id="notes"
+                value={form.notes}
+                onChange={(e) => setField("notes")(e.target.value)}
+                placeholder="Optional notes"
+                rows={3}
+              />
             </div>
 
             <CustomFieldsEditor fields={customFields} onChange={setCustomFields} />
 
             <div className="flex gap-2">
-              <Button type="button" variant="outline" className="flex-1" onClick={() => router.push("/vault")}>Cancel</Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="flex-1"
+                onClick={() => router.push("/vault")}
+              >
+                Cancel
+              </Button>
               <Button type="submit" className="flex-1" disabled={!form.name || saving}>
                 {saving ? "Saving..." : existingItem ? "Save Changes" : "Save Item"}
               </Button>

@@ -77,6 +77,8 @@ export const LoginResponseSchema = z.object({
   wrappedVaultKey: z.string(),
   encryptionSalt: z.string(),
   vaultUrl: z.string().optional(),
+  mfaRequired: z.boolean().optional(),
+  tempToken: z.string().optional(),
 });
 
 export const RefreshRequestSchema = z.object({

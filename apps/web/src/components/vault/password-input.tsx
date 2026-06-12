@@ -50,7 +50,7 @@ export function PasswordInput({
     <div className="relative">
       <Input
         id={id}
-        type={readOnly || !visible ? "password" : "text"}
+        type={visible ? "text" : "password"}
         value={value}
         onChange={onChange ? (e) => onChange(e.target.value) : undefined}
         placeholder={placeholder}
@@ -58,22 +58,20 @@ export function PasswordInput({
         readOnly={readOnly}
         className="pr-9"
       />
-      {!readOnly && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          className="absolute right-0 top-0 h-full px-2 hover:bg-transparent"
-          onClick={toggleVisibility}
-          aria-label={visible ? "Hide password" : "Show password"}
-        >
-          {visible ? (
-            <EyeOff className="size-4 text-muted-foreground" />
-          ) : (
-            <Eye className="size-4 text-muted-foreground" />
-          )}
-        </Button>
-      )}
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        className="absolute right-0 top-0 h-full px-2 hover:bg-transparent"
+        onClick={toggleVisibility}
+        aria-label={visible ? "Hide password" : "Show password"}
+      >
+        {visible ? (
+          <EyeOff className="size-4 text-muted-foreground" />
+        ) : (
+          <Eye className="size-4 text-muted-foreground" />
+        )}
+      </Button>
     </div>
   );
 }

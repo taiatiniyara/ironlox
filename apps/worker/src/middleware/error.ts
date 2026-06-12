@@ -1,9 +1,17 @@
 import type { Context } from "hono";
 import type { ContentfulStatusCode } from "hono/utils/http-status";
+import { HTTPException } from "hono/http-exception";
 
 type AppContext = Context;
 
 export function errorHandler(err: Error, c: AppContext): Response {
+  if (err instanceof HTTPException) {
+    return c.json(
+      { message: err.message, code: "HTTP_ERROR" },
+      err.status as ContentfulStatusCode,
+    );
+  }
+
   if (err instanceof ValidationError) {
     return c.json({ message: "Invalid request", code: "VALIDATION_ERROR" }, 400);
   }

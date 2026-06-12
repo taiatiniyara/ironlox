@@ -3,14 +3,24 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useVault } from "@/lib/vault-context";
+import { usePageTitle } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { ArrowLeft, Download, FileDown, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { exportVaultToCsv } from "@ironlox/crypto";
 
 export default function ExportPage() {
+  usePageTitle("Export");
   const { vault } = useVault();
   const router = useRouter();
   const [warnOpen, setWarnOpen] = useState(false);
@@ -49,7 +59,7 @@ export default function ExportPage() {
         <Button variant="ghost" size="icon" onClick={() => router.push("/vault")}>
           <ArrowLeft className="size-4" />
         </Button>
-        <h1 className="text-lg font-semibold">Export Vault</h1>
+        <h1 className="text-xl font-semibold">Export Vault</h1>
       </div>
 
       <Card>
@@ -74,19 +84,24 @@ export default function ExportPage() {
                   Security Warning
                 </DialogTitle>
                 <DialogDescription>
-                  The exported CSV file will contain your passwords in plaintext.
-                  Anyone with access to this file can read all your secrets.
-                  Store it securely and delete it after use.
+                  The exported CSV file will contain your passwords in plaintext. Anyone with access
+                  to this file can read all your secrets. Store it securely and delete it after use.
                 </DialogDescription>
               </DialogHeader>
               <DialogFooter>
-                <Button variant="outline" onClick={() => setWarnOpen(false)}>Cancel</Button>
+                <Button variant="outline" onClick={() => setWarnOpen(false)}>
+                  Cancel
+                </Button>
                 <Button onClick={handleCsvExport}>Download CSV</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
 
-          <Button variant="outline" className="w-full justify-start gap-2" onClick={handleJsonExport}>
+          <Button
+            variant="outline"
+            className="w-full justify-start gap-2"
+            onClick={handleJsonExport}
+          >
             <Download className="size-4" />
             Export as JSON (unencrypted)
           </Button>

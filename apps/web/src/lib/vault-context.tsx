@@ -29,6 +29,7 @@ import {
   hexToBytes,
 } from "@ironlox/crypto";
 import { createApiClient, type ApiClient, ApiError } from "@ironlox/api-client";
+import { toast } from "sonner";
 
 const STORAGE_KEYS = {
   accessToken: "ironlox_access_token",
@@ -48,7 +49,7 @@ interface VaultContextType {
   email: string | null;
   apiClient: ApiClient | null;
   vaultKey: Uint8Array | null;
-  login: (email: string, masterPassword: string) => Promise<void>;
+  login: (email: string, masterPassword: string) => Promise<boolean>;
   register: (email: string, masterPassword: string) => Promise<void>;
   logout: () => Promise<void>;
   addItem: (item: VaultItem) => Promise<void>;
@@ -155,7 +156,7 @@ export function VaultProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = useCallback(
-    async (userEmail: string, masterPassword: string) => {
+    async (userEmail: string, masterPassword: string): Promise<boolean> => {
       const client = apiClientRef.current;
       if (!client) throw new Error("API client not initialized");
 
@@ -164,6 +165,20 @@ export function VaultProvider({ children }: { children: ReactNode }) {
       const authHash = toHex(authHashRaw);
 
       const loginResponse = await client.login({ email: userEmail, authHash });
+
+      if (loginResponse.mfaRequired) {
+        localStorage.setItem(
+          "ironlox_mfa_temp",
+          JSON.stringify({
+            tempToken: loginResponse.tempToken,
+            email: userEmail,
+            encryptionSalt: loginResponse.encryptionSalt,
+            wrappedVaultKey: loginResponse.wrappedVaultKey,
+            vaultVersion: loginResponse.vaultVersion,
+          }),
+        );
+        return true;
+      }
 
       persistSession(loginResponse.accessToken, loginResponse.refreshToken, userEmail);
       setEmail(userEmail);
@@ -188,6 +203,7 @@ export function VaultProvider({ children }: { children: ReactNode }) {
       }
 
       setIsVaultLoaded(true);
+      return false;
     },
     [persistSession],
   );
@@ -249,7 +265,7 @@ export function VaultProvider({ children }: { children: ReactNode }) {
       const updated = addItemToVault(vault ?? createEmptyVault(), item);
       setVaultState(updated);
       syncVaultToServer(updated).catch((err) => {
-        console.error("Vault sync failed:", err);
+        toast.error(err instanceof ApiError ? err.message : "Sync failed");
       });
     },
     [vault, syncVaultToServer],
@@ -263,7 +279,7 @@ export function VaultProvider({ children }: { children: ReactNode }) {
       }
       setVaultState(updated);
       syncVaultToServer(updated).catch((err) => {
-        console.error("Vault sync failed:", err);
+        toast.error(err instanceof ApiError ? err.message : "Sync failed");
       });
     },
     [vault, syncVaultToServer],
@@ -275,7 +291,7 @@ export function VaultProvider({ children }: { children: ReactNode }) {
       const updated = removeItemFromVault(vault, id);
       setVaultState(updated);
       syncVaultToServer(updated).catch((err) => {
-        console.error("Vault sync failed:", err);
+        toast.error(err instanceof ApiError ? err.message : "Sync failed");
       });
     },
     [vault, syncVaultToServer],
@@ -287,7 +303,7 @@ export function VaultProvider({ children }: { children: ReactNode }) {
       const updated = updateItemInVault(vault, id, updates);
       setVaultState(updated);
       syncVaultToServer(updated).catch((err) => {
-        console.error("Vault sync failed:", err);
+        toast.error(err instanceof ApiError ? err.message : "Sync failed");
       });
     },
     [vault, syncVaultToServer],

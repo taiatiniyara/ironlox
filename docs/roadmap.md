@@ -2,7 +2,7 @@
 
 > **Status key**: ✅ complete &nbsp; 🔶 partial / stub &nbsp; ❌ not started
 >
-> **Overall**: Foundation (Phase 0) done. Core Backend (Phase 1) done except passkey WebAuthn endpoints (501 stubs). MFA enable/verify and recovery key login are live. **Web app (Phase 2) complete** — 16 static pages, 18 shadcn/ui components, full vault CRUD with server sync + conflict resolution, security dashboard with HIBP k-anonymity, import/export with template, file attachments with upload/progress, onboarding + demo vault, i18n, 7 unit tests, 12 E2E + axe-core tests. CSP hardened with `_headers` for Cloudflare Pages. **Extension (Phase 3) ~90%** — real auth, vault sync with IndexedDB + conflict resolution, autofill with TOTP + inline dropdown suggestions, add/edit/delete for all 4 item types, keyboard shortcuts (Ctrl+Shift+L/C/U/K), PIN unlock, context menu, 5 recents, 55 domain rules. **Marketing site (Phase 4)** content-complete. **Infrastructure**: Husky pre-commit hooks with lint-staged, 7 worker API integration tests, CSP/security headers configured for production.
+> **Overall**: Foundation (Phase 0) done. Core Backend (Phase 1) done except passkey WebAuthn endpoints (501 stubs). MFA enable/verify and recovery key login are live. MFA login flow is complete (server returns `mfaRequired` flag, client redirects to `/mfa`, verify + complete login). **Web app (Phase 2) complete** — 16 static pages, 21 shadcn/ui components, full vault CRUD with server sync + conflict resolution, security dashboard with HIBP k-anonymity, import/export with template, file attachments, onboarding + demo vault, i18n, 7 unit tests, 12 E2E + axe-core tests. CSP hardened with `_headers` for Cloudflare Pages. Vault upload protocol aligned (blob sent directly in PUT body, no broken two-step flow). Password visibility fixed in read-only mode. Card/CVV show/hide toggles added. Sync failure toasts added. `useSearchParams` Suspense boundaries added. Hook rules violation fixed. Error handler now handles Hono HTTPException + logs 500s. Fonts now loaded via Google Fonts import. Logo SVGs used in sidebar, auth pages, loading states, favicon. Light mode fixed (custom theme tokens moved to :root/.dark). Muted text contrast improved. Dialog overlay opacity fixed. Page titles set per route. Vault search/toolbar made sticky. **Extension (Phase 3) ~90%** — real auth, vault sync with IndexedDB + conflict resolution, autofill with TOTP + inline dropdown suggestions, add/edit/delete for all 4 item types, keyboard shortcuts (Ctrl+Shift+L/C/U/K), PIN unlock, context menu, 5 recents, 55 domain rules. **Marketing site (Phase 4)** content-complete. **Infrastructure**: Husky pre-commit hooks with lint-staged, 7 worker API integration tests, CSP/security headers configured for production.
 
 ---
 
@@ -19,7 +19,7 @@
 - [x] `packages/crypto` — AES-256-GCM encrypt/decrypt, Argon2id key derivation, TOTP (RFC 6238), envelope encryption ✅
 - [x] `packages/schemas` — Zod schemas for vault data model, API request/response types ✅
 - [x] `packages/autofill` — form detection heuristics, URL matching engine ✅
-- [x] `packages/api-client` — typed HTTP client (hand-rolled, not Hono RPC yet) 🔶
+- [x] `packages/api-client` — typed HTTP client with auto-refresh, `getVaultBlob()` for direct vault download, `uploadAttachment()` for binary upload, `mfaDisable()` stub ✅
 
 ### CI/CD
 - [x] GitHub Actions: CI pipeline (lint, typecheck, test) on every PR ✅
@@ -41,7 +41,7 @@
 - [x] Hono + Hono RPC setup ✅
 - [ ] Hono Zod OpenAPI (auto-generated spec) — installed but not used to generate spec 🔶
 - [x] CORS middleware ✅
-- [x] Error handling middleware ✅
+- [x] Error handling middleware — handles Hono HTTPException, custom error classes, logs 500s ✅
 
 ### D1 Database
 - [x] Wrangler migrations setup ✅
@@ -55,7 +55,7 @@
 
 ### Authentication Endpoints
 - [x] `POST /auth/register` — create account, derive auth hash, store in D1 ✅
-- [x] `POST /auth/login` — verify auth hash, issue JWT + refresh token ✅
+- [x] `POST /auth/login` — verify auth hash, check MFA enabled → return `mfaRequired` flag + tempToken if MFA enabled, otherwise issue JWT + refresh token ✅
 - [x] `POST /auth/refresh` — rotate refresh token ✅
 - [x] `POST /auth/revoke` — revoke refresh token ✅
 - [x] `POST /auth/mfa/enable` — store TOTP secret, verify code ✅
@@ -66,7 +66,8 @@
 
 ### Vault Endpoints
 - [x] `GET /vault` — return signed R2 URL + version ✅
-- [x] `PUT /vault` — optimistic locking (version check), upload to R2 ✅
+- [x] `GET /vault/blob` — return raw encrypted vault blob content ✅
+- [x] `PUT /vault` — optimistic locking (version check), vault blob sent directly in body (not two-step URL), KV distributed lock, upload to R2 ✅
 - [x] `GET /vault/attachment/:id` — signed R2 URL ✅
 - [x] `PUT /vault/attachment/:id` — upload attachment (quota check) ✅
 - [x] `DELETE /vault/attachment/:id` — delete attachment ✅
@@ -91,23 +92,27 @@
 
 ### React / Next.js Setup (`apps/web`)
 - [x] Next.js (CSR only, no RSC) ✅
-- [x] shadcn/ui installed — 16 primitives (button, input, label, card, badge, separator, dropdown-menu, select, dialog, skeleton, toggle, tabs, table, textarea, popover, tooltip, switch, checkbox, slider, progress, sonner) ✅
+- [x] shadcn/ui installed — 21 primitives (button, input, label, card, badge, separator, dropdown-menu, select, dialog, skeleton, toggle, tabs, table, textarea, popover, tooltip, switch, checkbox, slider, progress, sonner) ✅
 - [x] Tailwind CSS v4 ✅
-- [x] Dark + light theme with next-themes toggle (settings page) ✅
-- [x] Inter + JetBrains Mono fonts ✅
+- [x] Dark + light theme with next-themes toggle (settings page) ✅ — custom tokens moved to :root/.dark for proper light mode
+- [x] Inter + JetBrains Mono fonts loaded via Google Fonts ✅
 - [x] Responsive: mobile cards, desktop table on vault ✅
-- [x] Sonner toast notifications on settings + security pages ✅
-- [x] Skeleton loading states on vault page ✅
-- [x] Empty states with CTAs on vault, security pages ✅
+- [x] Sonner toast notifications on all mutation failures + settings ✅
+- [x] Skeleton loading states on vault + auth guard + root page ✅
+- [x] Empty states with CTAs + icons on vault, security, attachments, search pages ✅
 - [x] i18next setup with `en.json` (login + signup pages use t() calls, ~120 keys) ✅
+- [x] Logo SVGs used in sidebar, auth pages, onboarding, loading states, favicon ✅
+- [x] `usePageTitle` hook for per-route document titles (all 14 pages) ✅
 
 ### Auth UI
 - [x] Login / Signup — separate routes (`/login`, `/signup`) with shadcn/ui forms ✅
 - [x] MFA setup dialog in settings (TOTP secret generation + verification) ✅
-- [x] MFA verify page (`/mfa`) ✅ (stub exists at `/mfa`)
+- [x] MFA verify page (`/mfa`) — full flow: login detects `mfaRequired`, stores tempToken, redirects, verifies code, completes vault unlock ✅
+- [x] MFA disable button in settings (calls API with catch for 501) 🔶
 - [x] Passkey registration stub (`/settings/passkey`) 🔶
 - [x] Recovery key login page (UI exists, backend endpoint is 501 stub) 🔶
 - [x] Account deletion confirmation dialog ✅
+- [x] Login form redirects to `/mfa` when MFA is enabled ✅
 
 ### Onboarding Flow
 - [x] 3-option landing: Import / Add first password / Demo vault ✅
@@ -123,7 +128,8 @@
 - [x] 5 most recent items pinned (tracked in localStorage, shown in "Recent" section) ✅
 - [x] Item detail view with masked/unmasked fields + copy buttons + TOTP display (`?item=<id>`) ✅
 - [x] Custom fields (add/remove, text + hidden toggle) ✅
-- [x] Password show/hide toggle (eye icon, auto-hide after 30s) ✅
+- [x] Password show/hide toggle (eye icon, auto-hide after 30s, works in both read-only + editable modes) ✅
+- [x] Card number + CVV show/hide toggle via PasswordInput component ✅
 - [x] Password generator inline popover (random 8-128 chars + passphrase 3-10 words) ✅
 
 ### Add / Edit Items
@@ -145,7 +151,7 @@
 - [x] Settings page with sections (Account, Appearance, Security) ✅
 - [x] Change email dialog (OTP flow via API) ✅
 - [x] Change master password dialog (re-wrap vault key) ✅
-- [ ] MFA setup/disable UI ❌
+- [x] MFA setup/disable UI ✅ (enable fully functional, disable calls API with 501 fallback)
 - [x] Recovery key view/regenerate in settings ✅
 - [x] Login history (fetches from getAccount, shows last 20 events) ✅
 - [x] Vault timeout, clipboard auto-clear preferences (persisted to localStorage) ✅
@@ -168,11 +174,13 @@
 
 ### Architecture
 - [x] ApiClient lifecycle fixed — created once in VaultProvider, tokens persisted to localStorage ✅
-- [x] Server vault sync — login fetches vault blob, decrypts, hydrates; mutations auto-encrypt + upload ✅
+- [x] Server vault sync — login fetches vault blob, decrypts, hydrates; mutations auto-encrypt + upload in single PUT ✅
 - [x] Token auto-refresh — intercepts 401, calls refresh(), retries once ✅
+- [x] `NEXT_PUBLIC_API_URL` defaults to production URL, overridden per environment ✅
 - [x] Proper App Router routing — `(auth)`, `(app)`, onboarding route groups ✅
 - [x] Root layout with Providers (VaultProvider, ThemeProvider, TooltipProvider, Toaster) ✅
 - [x] AuthGuard / GuestGuard redirect components ✅
+- [x] `useSearchParams` wrapped in `<Suspense>` boundaries ✅
 
 ---
 
@@ -203,10 +211,11 @@
 - [x] TOTP code display with live countdown ✅ (auto-copy after fill not done)
 
 ### Sync Client
-- [x] Encrypted vault fetch from R2 (signed URL) — VaultSync class exists, not connected to server 🔶
+- [x] Encrypted vault fetch from API (`getVaultBlob()` direct endpoint, not signed URL) ✅
+- [x] Vault upload via direct PUT (blob sent in body, one-step) ✅
 - [x] Vault decrypt local → IndexedDB cache ✅
-- [ ] Optimistic locking: version check before upload ❌
-- [ ] Conflict detection + auto-merge ❌
+- [x] Optimistic locking: version check before upload ✅
+- [x] Conflict detection + auto-merge ✅
 - [ ] Manual conflict resolution UI ❌
 - [x] Read-only offline mode ✅
 
@@ -257,7 +266,7 @@
 
 ### Testing
 - [x] Crypto: property tests + known vectors (coverage gate not enforced in CI) 🔶
-- [ ] API: integration tests (Miniflare + D1/R2 emulation) — test dir exists but empty ❌
+- [x] API: integration tests (Miniflare + D1/R2 emulation) — 7 tests passing ✅
 - [ ] Web app: Vitest component tests ❌
 - [x] E2E: Playwright (3 basic tests in `e2e/auth.spec.ts`) 🔶
 - [ ] Extension: Playwright E2E (Chrome + Firefox, top 50 sites) ❌
@@ -267,7 +276,7 @@
 - [ ] Rate limiting tuned ❌
 - [ ] Turnstile integration verified ❌
 - [ ] Argon2id parameters profiled (64MB, 3 iterations baseline) ❌
-- [x] CSP headers on all responses ✅
+- [x] CSP headers on all responses — `script-src` includes `'unsafe-inline'` for Next.js + Cloudflare Insights ✅
 - [x] CORS restricted to known origins ✅
 - [ ] Error messages never leak stack traces ❌
 - [ ] No secrets or keys in client bundles ❌

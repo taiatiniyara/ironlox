@@ -103,7 +103,7 @@ app.post("/login", async (c) => {
   const turnstileToken = (body as Record<string, unknown>).turnstileToken as string | undefined;
 
   const user = await c.env.DB.prepare(
-      "SELECT id, auth_hash, auth_salt, encryption_salt, wrapped_vault_key, vault_version, tier FROM users WHERE email = ? AND deleted_at IS NULL",
+      "SELECT id, auth_hash, auth_salt, encryption_salt, wrapped_vault_key, vault_version, tier, mfa_enabled FROM users WHERE email = ? AND deleted_at IS NULL",
   )
     .bind(email)
     .first<{
@@ -114,6 +114,7 @@ app.post("/login", async (c) => {
       wrapped_vault_key: string;
       vault_version: number;
       tier: string;
+      mfa_enabled: number;
     }>();
 
   if (!user) {
@@ -133,6 +134,20 @@ app.post("/login", async (c) => {
       }
     }
     throw new AuthError("Invalid email or password");
+  }
+
+  if (user.mfa_enabled) {
+    const tempToken = crypto.randomUUID();
+    await c.env.KV.put(`mfa-temp:${tempToken}`, user.id, { expirationTtl: 300 });
+    return c.json({
+      accessToken: "",
+      refreshToken: "",
+      mfaRequired: true,
+      tempToken,
+      encryptionSalt: user.encryption_salt,
+      wrappedVaultKey: user.wrapped_vault_key,
+      vaultVersion: user.vault_version,
+    });
   }
 
   const jti = crypto.randomUUID();

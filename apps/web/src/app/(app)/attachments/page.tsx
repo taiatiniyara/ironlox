@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useVault } from "@/lib/vault-context";
+import { usePageTitle } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -16,6 +17,7 @@ interface AttachedFile {
 }
 
 export default function AttachmentsPage() {
+  usePageTitle("Attachments");
   const { apiClient } = useVault();
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -92,7 +94,7 @@ export default function AttachmentsPage() {
         <Button variant="ghost" size="icon" onClick={() => router.push("/vault")}>
           <ArrowLeft className="size-4" />
         </Button>
-        <h1 className="text-lg font-semibold">File Attachments</h1>
+        <h1 className="text-xl font-semibold">File Attachments</h1>
       </div>
 
       <Card>

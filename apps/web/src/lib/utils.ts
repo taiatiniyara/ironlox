@@ -1,9 +1,9 @@
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
-import { useState, useEffect } from "react"
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+import { useState, useEffect } from "react";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
 export function useDebounce<T>(value: T, delay: number): T {
@@ -13,4 +13,10 @@ export function useDebounce<T>(value: T, delay: number): T {
     return () => clearTimeout(timer);
   }, [value, delay]);
   return debounced;
+}
+
+export function usePageTitle(title: string) {
+  useEffect(() => {
+    document.title = `${title} - Ironlox`;
+  }, [title]);
 }

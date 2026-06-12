@@ -3,17 +3,12 @@
 import { useState, useMemo, memo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useVault } from "@/lib/vault-context";
-import { useDebounce } from "@/lib/utils";
+import { useDebounce, usePageTitle } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/vault/password-input";
@@ -21,11 +16,29 @@ import { CopyButton } from "@/components/shared/copy-button";
 import { TotpDisplay } from "@/components/vault/totp-display";
 import { toast } from "sonner";
 import {
-  Plus, Copy, Search, Globe, CreditCard, FileText, User,
-  ArrowUpDown, ArrowLeft, Pencil, Key, LinkIcon, Pin,
+  Plus,
+  Copy,
+  Search,
+  Globe,
+  CreditCard,
+  FileText,
+  User,
+  ArrowUpDown,
+  ArrowLeft,
+  Pencil,
+  Key,
+  LinkIcon,
+  Pin,
+  SearchX,
 } from "lucide-react";
 import Fuse from "fuse.js";
-import type { VaultItem, LoginFields, CardFields, IdentityFields, NoteFields } from "@ironlox/schemas";
+import type {
+  VaultItem,
+  LoginFields,
+  CardFields,
+  IdentityFields,
+  NoteFields,
+} from "@ironlox/schemas";
 
 const RECENTS_KEY = "ironlox_recent_items";
 const MAX_RECENTS = 5;
@@ -33,7 +46,9 @@ const MAX_RECENTS = 5;
 function loadRecents(): string[] {
   try {
     return JSON.parse(localStorage.getItem(RECENTS_KEY) ?? "[]");
-  } catch { return []; }
+  } catch {
+    return [];
+  }
 }
 
 function saveRecents(ids: string[]) {
@@ -47,7 +62,10 @@ function addRecent(id: string) {
 }
 
 const categoryIcons: Record<string, React.ComponentType<{ className?: string }>> = {
-  login: Globe, card: CreditCard, note: FileText, identity: User,
+  login: Globe,
+  card: CreditCard,
+  note: FileText,
+  identity: User,
 };
 
 const categories = ["all", "login", "card", "note", "identity"] as const;
@@ -61,12 +79,20 @@ const sortOptions = [
 ];
 
 const fuseOptions = {
-  keys: ["name", "fields.username", "fields.uris", "fields.cardholder", "fields.content", "fields.notes"],
+  keys: [
+    "name",
+    "fields.username",
+    "fields.uris",
+    "fields.cardholder",
+    "fields.content",
+    "fields.notes",
+  ],
   threshold: 0.4,
   distance: 100,
 };
 
 export default function VaultPage() {
+  usePageTitle("Vault");
   const { vault } = useVault();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -79,10 +105,7 @@ export default function VaultPage() {
   const itemId = searchParams.get("item");
   const editId = searchParams.get("edit");
 
-  const activeItems = useMemo(
-    () => (vault?.items ?? []).filter((i) => !i.deleted),
-    [vault],
-  );
+  const activeItems = useMemo(() => (vault?.items ?? []).filter((i) => !i.deleted), [vault]);
 
   const fuse = useMemo(() => new Fuse(activeItems, fuseOptions), [activeItems]);
 
@@ -96,12 +119,15 @@ export default function VaultPage() {
 
   const recentIds = useMemo(() => loadRecents(), []);
   const recentItems = useMemo(
-    () => recentIds.map((id) => activeItems.find((i) => i.id === id)).filter(Boolean) as VaultItem[],
+    () =>
+      recentIds.map((id) => activeItems.find((i) => i.id === id)).filter(Boolean) as VaultItem[],
     [recentIds, activeItems],
   );
 
   const filtered = useMemo(() => {
-    let items = debouncedSearch ? fuse.search(debouncedSearch).map((r) => r.item) : [...activeItems];
+    let items = debouncedSearch
+      ? fuse.search(debouncedSearch).map((r) => r.item)
+      : [...activeItems];
     if (category !== "all") items = items.filter((i) => i.type === category);
     if (tagFilter) items = items.filter((i) => i.tags.includes(tagFilter));
     switch (sort) {
@@ -121,7 +147,13 @@ export default function VaultPage() {
   }, [activeItems, fuse, search, category, tagFilter, sort]);
 
   const typeCounts = useMemo(() => {
-    const counts: Record<string, number> = { all: activeItems.length, login: 0, card: 0, note: 0, identity: 0 };
+    const counts: Record<string, number> = {
+      all: activeItems.length,
+      login: 0,
+      card: 0,
+      note: 0,
+      identity: 0,
+    };
     for (const item of activeItems) {
       counts[item.type] = (counts[item.type] ?? 0) + 1;
     }
@@ -174,58 +206,70 @@ export default function VaultPage() {
 
   return (
     <div className="flex flex-col h-full p-4">
-      <div className="flex items-center gap-3 mb-3">
-        <div className="relative flex-1">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-          <Input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder={`Search ${activeItems.length} items...`}
-            className="pl-8"
-          />
-        </div>
-        <Select value={sort} onValueChange={(v) => { if (v) setSort(v); }}>
-          <SelectTrigger className="w-9 h-9 p-0 flex items-center justify-center">
-            <ArrowUpDown className="size-4" />
-          </SelectTrigger>
-          <SelectContent align="end">
-            {sortOptions.map((opt) => (
-              <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Button size="icon" onClick={() => router.push("/add")}>
-          <Plus className="size-4" />
-        </Button>
-      </div>
-
-      <div className="flex gap-1.5 mb-1 overflow-x-auto pb-1">
-        {categories.map((cat) => (
-          <Badge
-            key={cat}
-            variant={category === cat && !tagFilter ? "default" : "secondary"}
-            className="cursor-pointer text-xs shrink-0"
-            onClick={() => { setCategory(cat); setTagFilter(null); }}
+      <div className="sticky top-0 z-10 bg-background -mx-4 px-4 pb-3 pt-4 -mt-4">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="relative flex-1">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+            <Input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder={`Search ${activeItems.length} items...`}
+              className="pl-8"
+            />
+          </div>
+          <Select
+            value={sort}
+            onValueChange={(v) => {
+              if (v) setSort(v);
+            }}
           >
-            {cat === "all" ? "All" : cat.charAt(0).toUpperCase() + cat.slice(1)}
-            <span className="ml-1 opacity-60">({typeCounts[cat] ?? 0})</span>
-          </Badge>
-        ))}
-      </div>
-      {allTags.length > 0 && (
-        <div className="flex gap-1.5 mb-3 overflow-x-auto pb-1">
-          {allTags.map((tag) => (
+            <SelectTrigger className="w-9 h-9 p-0 flex items-center justify-center">
+              <ArrowUpDown className="size-4" />
+            </SelectTrigger>
+            <SelectContent align="end">
+              {sortOptions.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button size="icon" onClick={() => router.push("/add")}>
+            <Plus className="size-4" />
+          </Button>
+        </div>
+
+        <div className="flex gap-1.5 mb-1 overflow-x-auto pb-1">
+          {categories.map((cat) => (
             <Badge
-              key={tag}
-              variant={tagFilter === tag ? "default" : "outline"}
-              className="cursor-pointer text-[10px] shrink-0"
-              onClick={() => setTagFilter(tagFilter === tag ? null : tag)}
+              key={cat}
+              variant={category === cat && !tagFilter ? "default" : "secondary"}
+              className="cursor-pointer text-xs shrink-0"
+              onClick={() => {
+                setCategory(cat);
+                setTagFilter(null);
+              }}
             >
-              {tag}
+              {cat === "all" ? "All" : cat.charAt(0).toUpperCase() + cat.slice(1)}
+              <span className="ml-1 opacity-60">({typeCounts[cat] ?? 0})</span>
             </Badge>
           ))}
         </div>
-      )}
+        {allTags.length > 0 && (
+          <div className="flex gap-1.5 overflow-x-auto pb-1">
+            {allTags.map((tag) => (
+              <Badge
+                key={tag}
+                variant={tagFilter === tag ? "default" : "outline"}
+                className="cursor-pointer text-[10px] shrink-0"
+                onClick={() => setTagFilter(tagFilter === tag ? null : tag)}
+              >
+                {tag}
+              </Badge>
+            ))}
+          </div>
+        )}
+      </div>
 
       {!search && !tagFilter && category === "all" && recentItems.length > 0 && (
         <div className="mb-3">
@@ -237,7 +281,10 @@ export default function VaultPage() {
               <div
                 key={item.id}
                 className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-muted/50 cursor-pointer transition-colors group text-sm"
-                onClick={() => { addRecent(item.id); router.push(`/vault?item=${item.id}`); }}
+                onClick={() => {
+                  addRecent(item.id);
+                  router.push(`/vault?item=${item.id}`);
+                }}
               >
                 <IconForType type={item.type} />
                 <span className="flex-1 truncate">{item.name}</span>
@@ -249,7 +296,8 @@ export default function VaultPage() {
       )}
 
       {filtered.length === 0 ? (
-        <div className="flex-1 flex items-center justify-center">
+        <div className="flex-1 flex flex-col items-center justify-center gap-2">
+          <SearchX className="size-8 text-muted-foreground" />
           <p className="text-sm text-muted-foreground">No items match your search</p>
         </div>
       ) : (
@@ -263,7 +311,10 @@ export default function VaultPage() {
                       <tr
                         key={item.id}
                         className="border-b border-border last:border-0 hover:bg-muted/50 cursor-pointer transition-colors"
-                        onClick={() => { addRecent(item.id); router.push(`/vault?item=${item.id}`); }}
+                        onClick={() => {
+                          addRecent(item.id);
+                          router.push(`/vault?item=${item.id}`);
+                        }}
                       >
                         <td className="py-2.5 px-4">
                           <div className="flex items-center gap-2">
@@ -290,7 +341,10 @@ export default function VaultPage() {
               <div
                 key={item.id}
                 className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted/50 cursor-pointer transition-colors group"
-                onClick={() => { addRecent(item.id); router.push(`/vault?item=${item.id}`); }}
+                onClick={() => {
+                  addRecent(item.id);
+                  router.push(`/vault?item=${item.id}`);
+                }}
               >
                 <IconForType type={item.type} />
                 <div className="flex-1 min-w-0">
@@ -333,14 +387,29 @@ const QuickCopy = memo(function QuickCopy({ item }: { item: VaultItem }) {
     }
   }
   return (
-    <Button variant="ghost" size="icon" className="size-7 opacity-0 group-hover:opacity-100 transition-opacity" onClick={copy}>
-      {copied ? <span className="text-[10px] text-green-500">OK</span> : <Copy className="size-3.5" />}
+    <Button
+      variant="ghost"
+      size="icon"
+      className="size-7 opacity-0 group-hover:opacity-100 transition-opacity"
+      onClick={copy}
+    >
+      {copied ? (
+        <span className="text-[10px] text-green-500">OK</span>
+      ) : (
+        <Copy className="size-3.5" />
+      )}
     </Button>
   );
 });
 
 /** ── Inline Item Detail ── */
-const ItemDetailInline = memo(function ItemDetailInline({ item, onBack }: { item: VaultItem; onBack: () => void }) {
+const ItemDetailInline = memo(function ItemDetailInline({
+  item,
+  onBack,
+}: {
+  item: VaultItem;
+  onBack: () => void;
+}) {
   const { removeItem } = useVault();
   const router = useRouter();
   const Icon = categoryIcons[item.type] ?? FileText;
@@ -354,10 +423,13 @@ const ItemDetailInline = memo(function ItemDetailInline({ item, onBack }: { item
         <Icon className="size-5 text-muted-foreground shrink-0" />
         <div className="flex-1 min-w-0">
           <h1 className="text-lg font-semibold truncate">{item.name}</h1>
-          <Badge variant="secondary" className="text-[10px]">{item.type}</Badge>
+          <Badge variant="secondary" className="text-[10px]">
+            {item.type}
+          </Badge>
         </div>
         <Button variant="outline" size="sm" onClick={() => router.push(`/vault?edit=${item.id}`)}>
-          <Pencil className="size-3.5 mr-1" />Edit
+          <Pencil className="size-3.5 mr-1" />
+          Edit
         </Button>
       </div>
 
@@ -379,7 +451,12 @@ const ItemDetailInline = memo(function ItemDetailInline({ item, onBack }: { item
               <div key={i} className="space-y-1">
                 <Label className="text-[10px] text-muted-foreground">{f.name}</Label>
                 <div className="flex items-center gap-2">
-                  <Input value={f.value} readOnly type={f.type === "hidden" ? "password" : "text"} className="h-8 text-xs font-mono" />
+                  <Input
+                    value={f.value}
+                    readOnly
+                    type={f.type === "hidden" ? "password" : "text"}
+                    className="h-8 text-xs font-mono"
+                  />
                   <CopyButton value={f.value} />
                 </div>
               </div>
@@ -393,8 +470,16 @@ const ItemDetailInline = memo(function ItemDetailInline({ item, onBack }: { item
         <span>Updated: {new Date(item.updatedAt).toLocaleDateString()}</span>
       </div>
 
-      <Button variant="ghost" size="sm" className="w-full text-destructive"
-        onClick={async () => { await removeItem(item.id); toast.success("Item deleted"); onBack(); }}>
+      <Button
+        variant="ghost"
+        size="sm"
+        className="w-full text-destructive"
+        onClick={async () => {
+          await removeItem(item.id);
+          toast.success("Item deleted");
+          onBack();
+        }}
+      >
         Delete Item
       </Button>
     </div>
@@ -407,10 +492,21 @@ const LoginFields = memo(function LoginFields({ item }: { item: VaultItem }) {
     <div className="space-y-3">
       {f.uris?.length ? (
         <div className="space-y-1">
-          <Label className="text-xs text-muted-foreground"><LinkIcon className="size-3 inline mr-1" />Website</Label>
+          <Label className="text-xs text-muted-foreground">
+            <LinkIcon className="size-3 inline mr-1" />
+            Website
+          </Label>
           <div className="space-y-1">
             {f.uris.map((uri, i) => (
-              <a key={i} href={uri} target="_blank" rel="noopener noreferrer" className="block text-sm text-primary hover:underline break-all">{uri}</a>
+              <a
+                key={i}
+                href={uri}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block text-sm text-primary hover:underline break-all"
+              >
+                {uri}
+              </a>
             ))}
           </div>
         </div>
@@ -423,14 +519,24 @@ const LoginFields = memo(function LoginFields({ item }: { item: VaultItem }) {
         </div>
       </div>
       <div className="space-y-1">
-        <Label className="text-xs text-muted-foreground"><Key className="size-3 inline mr-1" />Password</Label>
+        <Label className="text-xs text-muted-foreground">
+          <Key className="size-3 inline mr-1" />
+          Password
+        </Label>
         <div className="flex items-center gap-2">
           <PasswordInput value={f.password} readOnly />
           <CopyButton value={f.password} />
         </div>
       </div>
-      {f.totpSecret ? <div className="space-y-1"><Label className="text-xs text-muted-foreground">2FA Code</Label><TotpDisplay secret={f.totpSecret} /></div> : null}
-      {f.notes ? <p className="text-sm text-muted-foreground whitespace-pre-wrap">{f.notes}</p> : null}
+      {f.totpSecret ? (
+        <div className="space-y-1">
+          <Label className="text-xs text-muted-foreground">2FA Code</Label>
+          <TotpDisplay secret={f.totpSecret} />
+        </div>
+      ) : null}
+      {f.notes ? (
+        <p className="text-sm text-muted-foreground whitespace-pre-wrap">{f.notes}</p>
+      ) : null}
     </div>
   );
 });
@@ -440,13 +546,40 @@ const CardFields = memo(function CardFields({ item }: { item: VaultItem }) {
   return (
     <div className="space-y-3">
       {f.brand ? <Badge variant="outline">{f.brand}</Badge> : null}
-      <div className="space-y-1"><Label className="text-xs text-muted-foreground">Cardholder</Label><div className="flex items-center gap-2"><Input value={f.cardholder} readOnly className="h-8 text-sm flex-1" /><CopyButton value={f.cardholder} /></div></div>
-      <div className="space-y-1"><Label className="text-xs text-muted-foreground">Card Number</Label><div className="flex items-center gap-2"><Input value={f.number} readOnly type="password" className="h-8 text-sm font-mono flex-1" /><CopyButton value={f.number} /></div></div>
-      <div className="flex gap-4">
-        <div className="flex-1 space-y-1"><Label className="text-xs text-muted-foreground">Expiry</Label><Input value={(f.expiryMonth && f.expiryYear) ? `${f.expiryMonth}/${f.expiryYear}` : ""} readOnly className="h-8 text-sm" /></div>
-        <div className="flex-1 space-y-1"><Label className="text-xs text-muted-foreground">CVV</Label><div className="flex items-center gap-2"><Input value={f.cvv} readOnly type="password" className="h-8 text-sm w-16" /><CopyButton value={f.cvv} /></div></div>
+      <div className="space-y-1">
+        <Label className="text-xs text-muted-foreground">Cardholder</Label>
+        <div className="flex items-center gap-2">
+          <Input value={f.cardholder} readOnly className="h-8 text-sm flex-1" />
+          <CopyButton value={f.cardholder} />
+        </div>
       </div>
-      {f.notes ? <p className="text-sm text-muted-foreground whitespace-pre-wrap">{f.notes}</p> : null}
+      <div className="space-y-1">
+        <Label className="text-xs text-muted-foreground">Card Number</Label>
+        <div className="flex items-center gap-2">
+          <PasswordInput value={f.number} readOnly />
+          <CopyButton value={f.number} />
+        </div>
+      </div>
+      <div className="flex gap-4">
+        <div className="flex-1 space-y-1">
+          <Label className="text-xs text-muted-foreground">Expiry</Label>
+          <Input
+            value={f.expiryMonth && f.expiryYear ? `${f.expiryMonth}/${f.expiryYear}` : ""}
+            readOnly
+            className="h-8 text-sm"
+          />
+        </div>
+        <div className="flex-1 space-y-1">
+          <Label className="text-xs text-muted-foreground">CVV</Label>
+          <div className="flex items-center gap-2">
+            <PasswordInput value={f.cvv} readOnly />
+            <CopyButton value={f.cvv} />
+          </div>
+        </div>
+      </div>
+      {f.notes ? (
+        <p className="text-sm text-muted-foreground whitespace-pre-wrap">{f.notes}</p>
+      ) : null}
     </div>
   );
 });
@@ -458,24 +591,42 @@ const IdentityFields = memo(function IdentityFields({ item }: { item: VaultItem 
       {(["firstName", "lastName", "email", "phone", "address"] as const).map((key) => {
         const val = f[key];
         if (!val) return null;
-        return <div key={key} className="space-y-1"><Label className="text-xs text-muted-foreground capitalize">{key}</Label><div className="flex items-center gap-2"><Input value={val} readOnly className="h-8 text-sm flex-1" /><CopyButton value={val} /></div></div>;
+        return (
+          <div key={key} className="space-y-1">
+            <Label className="text-xs text-muted-foreground capitalize">{key}</Label>
+            <div className="flex items-center gap-2">
+              <Input value={val} readOnly className="h-8 text-sm flex-1" />
+              <CopyButton value={val} />
+            </div>
+          </div>
+        );
       })}
-      {f.notes ? <p className="text-sm text-muted-foreground whitespace-pre-wrap">{f.notes}</p> : null}
+      {f.notes ? (
+        <p className="text-sm text-muted-foreground whitespace-pre-wrap">{f.notes}</p>
+      ) : null}
     </div>
   );
 });
 
 /** ── Inline Edit ── */
-const EditItemInline = memo(function EditItemInline({ item, onDone }: { item: VaultItem; onDone: () => void }) {
+const EditItemInline = memo(function EditItemInline({
+  item,
+  onDone,
+}: {
+  item: VaultItem;
+  onDone: () => void;
+}) {
   const { updateItem } = useVault();
   const [name, setName] = useState(item.name);
   const [notes, setNotes] = useState(
-    (item.type === "login" ? (item.fields as LoginFields).notes : (item.fields as NoteFields).content) ?? "",
+    (item.type === "login"
+      ? (item.fields as LoginFields).notes
+      : (item.fields as NoteFields).content) ?? "",
   );
   const [saving, setSaving] = useState(false);
 
   const isLogin = item.type === "login";
-  const loginFields = isLogin ? item.fields as LoginFields : null;
+  const loginFields = isLogin ? (item.fields as LoginFields) : null;
   const [username, setUsername] = useState(loginFields?.username ?? "");
   const [password, setPassword] = useState(loginFields?.password ?? "");
   const [uris, setUris] = useState<string[]>(loginFields?.uris ?? []);
@@ -497,7 +648,9 @@ const EditItemInline = memo(function EditItemInline({ item, onDone }: { item: Va
   return (
     <div className="max-w-lg mx-auto p-4">
       <div className="flex items-center gap-3 mb-4">
-        <Button variant="ghost" size="icon" onClick={onDone}><ArrowLeft className="size-4" /></Button>
+        <Button variant="ghost" size="icon" onClick={onDone}>
+          <ArrowLeft className="size-4" />
+        </Button>
         <h1 className="text-lg font-semibold">Edit {item.name}</h1>
       </div>
       <Card>
@@ -511,16 +664,45 @@ const EditItemInline = memo(function EditItemInline({ item, onDone }: { item: Va
               <>
                 <div className="space-y-2">
                   <Label htmlFor="euris">URIs</Label>
-                  <Input id="euris" value={uris.join(", ")} onChange={(e) => setUris(e.target.value.split(",").map((s) => s.trim()).filter(Boolean))} placeholder="https://example.com, https://..." />
+                  <Input
+                    id="euris"
+                    value={uris.join(", ")}
+                    onChange={(e) =>
+                      setUris(
+                        e.target.value
+                          .split(",")
+                          .map((s) => s.trim())
+                          .filter(Boolean),
+                      )
+                    }
+                    placeholder="https://example.com, https://..."
+                  />
                 </div>
-                <div className="space-y-2"><Label htmlFor="euser">Username</Label><Input id="euser" value={username} onChange={(e) => setUsername(e.target.value)} /></div>
-                <div className="space-y-2"><Label htmlFor="epass">Password</Label><PasswordInput id="epass" value={password} onChange={setPassword} /></div>
+                <div className="space-y-2">
+                  <Label htmlFor="euser">Username</Label>
+                  <Input
+                    id="euser"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="epass">Password</Label>
+                  <PasswordInput id="epass" value={password} onChange={setPassword} />
+                </div>
               </>
             )}
-            <div className="space-y-2"><Label htmlFor="enotes">Notes</Label><Input id="enotes" value={notes} onChange={(e) => setNotes(e.target.value)} /></div>
+            <div className="space-y-2">
+              <Label htmlFor="enotes">Notes</Label>
+              <Input id="enotes" value={notes} onChange={(e) => setNotes(e.target.value)} />
+            </div>
             <div className="flex gap-2">
-              <Button type="button" variant="outline" className="flex-1" onClick={onDone}>Cancel</Button>
-              <Button type="submit" className="flex-1" disabled={!name || saving}>{saving ? "Saving..." : "Save Changes"}</Button>
+              <Button type="button" variant="outline" className="flex-1" onClick={onDone}>
+                Cancel
+              </Button>
+              <Button type="submit" className="flex-1" disabled={!name || saving}>
+                {saving ? "Saving..." : "Save Changes"}
+              </Button>
             </div>
           </form>
         </CardContent>

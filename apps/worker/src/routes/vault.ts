@@ -60,23 +60,7 @@ app.put("/", async (c) => {
     throw new ValidationError("Vault blob exceeds maximum size");
   }
 
-  let version: number;
-  let vaultBlob: string;
-
-  let validated;
-  try {
-    const parsed = JSON.parse(rawBody);
-    validated = PutVaultRequestSchema.safeParse(parsed);
-  } catch {
-    throw new ValidationError("Invalid JSON body");
-  }
-
-  if (!validated?.success) {
-    throw new ValidationError("Invalid vault upload data");
-  }
-
-  version = validated.data.version;
-  vaultBlob = validated.data.vaultBlob;
+  const { version, vaultBlob } = parseVaultBody(rawBody);
 
   const key = `vault-lock:${userId}`;
   const locked = await c.env.KV.get(key);
@@ -221,6 +205,20 @@ async function getAttachmentUsage(env: Env, userId: string): Promise<{ usage: nu
   }
 
   return { usage, count: objects.objects.length, actualUsage: usage };
+}
+
+function parseVaultBody(raw: string): { version: number; vaultBlob: string } {
+  try {
+    const parsed = JSON.parse(raw);
+    const validated = PutVaultRequestSchema.safeParse(parsed);
+    if (!validated.success) {
+      throw new ValidationError("Invalid vault upload data");
+    }
+    return validated.data;
+  } catch (err) {
+    if (err instanceof ValidationError) throw err;
+    throw new ValidationError("Invalid JSON body");
+  }
 }
 
 export const vaultRoutes = app;

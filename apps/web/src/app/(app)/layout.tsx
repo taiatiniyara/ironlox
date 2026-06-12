@@ -1,14 +1,15 @@
 "use client";
 
+import { Suspense } from "react";
 import { AuthGuard } from "@/components/auth-guard";
 import { useVault } from "@/lib/vault-context";
 import { useTranslation } from "react-i18next";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   LogOut,
-  Lock,
   Plus,
   Settings,
   Shield,
@@ -37,16 +38,14 @@ function AppSidebar() {
     <div className="flex flex-col h-full">
       <div className="px-4 py-4 border-b border-border">
         <div className="flex items-center gap-2">
-          <Lock className="size-5 text-primary" />
+          <img src="/logo-icon.svg" alt="Ironlox" className="size-5" />
           <span className="font-semibold text-sm">Ironlox</span>
         </div>
-        {email && (
-          <p className="text-xs text-muted-foreground mt-1 truncate">{email}</p>
-        )}
+        {email && <p className="text-xs text-muted-foreground mt-1 truncate">{email}</p>}
         {isSyncing && (
           <p className="text-[10px] text-muted-foreground animate-pulse mt-0.5">
-                {t("nav.syncing")}
-              </p>
+            {t("nav.syncing")}
+          </p>
         )}
       </div>
 
@@ -92,7 +91,19 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <aside className="w-56 border-r border-border bg-card shrink-0 hidden md:flex flex-col">
           <AppSidebar />
         </aside>
-        <main className="flex-1 overflow-auto">{children}</main>
+        <main className="flex-1 overflow-auto">
+          <Suspense
+            fallback={
+              <div className="flex flex-col h-full p-4 space-y-3">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Skeleton key={i} className="h-14 w-full" />
+                ))}
+              </div>
+            }
+          >
+            {children}
+          </Suspense>
+        </main>
       </div>
     </AuthGuard>
   );

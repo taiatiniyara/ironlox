@@ -85,7 +85,15 @@ export class ApiClient {
     return this.post("/auth/mfa/enable", body);
   }
 
-  async mfaVerify(body: { code: string; email: string }): Promise<LoginResponse> {
+  async mfaDisable(): Promise<void> {
+    return this.post("/auth/mfa/disable", {});
+  }
+
+  async mfaVerify(body: {
+    code: string;
+    email: string;
+    tempToken: string;
+  }): Promise<LoginResponse> {
     return this.post("/auth/mfa/verify", body, false);
   }
 

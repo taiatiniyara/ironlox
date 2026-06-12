@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useVault } from "@/lib/vault-context";
+import { usePageTitle } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,7 +12,8 @@ import { toast } from "sonner";
 import { importExportCsv } from "@ironlox/crypto";
 import type { VaultItem } from "@ironlox/schemas";
 
-const CSV_TEMPLATE = "type,name,uri,username,password,notes,tags\nlogin,Example,https://example.com,user@example.com,mypassword,Optional notes,work;personal\ncard,My Card,,,,4111111111111111,,\nnote,Secure Note,,,,Some secret content,\nidentity,John Doe,,john@email.com,,,555-0100,";
+const CSV_TEMPLATE =
+  "type,name,uri,username,password,notes,tags\nlogin,Example,https://example.com,user@example.com,mypassword,Optional notes,work;personal\ncard,My Card,,,,4111111111111111,,\nnote,Secure Note,,,,Some secret content,\nidentity,John Doe,,john@email.com,,,555-0100,";
 
 function downloadTemplate() {
   const blob = new Blob([CSV_TEMPLATE], { type: "text/csv" });
@@ -24,6 +26,7 @@ function downloadTemplate() {
 }
 
 export default function ImportPage() {
+  usePageTitle("Import");
   const { bulkAddItems } = useVault();
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -71,7 +74,7 @@ export default function ImportPage() {
         <Button variant="ghost" size="icon" onClick={() => router.push("/vault")}>
           <ArrowLeft className="size-4" />
         </Button>
-        <h1 className="text-lg font-semibold">Import Passwords</h1>
+        <h1 className="text-xl font-semibold">Import Passwords</h1>
       </div>
 
       {preview.length === 0 ? (
@@ -80,8 +83,8 @@ export default function ImportPage() {
             <Upload className="size-8 text-muted-foreground mx-auto mb-2" />
             <CardTitle>Upload CSV</CardTitle>
             <CardDescription>
-              Import from 1Password, Bitwarden, LastPass, or Chrome.
-              Expected columns: type, name, uri, username, password, notes, tags.
+              Import from 1Password, Bitwarden, LastPass, or Chrome. Expected columns: type, name,
+              uri, username, password, notes, tags.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -105,15 +108,18 @@ export default function ImportPage() {
       ) : (
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">
-              {preview.length} items ready to import
-            </CardTitle>
+            <CardTitle className="text-base">{preview.length} items ready to import</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="max-h-64 overflow-auto space-y-1">
               {preview.map((item, i) => (
-                <div key={i} className="flex items-center gap-2 text-sm py-1 border-b border-border last:border-0">
-                  <Badge variant="outline" className="text-[10px] shrink-0">{item.type}</Badge>
+                <div
+                  key={i}
+                  className="flex items-center gap-2 text-sm py-1 border-b border-border last:border-0"
+                >
+                  <Badge variant="outline" className="text-[10px] shrink-0">
+                    {item.type}
+                  </Badge>
                   <span className="truncate flex-1">{item.name}</span>
                 </div>
               ))}

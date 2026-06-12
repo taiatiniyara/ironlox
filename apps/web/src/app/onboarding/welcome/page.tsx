@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useVault } from "@/lib/vault-context";
+import { usePageTitle } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -18,7 +19,12 @@ const demoItems: VaultItem[] = [
     folderId: null,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-    fields: { username: "demo-user", password: "P@ssw0rd2024!", uris: ["https://github.com"], notes: "Example login item" },
+    fields: {
+      username: "demo-user",
+      password: "P@ssw0rd2024!",
+      uris: ["https://github.com"],
+      notes: "Example login item",
+    },
   },
   {
     id: crypto.randomUUID(),
@@ -28,7 +34,14 @@ const demoItems: VaultItem[] = [
     folderId: null,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-    fields: { cardholder: "Demo User", number: "4111111111111111", expiryMonth: "12", expiryYear: "2028", cvv: "123", brand: "Visa" },
+    fields: {
+      cardholder: "Demo User",
+      number: "4111111111111111",
+      expiryMonth: "12",
+      expiryYear: "2028",
+      cvv: "123",
+      brand: "Visa",
+    },
   },
   {
     id: crypto.randomUUID(),
@@ -43,20 +56,28 @@ const demoItems: VaultItem[] = [
 ];
 
 export default function WelcomePage() {
+  usePageTitle("Welcome");
   const { addItem, vault } = useVault();
   const router = useRouter();
   const hasItems = (vault?.items ?? []).filter((i) => !i.deleted).length > 0;
 
   async function handleDemo() {
     for (const item of demoItems) {
-      await addItem({ ...item, id: crypto.randomUUID(), createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
+      await addItem({
+        ...item,
+        id: crypto.randomUUID(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      });
     }
     toast.success("Demo vault loaded. Explore your vault!");
     router.push("/vault");
   }
 
   const demoIcons: Record<string, React.ComponentType<{ className?: string }>> = {
-    login: Globe, card: CreditCard, note: FileText,
+    login: Globe,
+    card: CreditCard,
+    note: FileText,
   };
 
   return (
@@ -77,12 +98,17 @@ export default function WelcomePage() {
           </Button>
         </Link>
         <div className="border border-border rounded-lg p-3 space-y-2">
-          <p className="text-xs text-muted-foreground">Try the demo vault (3 sample items, no real data)</p>
+          <p className="text-xs text-muted-foreground">
+            Try the demo vault (3 sample items, no real data)
+          </p>
           <div className="space-y-1">
             {demoItems.map((item) => {
               const Icon = demoIcons[item.type] ?? FileText;
               return (
-                <div key={item.id} className="flex items-center gap-2 text-xs text-muted-foreground">
+                <div
+                  key={item.id}
+                  className="flex items-center gap-2 text-xs text-muted-foreground"
+                >
                   <Icon className="size-3" />
                   <span>{item.name}</span>
                   <span className="ml-auto text-[10px] capitalize">{item.type}</span>
@@ -90,7 +116,13 @@ export default function WelcomePage() {
               );
             })}
           </div>
-          <Button variant="secondary" size="sm" className="w-full" onClick={handleDemo} disabled={hasItems}>
+          <Button
+            variant="secondary"
+            size="sm"
+            className="w-full"
+            onClick={handleDemo}
+            disabled={hasItems}
+          >
             {hasItems ? "Vault already has items" : "Load Demo Vault"}
           </Button>
         </div>

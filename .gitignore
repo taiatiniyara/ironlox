@@ -19,3 +19,4 @@ test-results/
 *.tsbuildinfo
 nul
 graphify-out/
+out/

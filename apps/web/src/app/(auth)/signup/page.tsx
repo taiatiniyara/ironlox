@@ -27,7 +27,7 @@ function StrengthBar({ strength }: { strength: number }) {
       {[0, 1, 2, 3].map((level) => (
         <div
           key={level}
-          className={`h-1 flex-1 rounded transition-colors ${level < strength ? colors[strength - 1] : "bg-border"}`}
+          className={`h-1 flex-1 rounded transition-all duration-500 ${level < strength ? colors[strength - 1] : "bg-border"}`}
         />
       ))}
       <span className="text-[10px] text-muted-foreground ml-2 w-10">

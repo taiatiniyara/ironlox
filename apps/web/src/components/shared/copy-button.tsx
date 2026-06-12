@@ -28,14 +28,14 @@ export function CopyButton({ value, label, autoHideMs = 60000 }: CopyButtonProps
     <Button
       variant="ghost"
       size="sm"
-      className="h-7 gap-1 text-xs"
+      className="h-7 gap-1 text-xs transition-all duration-150"
       onClick={copy}
     >
       {copied ? (
-        <>
+        <span className="flex items-center gap-1 animate-pop-in">
           <Check className="size-3 text-green-500" />
           {label && <span className="text-green-500">{label}</span>}
-        </>
+        </span>
       ) : (
         <>
           <Copy className="size-3" />

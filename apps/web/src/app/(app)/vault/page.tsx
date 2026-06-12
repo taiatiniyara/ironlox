@@ -341,7 +341,7 @@ export default function VaultPage() {
         </div>
       ) : (
         <div className="flex-1 overflow-auto space-y-1">
-          <div className="hidden md:block">
+          <div className="hidden md:block animate-stagger-list">
             <Card>
               <CardContent className="p-0">
                 <table className="w-full">
@@ -375,7 +375,7 @@ export default function VaultPage() {
             </Card>
           </div>
 
-          <div className="md:hidden space-y-1">
+          <div className="md:hidden space-y-1 animate-stagger-list">
             {filtered.map((item) => (
               <div
                 key={item.id}
@@ -429,11 +429,11 @@ const QuickCopy = memo(function QuickCopy({ item }: { item: VaultItem }) {
     <Button
       variant="ghost"
       size="icon"
-      className="size-7 opacity-0 group-hover:opacity-100 transition-opacity"
+      className="size-7 opacity-0 group-hover:opacity-100 transition-opacity duration-150"
       onClick={copy}
     >
       {copied ? (
-        <span className="text-[10px] text-green-500">OK</span>
+        <span className="text-[10px] text-green-500 animate-pop-in">OK</span>
       ) : (
         <Copy className="size-3.5" />
       )}

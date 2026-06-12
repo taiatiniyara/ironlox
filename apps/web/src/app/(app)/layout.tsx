@@ -87,6 +87,10 @@ function AppSidebar() {
   );
 }
 
+function PageTransition({ children }: { children: React.ReactNode }) {
+  return <div className="page-enter">{children}</div>;
+}
+
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <AuthGuard>
@@ -99,12 +103,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             fallback={
               <div className="flex flex-col h-full p-4 space-y-3">
                 {Array.from({ length: 5 }).map((_, i) => (
-                  <Skeleton key={i} className="h-14 w-full" />
+                  <Skeleton key={i} className="h-14 w-full animate-pulse" />
                 ))}
               </div>
             }
           >
-            {children}
+            <PageTransition>{children}</PageTransition>
           </Suspense>
         </main>
       </div>

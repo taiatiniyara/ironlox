@@ -160,3 +160,109 @@ button {
     @apply font-sans;
   }
 }
+
+/* ── Animation utilities ── */
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+  20%, 40%, 60%, 80% { transform: translateX(4px); }
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in-scale {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes pop-in {
+  0% { opacity: 0; transform: scale(0.85); }
+  60% { transform: scale(1.03); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes check-draw {
+  0% { stroke-dashoffset: 24; }
+  100% { stroke-dashoffset: 0; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.3s ease-out forwards;
+}
+
+.animate-fade-in-scale {
+  animation: fade-in-scale 0.25s ease-out forwards;
+}
+
+.animate-pop-in {
+  animation: pop-in 0.3s ease-out forwards;
+}
+
+.animate-page-in {
+  animation: fade-in-scale 0.2s ease-out forwards;
+}
+
+@utility animate-shimmer {
+  background: linear-gradient(90deg, transparent 0%, var(--muted) 40%, transparent 80%);
+  background-size: 200% 100%;
+  animation: shimmer 2s linear infinite;
+}
+
+/* Staggered list items */
+.animate-stagger-list {
+  --stagger-base: 0s;
+}
+.animate-stagger-list > * {
+  opacity: 0;
+  animation: fade-in-up 0.35s ease-out forwards;
+}
+.animate-stagger-list > *:nth-child(1) { animation-delay: calc(var(--stagger-base) + 0.00s); }
+.animate-stagger-list > *:nth-child(2) { animation-delay: calc(var(--stagger-base) + 0.04s); }
+.animate-stagger-list > *:nth-child(3) { animation-delay: calc(var(--stagger-base) + 0.08s); }
+.animate-stagger-list > *:nth-child(4) { animation-delay: calc(var(--stagger-base) + 0.12s); }
+.animate-stagger-list > *:nth-child(5) { animation-delay: calc(var(--stagger-base) + 0.16s); }
+.animate-stagger-list > *:nth-child(6) { animation-delay: calc(var(--stagger-base) + 0.20s); }
+.animate-stagger-list > *:nth-child(7) { animation-delay: calc(var(--stagger-base) + 0.24s); }
+.animate-stagger-list > *:nth-child(8) { animation-delay: calc(var(--stagger-base) + 0.28s); }
+.animate-stagger-list > *:nth-child(9) { animation-delay: calc(var(--stagger-base) + 0.32s); }
+.animate-stagger-list > *:nth-child(10) { animation-delay: calc(var(--stagger-base) + 0.36s); }
+.animate-stagger-list > *:nth-child(11) { animation-delay: calc(var(--stagger-base) + 0.40s); }
+.animate-stagger-list > *:nth-child(12) { animation-delay: calc(var(--stagger-base) + 0.44s); }
+.animate-stagger-list > *:nth-child(13) { animation-delay: calc(var(--stagger-base) + 0.48s); }
+.animate-stagger-list > *:nth-child(14) { animation-delay: calc(var(--stagger-base) + 0.52s); }
+.animate-stagger-list > *:nth-child(15) { animation-delay: calc(var(--stagger-base) + 0.56s); }
+.animate-stagger-list > *:nth-child(16) { animation-delay: calc(var(--stagger-base) + 0.60s); }
+.animate-stagger-list > *:nth-child(17) { animation-delay: calc(var(--stagger-base) + 0.64s); }
+.animate-stagger-list > *:nth-child(18) { animation-delay: calc(var(--stagger-base) + 0.68s); }
+.animate-stagger-list > *:nth-child(19) { animation-delay: calc(var(--stagger-base) + 0.72s); }
+.animate-stagger-list > *:nth-child(20) { animation-delay: calc(var(--stagger-base) + 0.76s); }
+
+/* Page transition helper */
+.page-enter {
+  animation: fade-in-scale 0.2s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .animate-stagger-list > * {
+    opacity: 1;
+    animation: none;
+  }
+}

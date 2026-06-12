@@ -82,7 +82,7 @@ export function VaultProvider({ children }: { children: ReactNode }) {
   const vaultVersionRef = useRef<number>(1);
 
   useEffect(() => {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8787";
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? "https://api.ironlox.com";
     const client = createApiClient(baseUrl);
 
     client.setOnTokenRefresh((tokens) => {
@@ -151,7 +151,9 @@ export function VaultProvider({ children }: { children: ReactNode }) {
           const serverVault = await decryptVault(blob, vaultKey);
           const merged = mergeVaults(updatedVault, serverVault);
           const encrypted = await encryptVault(merged, vaultKey);
-          const { uploadUrl, version: retryVersion } = await client.putVault({ version: serverVault.version });
+          const { uploadUrl, version: retryVersion } = await client.putVault({
+            version: serverVault.version,
+          });
           await uploadVaultBlob(uploadUrl, encrypted);
           vaultVersionRef.current = retryVersion;
           setVaultState(merged);
@@ -187,8 +189,7 @@ export function VaultProvider({ children }: { children: ReactNode }) {
       vaultKeyRef.current = vaultKey;
       vaultVersionRef.current = loginResponse.vaultVersion;
 
-      const vaultUrl =
-        loginResponse.vaultUrl ?? (await client.getVault()).vaultUrl;
+      const vaultUrl = loginResponse.vaultUrl ?? (await client.getVault()).vaultUrl;
 
       if (vaultUrl) {
         const blob = await fetchVaultBlob(vaultUrl);
@@ -257,10 +258,7 @@ export function VaultProvider({ children }: { children: ReactNode }) {
 
   const addItem = useCallback(
     async (item: VaultItem) => {
-      const updated = addItemToVault(
-        vault ?? createEmptyVault(),
-        item,
-      );
+      const updated = addItemToVault(vault ?? createEmptyVault(), item);
       setVaultState(updated);
       syncVaultToServer(updated).catch((err) => {
         console.error("Vault sync failed:", err);
@@ -340,11 +338,7 @@ export function VaultProvider({ children }: { children: ReactNode }) {
     ],
   );
 
-  return (
-    <VaultContext.Provider value={contextValue}>
-      {children}
-    </VaultContext.Provider>
-  );
+  return <VaultContext.Provider value={contextValue}>{children}</VaultContext.Provider>;
 }
 
 export function useVault() {

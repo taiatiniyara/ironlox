@@ -10,5 +10,5 @@ export { deriveEncryptionKey, deriveAuthHash, generateVaultKey, wrapVaultKey, un
 export { generateRecoveryKey, hashRecoveryKey } from "./recovery.js";
 export { generatePassword, generatePassphrase } from "./generator.js";
 export { generateTotp, generateTotpSecret, verifyTotp, generateTotpUri } from "./totp.js";
-export { constantTimeEqual, importExportCsv, exportVaultToCsv } from "./utils.js";
-export { encryptVault, decryptVault, createEmptyVault, addItemToVault, removeItemFromVault, updateItemInVault } from "./vault.js";
+export { constantTimeEqual, importExportCsv, exportVaultToCsv, toHex, hexToBytes } from "./utils.js";
+export { encryptVault, decryptVault, createEmptyVault, addItemToVault, removeItemFromVault, updateItemInVault, mergeVaults } from "./vault.js";

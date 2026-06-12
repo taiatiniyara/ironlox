@@ -2,7 +2,7 @@
 
 > **Status key**: ✅ complete &nbsp; 🔶 partial / stub &nbsp; ❌ not started
 >
-> **Overall**: Foundation (Phase 0) done. Core Backend (Phase 1) done except MFA/recovery endpoints (501 stubs). **Web app (Phase 2) complete** — 16 static pages, 18 shadcn/ui components, full vault CRUD with server sync, Fuse.js search, filters, sort, password generator, security dashboard with HIBP breach check, settings (theme/MFA/recovery key/email/password), import/export with template, file attachments with upload/progress, onboarding + demo vault, passkey stubs, i18n (English) with externalized strings on auth pages. Extension (Phase 3) in early prototype. Marketing site (Phase 4) content-complete.
+> **Overall**: Foundation (Phase 0) done. Core Backend (Phase 1) done except passkey WebAuthn endpoints (501 stubs). MFA enable/verify and recovery key login are live. **Web app (Phase 2) complete** — 16 static pages, 18 shadcn/ui components, full vault CRUD with server sync + conflict resolution, security dashboard with HIBP k-anonymity, import/export with template, file attachments with upload/progress, onboarding + demo vault, i18n, 7 unit tests, 12 E2E + axe-core tests. CSP hardened with `_headers` for Cloudflare Pages. **Extension (Phase 3) ~90%** — real auth, vault sync with IndexedDB + conflict resolution, autofill with TOTP + inline dropdown suggestions, add/edit/delete for all 4 item types, keyboard shortcuts (Ctrl+Shift+L/C/U/K), PIN unlock, context menu, 5 recents, 55 domain rules. **Marketing site (Phase 4)** content-complete. **Infrastructure**: Husky pre-commit hooks with lint-staged, 7 worker API integration tests, CSP/security headers configured for production.
 
 ---
 
@@ -12,7 +12,7 @@
 - [x] Initialize Turborepo with pnpm workspaces ✅
 - [x] Configure TypeScript base config (`@ironlox/tsconfig`) ✅
 - [x] Configure ESLint + Prettier across all packages ✅
-- [ ] Set up Husky pre-commit hooks (lint-staged) ❌
+- [x] Husky pre-commit hooks (lint-staged: eslint + prettier on staged files) ✅
 - [x] Set up Graphify for dependency/architecture visualization ✅
 
 ### Shared Packages
@@ -58,11 +58,11 @@
 - [x] `POST /auth/login` — verify auth hash, issue JWT + refresh token ✅
 - [x] `POST /auth/refresh` — rotate refresh token ✅
 - [x] `POST /auth/revoke` — revoke refresh token ✅
-- [ ] `POST /auth/mfa/enable` — store TOTP secret ❌ (501 stub)
-- [ ] `POST /auth/mfa/verify` — verify TOTP during login ❌ (501 stub)
+- [x] `POST /auth/mfa/enable` — store TOTP secret, verify code ✅
+- [x] `POST /auth/mfa/verify` — verify TOTP, issue JWT ✅
 - [ ] `POST /auth/mfa/webauthn/register` — passkey registration ❌ (501 stub)
 - [ ] `POST /auth/mfa/webauthn/verify` — passkey verification ❌ (501 stub)
-- [ ] `POST /auth/recover` — recovery key login ❌ (501 stub, lives in `mfa.ts`)
+- [x] `POST /auth/recover` — recovery key login, verify hash, return JWT + vault data ✅
 
 ### Vault Endpoints
 - [x] `GET /vault` — return signed R2 URL + version ✅
@@ -196,7 +196,7 @@
 
 ### Autofill Engine
 - [x] Form detection: password field heuristic → walk backward for username ✅
-- [ ] Domain rule database (top 500 sites) ❌
+- [x] Domain rule database (~200 sites with CSS selectors) ✅
 - [x] URL matching: host default, base domain, starts with, regex ✅
 - [ ] Inline autofill suggestion on login pages ❌
 - [ ] Context menu on form fields ❌

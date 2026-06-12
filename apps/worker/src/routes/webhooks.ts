@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import type { Env, Variables } from "../index.js";
+import { hexToBytes } from "@ironlox/crypto";
 
 const app = new Hono<{ Bindings: Env; Variables: Variables }>();
 
@@ -31,21 +32,13 @@ async function verifyStripeSignature(
     const valid = await crypto.subtle.verify(
       "HMAC",
       key,
-      hexToBuffer(sigValue),
+      hexToBytes(sigValue),
       encoder.encode(signedPayload),
     );
     if (valid) return true;
   }
 
   return false;
-}
-
-function hexToBuffer(hex: string): Uint8Array {
-  const bytes = new Uint8Array(hex.length / 2);
-  for (let i = 0; i < hex.length; i += 2) {
-    bytes[i / 2] = parseInt(hex.substring(i, i + 2), 16);
-  }
-  return bytes;
 }
 
 /**

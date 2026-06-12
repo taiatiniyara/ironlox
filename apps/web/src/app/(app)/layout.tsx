@@ -2,6 +2,7 @@
 
 import { AuthGuard } from "@/components/auth-guard";
 import { useVault } from "@/lib/vault-context";
+import { useTranslation } from "react-i18next";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -17,19 +18,20 @@ import {
   Paperclip,
 } from "lucide-react";
 
-const navItems = [
-  { href: "/vault", label: "Vault", icon: FolderOpen },
-  { href: "/add", label: "Add Item", icon: Plus },
-  { href: "/import", label: "Import", icon: Upload },
-  { href: "/export", label: "Export", icon: Download },
-  { href: "/attachments", label: "Files", icon: Paperclip },
-  { href: "/security", label: "Security", icon: Shield },
-  { href: "/settings", label: "Settings", icon: Settings },
-];
-
 function AppSidebar() {
+  const { t } = useTranslation();
   const { email, logout, isSyncing } = useVault();
   const pathname = usePathname();
+
+  const navItems = [
+    { href: "/vault", label: t("nav.vault"), icon: FolderOpen },
+    { href: "/add", label: t("nav.add"), icon: Plus },
+    { href: "/import", label: t("nav.import"), icon: Upload },
+    { href: "/export", label: t("nav.export"), icon: Download },
+    { href: "/attachments", label: t("nav.files"), icon: Paperclip },
+    { href: "/security", label: t("nav.security"), icon: Shield },
+    { href: "/settings", label: t("nav.settings"), icon: Settings },
+  ];
 
   return (
     <div className="flex flex-col h-full">
@@ -43,8 +45,8 @@ function AppSidebar() {
         )}
         {isSyncing && (
           <p className="text-[10px] text-muted-foreground animate-pulse mt-0.5">
-            Syncing...
-          </p>
+                {t("nav.syncing")}
+              </p>
         )}
       </div>
 
@@ -76,7 +78,7 @@ function AppSidebar() {
           onClick={logout}
         >
           <LogOut className="size-4 mr-3" />
-          Lock Vault
+          {t("nav.lock")}
         </Button>
       </div>
     </div>

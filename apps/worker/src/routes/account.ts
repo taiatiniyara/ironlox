@@ -35,14 +35,14 @@ app.get("/", authMiddleware, async (c) => {
   const quota = user.tier === "premium" ? 2 * 1024 * 1024 * 1024 : 250 * 1024 * 1024;
 
   const loginEvents = await c.env.DB.prepare(
-    "SELECT created_at as timestamp, ip_hash, user_agent, city_country FROM login_events WHERE user_id = ? ORDER BY created_at DESC LIMIT 20",
+    "SELECT created_at as timestamp, ip_hash, user_agent, city_country as cityCountry FROM login_events WHERE user_id = ? ORDER BY created_at DESC LIMIT 20",
   )
     .bind(userId)
     .all<{
       timestamp: string;
       ip_hash: string;
       user_agent: string;
-      city_country: string;
+      cityCountry: string;
     }>();
 
   return c.json({

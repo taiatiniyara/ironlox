@@ -47,7 +47,8 @@
       "activeTab",
       "clipboardWrite",
       "alarms",
-      "idle"
+      "idle",
+      "contextMenus"
     ],
     "host_permissions": [
       "<all_urls>"

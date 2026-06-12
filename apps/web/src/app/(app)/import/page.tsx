@@ -24,7 +24,7 @@ function downloadTemplate() {
 }
 
 export default function ImportPage() {
-  const { addItem } = useVault();
+  const { bulkAddItems } = useVault();
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<VaultItem[]>([]);
@@ -55,13 +55,12 @@ export default function ImportPage() {
 
   async function handleImport() {
     setImporting(true);
-    let imported = 0;
-    for (const item of preview) {
-      const withId = { ...item, id: crypto.randomUUID() };
-      await addItem(withId);
-      imported++;
-    }
-    toast.success(`Imported ${imported} items`);
+    const items = preview.map((item) => ({
+      ...item,
+      id: crypto.randomUUID(),
+    }));
+    await bulkAddItems(items);
+    toast.success(`Imported ${items.length} items`);
     setImporting(false);
     router.push("/vault");
   }

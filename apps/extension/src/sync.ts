@@ -1,5 +1,5 @@
-import { createApiClient, type ApiClient } from "@ironlox/api-client";
-import { encryptVault, decryptVault, createEmptyVault, deriveEncryptionKey, deriveAuthHash, unwrapVaultKey } from "@ironlox/crypto";
+import { createApiClient, type ApiClient, ApiError } from "@ironlox/api-client";
+import { encryptVault, decryptVault, createEmptyVault, deriveEncryptionKey, deriveAuthHash, unwrapVaultKey, toHex, mergeVaults } from "@ironlox/crypto";
 import type { Vault } from "@ironlox/schemas";
 
 const DB_NAME = "ironlox-vault-cache";
@@ -65,6 +65,7 @@ export class VaultSync {
 
   getEmail(): string | null { return this.email; }
   isAuthenticated(): boolean { return !!(this.accessToken && this.vaultKey); }
+  getVaultKey(): Uint8Array | null { return this.vaultKey; }
 
   setAuth(accessToken: string, _refreshToken: string, vaultKey: Uint8Array, email: string): void {
     this.accessToken = accessToken;
@@ -85,7 +86,7 @@ export class VaultSync {
   async login(masterPassword: string, email: string): Promise<Credentials> {
     const authSalt = crypto.getRandomValues(new Uint8Array(32));
     const authHashRaw = await deriveAuthHash(masterPassword, email, authSalt);
-    const authHash = Array.from(new Uint8Array(authHashRaw)).map((b) => b.toString(16).padStart(2, "0")).join("");
+    const authHash = toHex(new Uint8Array(authHashRaw));
 
     const loginResponse = await this.apiClient.login({ email, authHash });
 
@@ -117,10 +118,22 @@ export class VaultSync {
 
   async push(vault: Vault, currentVersion: number): Promise<number> {
     if (!this.vaultKey) throw new Error("No vault key set");
-    const encryptedBlob = await encryptVault(vault, this.vaultKey);
-    const { uploadUrl, version } = await this.apiClient.putVault({ version: currentVersion });
-    await fetch(uploadUrl, { method: "PUT", body: encryptedBlob, headers: { "Content-Type": "application/octet-stream" } });
-    return version;
+    try {
+      const encryptedBlob = await encryptVault(vault, this.vaultKey);
+      const { uploadUrl, version } = await this.apiClient.putVault({ version: currentVersion });
+      await fetch(uploadUrl, { method: "PUT", body: encryptedBlob, headers: { "Content-Type": "application/octet-stream" } });
+      return version;
+    } catch (err) {
+      if (err instanceof ApiError && err.code === "VAULT_VERSION_CONFLICT") {
+        const serverState = await this.pull();
+        const merged = mergeVaults(vault, serverState.vault);
+        const encryptedBlob = await encryptVault(merged, this.vaultKey);
+        const { uploadUrl, version } = await this.apiClient.putVault({ version: serverState.version });
+        await fetch(uploadUrl, { method: "PUT", body: encryptedBlob, headers: { "Content-Type": "application/octet-stream" } });
+        return version;
+      }
+      throw err;
+    }
   }
 
   async loadOffline(): Promise<SyncState | null> {

@@ -77,18 +77,14 @@ export default function SecurityPage() {
   const runHibpCheck = useCallback(async () => {
     setHibpRunning(true);
     setHibpDone(false);
+    setHibpResults([]);
     const results: Array<{ name: string; count: number }> = [];
-    let checked = 0;
     for (const login of logins) {
       if (!login.password) continue;
       try {
         const count = await checkHibp(login.password);
         if (count > 0) results.push({ name: login.name, count });
       } catch { /* skip network errors */ }
-      checked++;
-      if (checked % 5 === 0) {
-        setHibpResults([...results]);
-      }
       await new Promise((r) => setTimeout(r, 1600)); // rate limit: ~1 req/sec
     }
     setHibpResults(results);

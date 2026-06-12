@@ -5,6 +5,7 @@ import {
   useContext,
   useState,
   useCallback,
+  useMemo,
   useEffect,
   useRef,
   type ReactNode,
@@ -15,6 +16,7 @@ import {
   addItemToVault,
   removeItemFromVault,
   updateItemInVault,
+  mergeVaults,
   encryptVault,
   decryptVault,
   deriveAuthHash,
@@ -23,28 +25,16 @@ import {
   generateVaultKey,
   wrapVaultKey,
   unwrapVaultKey,
+  toHex,
+  hexToBytes,
 } from "@ironlox/crypto";
-import { createApiClient, type ApiClient } from "@ironlox/api-client";
+import { createApiClient, type ApiClient, ApiError } from "@ironlox/api-client";
 
 const STORAGE_KEYS = {
   accessToken: "ironlox_access_token",
   refreshToken: "ironlox_refresh_token",
   email: "ironlox_email",
 } as const;
-
-function toHex(buf: Uint8Array): string {
-  return Array.from(new Uint8Array(buf))
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
-}
-
-function hexToBytes(hex: string): Uint8Array {
-  const bytes = new Uint8Array(hex.length / 2);
-  for (let i = 0; i < hex.length; i += 2) {
-    bytes[i / 2] = parseInt(hex.substring(i, i + 2), 16);
-  }
-  return bytes;
-}
 
 async function fetchVaultBlob(vaultUrl: string): Promise<string> {
   const res = await fetch(vaultUrl);
@@ -73,6 +63,7 @@ interface VaultContextType {
   register: (email: string, masterPassword: string) => Promise<void>;
   logout: () => Promise<void>;
   addItem: (item: VaultItem) => Promise<void>;
+  bulkAddItems: (items: VaultItem[]) => Promise<void>;
   removeItem: (id: string) => Promise<void>;
   updateItem: (id: string, updates: Partial<VaultItem>) => Promise<void>;
 }
@@ -150,9 +141,24 @@ export function VaultProvider({ children }: { children: ReactNode }) {
       });
 
       await uploadVaultBlob(uploadUrl, encrypted);
-
       vaultVersionRef.current = newVersion;
       setVaultState((prev) => (prev ? { ...prev, version: newVersion } : prev));
+    } catch (err) {
+      if (err instanceof ApiError && err.code === "VAULT_VERSION_CONFLICT") {
+        const { vaultUrl } = await client.getVault();
+        if (vaultUrl && vaultKey) {
+          const blob = await fetchVaultBlob(vaultUrl);
+          const serverVault = await decryptVault(blob, vaultKey);
+          const merged = mergeVaults(updatedVault, serverVault);
+          const encrypted = await encryptVault(merged, vaultKey);
+          const { uploadUrl, version: retryVersion } = await client.putVault({ version: serverVault.version });
+          await uploadVaultBlob(uploadUrl, encrypted);
+          vaultVersionRef.current = retryVersion;
+          setVaultState(merged);
+        }
+      } else {
+        throw err;
+      }
     } finally {
       setIsSyncing(false);
     }
@@ -251,57 +257,91 @@ export function VaultProvider({ children }: { children: ReactNode }) {
 
   const addItem = useCallback(
     async (item: VaultItem) => {
-      setVaultState((prev) => {
-        const updated = addItemToVault(prev ?? createEmptyVault(), item);
-        syncVaultToServer(updated).catch(() => {});
-        return updated;
+      const updated = addItemToVault(
+        vault ?? createEmptyVault(),
+        item,
+      );
+      setVaultState(updated);
+      syncVaultToServer(updated).catch((err) => {
+        console.error("Vault sync failed:", err);
       });
     },
-    [syncVaultToServer],
+    [vault, syncVaultToServer],
+  );
+
+  const bulkAddItems = useCallback(
+    async (items: VaultItem[]) => {
+      let updated = vault ?? createEmptyVault();
+      for (const item of items) {
+        updated = addItemToVault(updated, item);
+      }
+      setVaultState(updated);
+      syncVaultToServer(updated).catch((err) => {
+        console.error("Vault sync failed:", err);
+      });
+    },
+    [vault, syncVaultToServer],
   );
 
   const removeItem = useCallback(
     async (id: string) => {
-      setVaultState((prev) => {
-        if (!prev) return prev;
-        const updated = removeItemFromVault(prev, id);
-        syncVaultToServer(updated).catch(() => {});
-        return updated;
+      if (!vault) return;
+      const updated = removeItemFromVault(vault, id);
+      setVaultState(updated);
+      syncVaultToServer(updated).catch((err) => {
+        console.error("Vault sync failed:", err);
       });
     },
-    [syncVaultToServer],
+    [vault, syncVaultToServer],
   );
 
   const updateItem = useCallback(
     async (id: string, updates: Partial<VaultItem>) => {
-      setVaultState((prev) => {
-        if (!prev) return prev;
-        const updated = updateItemInVault(prev, id, updates);
-        syncVaultToServer(updated).catch(() => {});
-        return updated;
+      if (!vault) return;
+      const updated = updateItemInVault(vault, id, updates);
+      setVaultState(updated);
+      syncVaultToServer(updated).catch((err) => {
+        console.error("Vault sync failed:", err);
       });
     },
-    [syncVaultToServer],
+    [vault, syncVaultToServer],
+  );
+
+  const contextValue = useMemo(
+    () => ({
+      vault,
+      isAuthenticated,
+      isVaultLoaded,
+      isSyncing,
+      email,
+      apiClient: apiClientRef.current,
+      vaultKey: vaultKeyRef.current,
+      login,
+      register,
+      logout,
+      addItem,
+      bulkAddItems,
+      removeItem,
+      updateItem,
+    }),
+    [
+      vault,
+      isAuthenticated,
+      isVaultLoaded,
+      isSyncing,
+      email,
+      login,
+      register,
+      logout,
+      addItem,
+      bulkAddItems,
+      removeItem,
+      updateItem,
+    ],
   );
 
   return (
-    <VaultContext.Provider
-      value={{
-        vault,
-        isAuthenticated,
-        isVaultLoaded,
-        isSyncing,
-        email,
-        apiClient: apiClientRef.current,
-        vaultKey: vaultKeyRef.current,
-        login,
-        register,
-        logout,
-        addItem,
-        removeItem,
-        updateItem,
-      }}
-    >
+    <VaultContext.Provider value={contextValue}>
       {children}
     </VaultContext.Provider>
   );

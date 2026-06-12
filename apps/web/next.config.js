@@ -9,7 +9,7 @@ const cspHeader = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob:",
   "font-src 'self'",
-  "connect-src 'self' http://localhost:8787 https://api.ironlox.com",
+  "connect-src 'self' http://localhost:8787 https://api.ironlox.com https://*.r2.cloudflarestorage.com https://api.pwnedpasswords.com",
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",

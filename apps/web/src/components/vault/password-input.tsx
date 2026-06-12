@@ -7,10 +7,11 @@ import { Button } from "@/components/ui/button";
 
 interface PasswordInputProps {
   value: string;
-  onChange: (value: string) => void;
+  onChange?: (value: string) => void;
   placeholder?: string;
   id?: string;
   required?: boolean;
+  readOnly?: boolean;
   autoHideMs?: number;
 }
 
@@ -20,6 +21,7 @@ export function PasswordInput({
   placeholder = "Password",
   id,
   required,
+  readOnly,
   autoHideMs = 30000,
 }: PasswordInputProps) {
   const [visible, setVisible] = useState(false);
@@ -48,26 +50,30 @@ export function PasswordInput({
     <div className="relative">
       <Input
         id={id}
-        type={visible ? "text" : "password"}
+        type={readOnly || !visible ? "password" : "text"}
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={onChange ? (e) => onChange(e.target.value) : undefined}
         placeholder={placeholder}
         required={required}
+        readOnly={readOnly}
         className="pr-9"
       />
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        className="absolute right-0 top-0 h-full px-2 hover:bg-transparent"
-        onClick={toggleVisibility}
-      >
-        {visible ? (
-          <EyeOff className="size-4 text-muted-foreground" />
-        ) : (
-          <Eye className="size-4 text-muted-foreground" />
-        )}
-      </Button>
+      {!readOnly && (
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="absolute right-0 top-0 h-full px-2 hover:bg-transparent"
+          onClick={toggleVisibility}
+          aria-label={visible ? "Hide password" : "Show password"}
+        >
+          {visible ? (
+            <EyeOff className="size-4 text-muted-foreground" />
+          ) : (
+            <Eye className="size-4 text-muted-foreground" />
+          )}
+        </Button>
+      )}
     </div>
   );
 }

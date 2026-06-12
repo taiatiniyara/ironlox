@@ -2,6 +2,27 @@ import type { Vault } from "@ironlox/schemas";
 import { aesEncrypt, aesDecrypt } from "./aes.js";
 
 /**
+ * Merge two vaults using last-write-wins conflict resolution.
+ * Newer items (by updatedAt) win when both local and server have the same item.
+ * Items only in local are added; items only in server are kept.
+ */
+export function mergeVaults(local: Vault, server: Vault): Vault {
+  const serverMap = new Map(server.items.map((i) => [i.id, i]));
+  for (const localItem of local.items) {
+    const serverItem = serverMap.get(localItem.id);
+    if (!serverItem) {
+      serverMap.set(localItem.id, localItem);
+    } else if (localItem.updatedAt > serverItem.updatedAt) {
+      serverMap.set(localItem.id, localItem);
+    }
+  }
+  return {
+    version: server.version,
+    items: [...serverMap.values()],
+  };
+}
+
+/**
  * Encrypt the entire vault with the vault key.
  * Serializes vault to JSON, encrypts with AES-256-GCM.
  *

@@ -17,7 +17,7 @@
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
     "build": "tsc",
-    "test": "vitest run --passWithNoTests",
+    "test": "vitest run",
     "lint": "eslint src/",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist",

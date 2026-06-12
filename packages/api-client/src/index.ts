@@ -198,7 +198,11 @@ export class ApiClient {
       throw new ApiError(response.status, data.message ?? "Request failed", data.code);
     }
 
-    return response.json() as Promise<T>;
+    try {
+      return response.json() as Promise<T>;
+    } catch {
+      throw new ApiError(response.status, "Invalid response from server");
+    }
   }
 }
 

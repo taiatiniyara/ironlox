@@ -175,3 +175,25 @@ export type PutVaultResponse = z.infer<typeof PutVaultResponseSchema>;
 export type AccountInfoResponse = z.infer<typeof AccountInfoResponseSchema>;
 export type ChangePasswordRequest = z.infer<typeof ChangePasswordRequestSchema>;
 export type ChangeEmailRequest = z.infer<typeof ChangeEmailRequestSchema>;
+
+// Typed item helpers — narrow VaultItem.fields to the correct subtype
+export type TypedVaultItem<T extends VaultItem["type"]> = Omit<VaultItem, "fields"> & {
+  fields: T extends "login" ? LoginFields :
+          T extends "card" ? CardFields :
+          T extends "note" ? NoteFields :
+          T extends "identity" ? IdentityFields :
+          never;
+};
+
+export function isLoginItem(item: VaultItem): item is TypedVaultItem<"login"> {
+  return item.type === "login";
+}
+export function isCardItem(item: VaultItem): item is TypedVaultItem<"card"> {
+  return item.type === "card";
+}
+export function isNoteItem(item: VaultItem): item is TypedVaultItem<"note"> {
+  return item.type === "note";
+}
+export function isIdentityItem(item: VaultItem): item is TypedVaultItem<"identity"> {
+  return item.type === "identity";
+}

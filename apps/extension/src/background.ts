@@ -4,7 +4,24 @@ const LOCK_TIMEOUT_MINUTES = 5;
 
 chrome.runtime.onInstalled.addListener(() => {
   chrome.alarms.create("auto-lock", { delayInMinutes: LOCK_TIMEOUT_MINUTES, periodInMinutes: LOCK_TIMEOUT_MINUTES });
-  chrome.alarms.create("token-refresh", { periodInMinutes: 10 });
+  chrome.contextMenus.create({ id: "fill-credentials", title: "Fill credentials", contexts: ["editable"] });
+});
+
+chrome.contextMenus.onClicked.addListener(async (info, tab) => {
+  if (info.menuItemId === "fill-credentials" && tab?.id) {
+    const cached = await vaultSync.loadOffline();
+    if (!cached) return;
+    const active = cached.vault.items.filter((i) => !i.deleted && i.type === "login");
+    if (active.length === 0) return;
+    const tabUrl = tab.url ?? "";
+    const match = active.find((item) => {
+      const f = item.fields as Record<string, unknown>;
+      const uris = (f.uris as string[]) ?? [];
+      return uris.some((uri) => tabUrl.startsWith(uri));
+    }) ?? active[0]!;
+    const f = match.fields as Record<string, unknown>;
+    chrome.tabs.sendMessage(tab.id, { type: "AUTOFILL", username: f.username ?? "", password: f.password ?? "" });
+  }
 });
 
 chrome.commands.onCommand.addListener(async (command) => {
@@ -44,21 +61,33 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
     vaultSync.clearAuth();
     chrome.storage.local.set({ ironlox_locked: true });
   }
-  if (alarm.name === "token-refresh") {
-    try {
-      const { ironlox_access, ironlox_refresh } = await chrome.storage.local.get(["ironlox_access", "ironlox_refresh"]);
-      if (ironlox_access && ironlox_refresh) {
-        // Tokens are refreshed automatically via apiClient.onTokenRefresh callback
-      }
-    } catch { /* refresh failed, user must re-login */ }
-  }
 });
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message.type === "AUTOFILL") {
     sendResponse({ success: true });
   }
-  return true;
+  if (message.type === "GET_MATCHES") {
+    (async () => {
+      const cached = await vaultSync.loadOffline();
+      if (!cached) { sendResponse({ matches: [] }); return; }
+      const active = cached.vault.items.filter((i) => !i.deleted && i.type === "login");
+      const url = message.url as string ?? "";
+      const matches = active
+        .filter((item) => {
+          const f = item.fields as Record<string, unknown>;
+          const uris = (f.uris as string[]) ?? [];
+          return uris.length === 0 || uris.some((uri) => url.startsWith(uri));
+        })
+        .map((item) => {
+          const f = item.fields as Record<string, unknown>;
+          return { name: item.name, username: (f.username as string) ?? "", password: (f.password as string) ?? "" };
+        });
+      sendResponse({ matches });
+    })();
+    return true;
+  }
+  return false;
 });
 
 chrome.idle.onStateChanged.addListener((state) => {

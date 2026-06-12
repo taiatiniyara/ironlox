@@ -4,11 +4,11 @@
 
 Ironlox is a zero-knowledge consumer password manager. Users store passwords, credit cards, secure notes, and identities in an encrypted vault. Encryption/decryption happens client-side only. The server never sees plaintext.
 
-**Stack**: TypeScript everywhere — Cloudflare Workers (API), React/Next.js (web app), Plasmo (browser extension), Tailwind CSS (UI, shadcn/ui planned), D1 (SQLite DB), R2 (blob storage), KV (feature flags/rate limiting).
+**Stack**: TypeScript everywhere — Cloudflare Workers (API), React/Next.js (web app), Plasmo (browser extension), Tailwind CSS + shadcn/ui (UI), D1 (SQLite DB), R2 (blob storage), KV (feature flags/rate limiting).
 
 **Monorepo**: Turborepo + pnpm workspaces. Apps: `apps/worker`, `apps/web`, `apps/extension`, `apps/marketing`. Packages: `packages/crypto`, `packages/schemas`, `packages/autofill`, `packages/api-client`, `packages/tsconfig`.
 
-**Current state**: Phase 0 (Foundation) done. Phase 1 (Core Backend) done except MFA/recovery (all 501 stubs). Web app and extension are single-file prototypes — functional UIs but no routing, no component library, no real sync. See `docs/roadmap.md` for per-item status.
+**Current state**: Phase 0 (Foundation) done. Phase 1 (Core Backend) done except MFA/recovery endpoints (501 stubs). Phase 2 (Web App) complete — 16 static pages, shadcn/ui, full vault CRUD with server sync, Fuse.js search, security dashboard with HIBP, import/export, file attachments, i18n (EN). Phase 3 (Extension) ~85% — real auth, vault sync, autofill with TOTP, add/edit/delete items, keyboard shortcuts, clipboard auto-clear, PIN unlock, context menu, 5 recents, conflict resolution. Phase 4 (Marketing) content-complete. See `docs/roadmap.md` for per-item status.
 
 **Key docs**: `docs/product-spec.md` (full spec), `docs/roadmap.md` (phased plan).
 
@@ -137,7 +137,7 @@ pnpm run graphify:path "<nodeA>" "<nodeB>"   # Shortest path between two concept
 - `@/` path alias maps to package/app root.
 
 ### React / Web App
-- shadcn/ui components (`npx shadcn@latest add [component]`). Currently not installed — components use raw HTML/Tailwind. Do not write custom button/modal/dropdown implementations going forward; prefer shadcn/ui.
+- shadcn/ui components (`npx shadcn@latest add [component]`). Currently installed with 18 primitives (button, input, label, card, badge, separator, dropdown-menu, select, dialog, skeleton, toggle, tabs, table, textarea, popover, tooltip, switch, checkbox, slider, progress, sonner). Use Tailwind v4 + `@base-ui/react` primitives. Prefer existing shadcn/ui components over raw HTML.
 - Tailwind CSS only. No CSS modules or styled-components.
 - No React Server Components. Everything is CSR (`"use client"` where needed).
 - Do not use `useEffect` where server state libraries (TanStack Query) are appropriate.

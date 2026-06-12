@@ -23,7 +23,8 @@
     "dev": "next dev --port 3001",
     "build": "next build",
     "start": "next start",
-    "test": "vitest run --passWithNoTests",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
     "lint": "eslint src/ --config ../../eslint.config.js",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf .next"
@@ -58,6 +59,7 @@
     "@types/node": "^25.9.3",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^6.0.2",
     "jsdom": "^29.1.1",
     "typescript": "^6.0.3",
     "vitest": "^4.1.8"

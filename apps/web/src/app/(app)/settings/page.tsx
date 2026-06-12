@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Moon, Sun, Monitor, Trash2, Shield, Key, Mail, Clock, QrCode } from "lucide-react";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { generateSalt, deriveAuthHash, deriveEncryptionKey, wrapVaultKey, generateRecoveryKey, generateTotpSecret, verifyTotp } from "@ironlox/crypto";
+import { generateSalt, deriveAuthHash, deriveEncryptionKey, wrapVaultKey, generateRecoveryKey, generateTotpSecret, verifyTotp, toHex } from "@ironlox/crypto";
 
 const PREF_KEYS = {
   vaultTimeout: "ironlox_vault_timeout",
@@ -26,10 +26,6 @@ function loadPref(key: string, fallback: string): string {
 
 function savePref(key: string, value: string) {
   localStorage.setItem(key, value);
-}
-
-function toHex(buf: Uint8Array): string {
-  return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
 export default function SettingsPage() {

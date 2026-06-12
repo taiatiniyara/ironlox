@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, memo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useVault } from "@/lib/vault-context";
+import { useDebounce } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -24,7 +25,7 @@ import {
   ArrowUpDown, ArrowLeft, Pencil, Key, LinkIcon, Pin,
 } from "lucide-react";
 import Fuse from "fuse.js";
-import type { VaultItem } from "@ironlox/schemas";
+import type { VaultItem, LoginFields, CardFields, IdentityFields, NoteFields } from "@ironlox/schemas";
 
 const RECENTS_KEY = "ironlox_recent_items";
 const MAX_RECENTS = 5;
@@ -70,6 +71,7 @@ export default function VaultPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 200);
   const [category, setCategory] = useState<Category>("all");
   const [tagFilter, setTagFilter] = useState<string | null>(null);
   const [sort, setSort] = useState("updatedAt");
@@ -99,12 +101,12 @@ export default function VaultPage() {
   );
 
   const filtered = useMemo(() => {
-    let items = search ? fuse.search(search).map((r) => r.item) : [...activeItems];
+    let items = debouncedSearch ? fuse.search(debouncedSearch).map((r) => r.item) : [...activeItems];
     if (category !== "all") items = items.filter((i) => i.type === category);
     if (tagFilter) items = items.filter((i) => i.tags.includes(tagFilter));
     switch (sort) {
       case "createdAt":
-        items.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        items.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
         break;
       case "nameAsc":
         items.sort((a, b) => a.name.localeCompare(b.name));
@@ -113,15 +115,15 @@ export default function VaultPage() {
         items.sort((a, b) => b.name.localeCompare(a.name));
         break;
       default:
-        items.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+        items.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
     }
     return items;
   }, [activeItems, fuse, search, category, tagFilter, sort]);
 
   const typeCounts = useMemo(() => {
-    const counts: Record<string, number> = { all: activeItems.length };
-    for (const type of ["login", "card", "note", "identity"] as const) {
-      counts[type] = activeItems.filter((i) => i.type === type).length;
+    const counts: Record<string, number> = { all: activeItems.length, login: 0, card: 0, note: 0, identity: 0 };
+    for (const item of activeItems) {
+      counts[item.type] = (counts[item.type] ?? 0) + 1;
     }
     return counts;
   }, [activeItems]);
@@ -305,26 +307,29 @@ export default function VaultPage() {
   );
 }
 
-function IconForType({ type }: { type: string }) {
+const IconForType = memo(function IconForType({ type }: { type: string }) {
   const Icon = categoryIcons[type] ?? FileText;
   return <Icon className="size-4 text-muted-foreground shrink-0" />;
-}
+});
 
 function subtitle(item: VaultItem): string {
-  if (item.type === "login" && "username" in item.fields) {
-    return (item.fields.username as string) || "Login";
+  if (item.type === "login") {
+    return (item.fields as LoginFields).username || "Login";
   }
   return item.type.charAt(0).toUpperCase() + item.type.slice(1);
 }
 
-function QuickCopy({ item }: { item: VaultItem }) {
+const QuickCopy = memo(function QuickCopy({ item }: { item: VaultItem }) {
   const [copied, setCopied] = useState(false);
   function copy(e: React.MouseEvent) {
     e.stopPropagation();
-    if ("password" in item.fields && item.fields.password) {
-      navigator.clipboard.writeText(item.fields.password as string);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+    if (item.type === "login") {
+      const pwd = (item.fields as LoginFields).password;
+      if (pwd) {
+        navigator.clipboard.writeText(pwd);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      }
     }
   }
   return (
@@ -332,10 +337,10 @@ function QuickCopy({ item }: { item: VaultItem }) {
       {copied ? <span className="text-[10px] text-green-500">OK</span> : <Copy className="size-3.5" />}
     </Button>
   );
-}
+});
 
 /** ── Inline Item Detail ── */
-function ItemDetailInline({ item, onBack }: { item: VaultItem; onBack: () => void }) {
+const ItemDetailInline = memo(function ItemDetailInline({ item, onBack }: { item: VaultItem; onBack: () => void }) {
   const { removeItem } = useVault();
   const router = useRouter();
   const Icon = categoryIcons[item.type] ?? FileText;
@@ -361,7 +366,7 @@ function ItemDetailInline({ item, onBack }: { item: VaultItem; onBack: () => voi
           {item.type === "login" && <LoginFields item={item} />}
           {item.type === "card" && <CardFields item={item} />}
           {item.type === "note" && "content" in item.fields && (
-            <p className="text-sm whitespace-pre-wrap">{item.fields.content as string}</p>
+            <p className="text-sm whitespace-pre-wrap">{(item.fields as NoteFields).content}</p>
           )}
           {item.type === "identity" && <IdentityFields item={item} />}
         </CardContent>
@@ -394,83 +399,86 @@ function ItemDetailInline({ item, onBack }: { item: VaultItem; onBack: () => voi
       </Button>
     </div>
   );
-}
+});
 
-function LoginFields({ item }: { item: VaultItem & { fields: Record<string, unknown> } }) {
-  const f = item.fields;
+const LoginFields = memo(function LoginFields({ item }: { item: VaultItem }) {
+  const f = item.fields as LoginFields;
   return (
     <div className="space-y-3">
-      {(f.uris as string[])?.length > 0 && (
+      {f.uris?.length ? (
         <div className="space-y-1">
           <Label className="text-xs text-muted-foreground"><LinkIcon className="size-3 inline mr-1" />Website</Label>
           <div className="space-y-1">
-            {(f.uris as string[]).map((uri, i) => (
+            {f.uris.map((uri, i) => (
               <a key={i} href={uri} target="_blank" rel="noopener noreferrer" className="block text-sm text-primary hover:underline break-all">{uri}</a>
             ))}
           </div>
         </div>
-      )}
+      ) : null}
       <div className="space-y-1">
         <Label className="text-xs text-muted-foreground">Username</Label>
         <div className="flex items-center gap-2">
-          <Input value={(f.username as string) ?? ""} readOnly className="h-8 text-sm font-mono flex-1" />
-          <CopyButton value={(f.username as string) ?? ""} label="Copy" />
+          <Input value={f.username} readOnly className="h-8 text-sm font-mono flex-1" />
+          <CopyButton value={f.username} label="Copy" />
         </div>
       </div>
       <div className="space-y-1">
         <Label className="text-xs text-muted-foreground"><Key className="size-3 inline mr-1" />Password</Label>
         <div className="flex items-center gap-2">
-          <PasswordInput value={(f.password as string) ?? ""} onChange={() => {}} />
-          <CopyButton value={(f.password as string) ?? ""} />
+          <PasswordInput value={f.password} readOnly />
+          <CopyButton value={f.password} />
         </div>
       </div>
-      {f.totpSecret ? <div className="space-y-1"><Label className="text-xs text-muted-foreground">2FA Code</Label><TotpDisplay secret={f.totpSecret as string} /></div> : null}
-      {f.notes ? <p className="text-sm text-muted-foreground whitespace-pre-wrap">{f.notes as string}</p> : null}
+      {f.totpSecret ? <div className="space-y-1"><Label className="text-xs text-muted-foreground">2FA Code</Label><TotpDisplay secret={f.totpSecret} /></div> : null}
+      {f.notes ? <p className="text-sm text-muted-foreground whitespace-pre-wrap">{f.notes}</p> : null}
     </div>
   );
-}
+});
 
-function CardFields({ item }: { item: VaultItem & { fields: Record<string, unknown> } }) {
-  const f = item.fields;
+const CardFields = memo(function CardFields({ item }: { item: VaultItem }) {
+  const f = item.fields as CardFields;
   return (
     <div className="space-y-3">
-      {f.brand ? <Badge variant="outline">{f.brand as string}</Badge> : null}
-      <div className="space-y-1"><Label className="text-xs text-muted-foreground">Cardholder</Label><div className="flex items-center gap-2"><Input value={(f.cardholder as string) ?? ""} readOnly className="h-8 text-sm flex-1" /><CopyButton value={(f.cardholder as string) ?? ""} /></div></div>
-      <div className="space-y-1"><Label className="text-xs text-muted-foreground">Card Number</Label><div className="flex items-center gap-2"><Input value={(f.number as string) ?? ""} readOnly type="password" className="h-8 text-sm font-mono flex-1" /><CopyButton value={(f.number as string) ?? ""} /></div></div>
+      {f.brand ? <Badge variant="outline">{f.brand}</Badge> : null}
+      <div className="space-y-1"><Label className="text-xs text-muted-foreground">Cardholder</Label><div className="flex items-center gap-2"><Input value={f.cardholder} readOnly className="h-8 text-sm flex-1" /><CopyButton value={f.cardholder} /></div></div>
+      <div className="space-y-1"><Label className="text-xs text-muted-foreground">Card Number</Label><div className="flex items-center gap-2"><Input value={f.number} readOnly type="password" className="h-8 text-sm font-mono flex-1" /><CopyButton value={f.number} /></div></div>
       <div className="flex gap-4">
         <div className="flex-1 space-y-1"><Label className="text-xs text-muted-foreground">Expiry</Label><Input value={(f.expiryMonth && f.expiryYear) ? `${f.expiryMonth}/${f.expiryYear}` : ""} readOnly className="h-8 text-sm" /></div>
-        <div className="flex-1 space-y-1"><Label className="text-xs text-muted-foreground">CVV</Label><div className="flex items-center gap-2"><Input value={(f.cvv as string) ?? ""} readOnly type="password" className="h-8 text-sm w-16" /><CopyButton value={(f.cvv as string) ?? ""} /></div></div>
+        <div className="flex-1 space-y-1"><Label className="text-xs text-muted-foreground">CVV</Label><div className="flex items-center gap-2"><Input value={f.cvv} readOnly type="password" className="h-8 text-sm w-16" /><CopyButton value={f.cvv} /></div></div>
       </div>
-      {f.notes ? <p className="text-sm text-muted-foreground whitespace-pre-wrap">{f.notes as string}</p> : null}
+      {f.notes ? <p className="text-sm text-muted-foreground whitespace-pre-wrap">{f.notes}</p> : null}
     </div>
   );
-}
+});
 
-function IdentityFields({ item }: { item: VaultItem & { fields: Record<string, unknown> } }) {
-  const f = item.fields;
+const IdentityFields = memo(function IdentityFields({ item }: { item: VaultItem }) {
+  const f = item.fields as IdentityFields;
   return (
     <div className="space-y-3">
-      {["firstName", "lastName", "email", "phone", "address"].map((key) => {
+      {(["firstName", "lastName", "email", "phone", "address"] as const).map((key) => {
         const val = f[key];
         if (!val) return null;
-        return <div key={key} className="space-y-1"><Label className="text-xs text-muted-foreground capitalize">{key}</Label><div className="flex items-center gap-2"><Input value={val as string} readOnly className="h-8 text-sm flex-1" /><CopyButton value={val as string} /></div></div>;
+        return <div key={key} className="space-y-1"><Label className="text-xs text-muted-foreground capitalize">{key}</Label><div className="flex items-center gap-2"><Input value={val} readOnly className="h-8 text-sm flex-1" /><CopyButton value={val} /></div></div>;
       })}
-      {f.notes ? <p className="text-sm text-muted-foreground whitespace-pre-wrap">{f.notes as string}</p> : null}
+      {f.notes ? <p className="text-sm text-muted-foreground whitespace-pre-wrap">{f.notes}</p> : null}
     </div>
   );
-}
+});
 
 /** ── Inline Edit ── */
-function EditItemInline({ item, onDone }: { item: VaultItem; onDone: () => void }) {
+const EditItemInline = memo(function EditItemInline({ item, onDone }: { item: VaultItem; onDone: () => void }) {
   const { updateItem } = useVault();
   const [name, setName] = useState(item.name);
-  const [notes, setNotes] = useState((item.fields as Record<string, unknown>).notes as string ?? "");
+  const [notes, setNotes] = useState(
+    (item.type === "login" ? (item.fields as LoginFields).notes : (item.fields as NoteFields).content) ?? "",
+  );
   const [saving, setSaving] = useState(false);
 
   const isLogin = item.type === "login";
-  const [username, setUsername] = useState(isLogin ? (item.fields as Record<string, unknown>).username as string ?? "" : "");
-  const [password, setPassword] = useState(isLogin ? (item.fields as Record<string, unknown>).password as string ?? "" : "");
-  const [uris, setUris] = useState<string[]>(isLogin ? ((item.fields as Record<string, unknown>).uris as string[]) ?? [] : []);
+  const loginFields = isLogin ? item.fields as LoginFields : null;
+  const [username, setUsername] = useState(loginFields?.username ?? "");
+  const [password, setPassword] = useState(loginFields?.password ?? "");
+  const [uris, setUris] = useState<string[]>(loginFields?.uris ?? []);
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
@@ -519,4 +527,4 @@ function EditItemInline({ item, onDone }: { item: VaultItem; onDone: () => void 
       </Card>
     </div>
   );
-}
+});

@@ -1,6 +1,26 @@
 import type { Vault, VaultItem, LoginFields, CardFields, NoteFields, IdentityFields } from "@ironlox/schemas";
 
 /**
+ * Encode a Uint8Array to a lowercase hex string.
+ */
+export function toHex(buf: Uint8Array): string {
+  return Array.from(new Uint8Array(buf))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+/**
+ * Decode a hex string to a Uint8Array.
+ */
+export function hexToBytes(hex: string): Uint8Array {
+  const bytes = new Uint8Array(hex.length / 2);
+  for (let i = 0; i < hex.length; i += 2) {
+    bytes[i / 2] = parseInt(hex.substring(i, i + 2), 16);
+  }
+  return bytes;
+}
+
+/**
  * Constant-time string comparison.
  * Prevents timing attacks on secret comparisons (passwords, tokens, hashes).
  * Both strings must be the same length; caller should hash before comparing.

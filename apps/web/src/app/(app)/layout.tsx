@@ -6,6 +6,7 @@ import { useVault } from "@/lib/vault-context";
 import { useTranslation } from "react-i18next";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -23,6 +24,7 @@ function AppSidebar() {
   const { t } = useTranslation();
   const { email, logout, isSyncing } = useVault();
   const pathname = usePathname();
+  const { resolvedTheme } = useTheme();
 
   const navItems = [
     { href: "/vault", label: t("nav.vault"), icon: FolderOpen },
@@ -37,10 +39,11 @@ function AppSidebar() {
   return (
     <div className="flex flex-col h-full">
       <div className="px-4 py-4 border-b border-border">
-        <div className="flex items-center gap-2">
-          <img src="/logo-icon.svg" alt="Ironlox" className="size-5" />
-          <span className="font-semibold text-sm">Ironlox</span>
-        </div>
+        <img
+          src={resolvedTheme === "light" ? "/logo-dark.svg" : "/logo.svg"}
+          alt="Ironlox"
+          className="h-5 w-auto"
+        />
         {email && <p className="text-xs text-muted-foreground mt-1 truncate">{email}</p>}
         {isSyncing && (
           <p className="text-[10px] text-muted-foreground animate-pulse mt-0.5">

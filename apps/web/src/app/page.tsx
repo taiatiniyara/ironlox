@@ -6,16 +6,17 @@ import { useVault } from "@/lib/vault-context";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Home() {
-  const { isAuthenticated } = useVault();
+  const { isAuthenticated, isAuthRestored } = useVault();
   const router = useRouter();
 
   useEffect(() => {
+    if (!isAuthRestored) return;
     if (isAuthenticated) {
       router.replace("/vault");
     } else {
       router.replace("/login");
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, isAuthRestored, router]);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center gap-4">

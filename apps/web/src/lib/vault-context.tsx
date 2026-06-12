@@ -44,6 +44,7 @@ async function fetchVaultBlob(client: ApiClient): Promise<string> {
 interface VaultContextType {
   vault: Vault | null;
   isAuthenticated: boolean;
+  isAuthRestored: boolean;
   isVaultLoaded: boolean;
   isSyncing: boolean;
   email: string | null;
@@ -63,6 +64,7 @@ const VaultContext = createContext<VaultContextType | null>(null);
 export function VaultProvider({ children }: { children: ReactNode }) {
   const [vault, setVaultState] = useState<Vault | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthRestored, setIsAuthRestored] = useState(false);
   const [isVaultLoaded, setIsVaultLoaded] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [email, setEmail] = useState<string | null>(null);
@@ -90,7 +92,9 @@ export function VaultProvider({ children }: { children: ReactNode }) {
     if (storedToken && storedRefresh) {
       client.setTokens(storedToken, storedRefresh);
       setEmail(storedEmail);
+      setIsAuthenticated(true);
     }
+    setIsAuthRestored(true);
   }, []);
 
   const persistSession = useCallback(
@@ -313,6 +317,7 @@ export function VaultProvider({ children }: { children: ReactNode }) {
     () => ({
       vault,
       isAuthenticated,
+      isAuthRestored,
       isVaultLoaded,
       isSyncing,
       email,
@@ -329,6 +334,7 @@ export function VaultProvider({ children }: { children: ReactNode }) {
     [
       vault,
       isAuthenticated,
+      isAuthRestored,
       isVaultLoaded,
       isSyncing,
       email,

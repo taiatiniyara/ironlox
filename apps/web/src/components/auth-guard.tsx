@@ -19,14 +19,18 @@ function LoadingState({ label }: { label: string }) {
 }
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, isVaultLoaded } = useVault();
+  const { isAuthenticated, isAuthRestored, isVaultLoaded } = useVault();
   const router = useRouter();
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (isAuthRestored && !isAuthenticated) {
       router.push("/login");
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthRestored, isAuthenticated, router]);
+
+  if (!isAuthRestored) {
+    return <LoadingState label="Restoring session..." />;
+  }
 
   if (!isAuthenticated) {
     return <LoadingState label="Redirecting..." />;
@@ -40,14 +44,18 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
 }
 
 export function GuestGuard({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated } = useVault();
+  const { isAuthenticated, isAuthRestored } = useVault();
   const router = useRouter();
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthRestored && isAuthenticated) {
       router.push("/vault");
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthRestored, isAuthenticated, router]);
+
+  if (!isAuthRestored) {
+    return <LoadingState label="Restoring session..." />;
+  }
 
   if (isAuthenticated) {
     return <LoadingState label="Redirecting..." />;

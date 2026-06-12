@@ -20,3 +20,4 @@ test-results/
 nul
 graphify-out/
 out/
+*~lock~

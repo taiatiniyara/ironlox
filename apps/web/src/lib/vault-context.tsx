@@ -266,41 +266,48 @@ export function VaultProvider({ children }: { children: ReactNode }) {
     clearSession();
   }, [clearSession]);
 
-  const unlockVault = useCallback(async (masterPassword: string): Promise<void> => {
-    const client = apiClientRef.current;
-    if (!client) throw new Error("Not authenticated");
+  const unlockVault = useCallback(
+    async (masterPassword: string): Promise<void> => {
+      const client = apiClientRef.current;
+      if (!client) throw new Error("Not authenticated");
 
-    setIsVaultLoaded(false);
-    try {
-      const account = await client.getAccount();
-      if (!account.encryptionSalt || !account.wrappedVaultKey) {
-        throw new Error("Account not fully initialized");
-      }
-      const encryptionKey = await deriveEncryptionKey(
-        masterPassword,
-        hexToBytes(account.encryptionSalt),
-      );
-      const vaultKey = await unwrapVaultKey(account.wrappedVaultKey, encryptionKey);
-      vaultKeyRef.current = vaultKey;
-      vaultVersionRef.current = account.vaultVersion;
-
-      const blob = await client.getVaultBlob();
-      if (!blob) {
-        setVaultState(createEmptyVault());
-      } else {
-        try {
-          const decrypted = await decryptVault(blob, vaultKey);
-          setVaultState(decrypted);
-        } catch {
-          setVaultState(createEmptyVault());
+      setIsVaultLoaded(false);
+      try {
+        const account = await client.getAccount();
+        if (!account.encryptionSalt || !account.wrappedVaultKey) {
+          throw new Error("Account not fully initialized");
         }
+        const encryptionKey = await deriveEncryptionKey(
+          masterPassword,
+          hexToBytes(account.encryptionSalt),
+        );
+        const vaultKey = await unwrapVaultKey(account.wrappedVaultKey, encryptionKey);
+        vaultKeyRef.current = vaultKey;
+        vaultVersionRef.current = account.vaultVersion;
+
+        const blob = await client.getVaultBlob();
+        if (!blob) {
+          setVaultState(createEmptyVault());
+        } else {
+          try {
+            const decrypted = await decryptVault(blob, vaultKey);
+            setVaultState(decrypted);
+          } catch {
+            setVaultState(createEmptyVault());
+          }
+        }
+        setIsVaultLoaded(true);
+      } catch (err) {
+        setIsVaultLoaded(true);
+        if (err instanceof ApiError && err.status === 401) {
+          clearSession();
+          throw new Error("SESSION_EXPIRED", { cause: err });
+        }
+        throw new Error("Failed to unlock vault. Check your master password.", { cause: err });
       }
-      setIsVaultLoaded(true);
-    } catch {
-      setIsVaultLoaded(true);
-      throw new Error("Failed to unlock vault. Check your master password.");
-    }
-  }, []);
+    },
+    [clearSession],
+  );
 
   const addItem = useCallback(
     async (item: VaultItem) => {

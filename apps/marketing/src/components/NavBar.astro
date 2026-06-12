@@ -1,0 +1,67 @@
+---
+export interface Props {
+  variant?: "landing" | "legal";
+}
+
+const variant = Astro.props.variant ?? "landing";
+---
+
+<nav
+  class:list={[
+    "border-b border-white/4 bg-surface-950/80 backdrop-blur-xl",
+    { "fixed top-0 inset-x-0 z-50": variant === "landing" },
+  ]}
+>
+  <div
+    class:list={[
+      {
+        "max-w-6xl": variant === "landing",
+        "max-w-3xl": variant === "legal",
+      },
+      "mx-auto px-6 h-16 flex items-center justify-between",
+    ]}
+  >
+    <a href="/" class="flex items-center shrink-0" aria-label="Ironlox home">
+      <img src="/logo.svg" alt="Ironlox" class="h-8 w-auto" />
+    </a>
+
+    {
+      variant === "landing" ? (
+        <>
+          <input type="checkbox" id="mobile-menu-toggle" class="peer sr-only" />
+          <label
+            for="mobile-menu-toggle"
+            class="md:hidden p-2 -mr-2 cursor-pointer text-surface-200 hover:text-white peer-checked:hidden"
+            aria-label="Open menu"
+          >
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </label>
+          <label
+            for="mobile-menu-toggle"
+            class="md:hidden p-2 -mr-2 cursor-pointer text-surface-200 hover:text-white hidden peer-checked:inline-block"
+            aria-label="Close menu"
+          >
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M6 6l12 12M18 6l-12 12" />
+            </svg>
+          </label>
+
+          <div class="hidden peer-checked:flex md:flex flex-col md:flex-row absolute md:static top-16 left-0 right-0 bg-surface-950/95 md:bg-transparent backdrop-blur-xl md:backdrop-blur-none border-b md:border-0 border-white/4 p-6 md:p-0 gap-4 md:gap-6 items-start md:items-center text-sm">
+            <a href="#features" class="text-surface-200 hover:text-white transition-colors">Features</a>
+            <a href="#how-it-works" class="text-surface-200 hover:text-white transition-colors">How it works</a>
+            <a href="#comparison" class="text-surface-200 hover:text-white transition-colors">Compare</a>
+            <a href="#pricing" class="text-surface-200 hover:text-white transition-colors">Pricing</a>
+            <a href="https://github.com/taiatiniyara/ironlox" class="text-surface-200 hover:text-white transition-colors">Docs</a>
+            <a href="https://app.ironlox.com" class="inline-flex items-center px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white text-sm font-medium rounded-lg transition-colors">
+              Sign up free
+            </a>
+          </div>
+        </>
+      ) : (
+        <a href="/" class="text-sm text-surface-200 hover:text-white transition-colors">&larr; Back home</a>
+      )
+    }
+  </div>
+</nav>

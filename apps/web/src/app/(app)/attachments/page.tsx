@@ -1,13 +1,14 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRef, useState, useEffect } from "react";
 import { useVault } from "@/lib/vault-context";
 import { usePageTitle } from "@/lib/utils";
+import { PageHeader } from "@/components/shared/page-header";
+import { LoadingButton } from "@/components/shared/loading-button";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { ArrowLeft, Upload, Paperclip, Trash2, Download, Loader2 } from "lucide-react";
+import { Upload, Paperclip, Trash2, Download } from "lucide-react";
 import { toast } from "sonner";
 
 interface AttachedFile {
@@ -19,21 +20,24 @@ interface AttachedFile {
 export default function AttachmentsPage() {
   usePageTitle("Attachments");
   const { apiClient } = useVault();
-  const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
   const [quota, setQuota] = useState({ used: 0, total: 250 });
   const [files, setFiles] = useState<AttachedFile[]>([]);
   const [uploading, setUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
 
   useEffect(() => {
     if (!apiClient) return;
+    let cancelled = false;
     apiClient
       .getAccount()
       .then((acct) => {
+        if (cancelled) return;
         setQuota({ used: acct.attachmentUsed || 0, total: acct.attachmentQuota || 250 });
       })
       .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
   }, [apiClient]);
 
   async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -44,7 +48,6 @@ export default function AttachmentsPage() {
       return;
     }
     setUploading(true);
-    setUploadProgress(0);
     try {
       const id = crypto.randomUUID();
       const buffer = await file.arrayBuffer();
@@ -56,7 +59,6 @@ export default function AttachmentsPage() {
       toast.error("Upload failed");
     } finally {
       setUploading(false);
-      setUploadProgress(0);
       if (fileRef.current) fileRef.current.value = "";
     }
   }
@@ -90,12 +92,7 @@ export default function AttachmentsPage() {
 
   return (
     <div className="max-w-lg mx-auto p-4 space-y-4">
-      <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={() => router.push("/vault")}>
-          <ArrowLeft className="size-4" />
-        </Button>
-        <h1 className="text-xl font-semibold">File Attachments</h1>
-      </div>
+      <PageHeader title="File Attachments" />
 
       <Card>
         <CardHeader>
@@ -106,28 +103,17 @@ export default function AttachmentsPage() {
         </CardHeader>
         <CardContent className="space-y-3">
           <Progress value={usagePercent} className="h-2" />
-          {uploading && (
-            <p className="text-xs text-muted-foreground">Uploading... {uploadProgress}%</p>
-          )}
           <input ref={fileRef} type="file" onChange={handleUpload} className="hidden" />
-          <Button
+          <LoadingButton
             variant="outline"
             className="w-full gap-2"
             onClick={() => fileRef.current?.click()}
-            disabled={uploading}
+            loading={uploading}
+            loadingText="Uploading..."
           >
-            {uploading ? (
-              <>
-                <Loader2 className="size-4 animate-spin" />
-                Uploading...
-              </>
-            ) : (
-              <>
-                <Upload className="size-4" />
-                Upload File (max 25MB)
-              </>
-            )}
-          </Button>
+            <Upload className="size-4" />
+            Upload File (max 25MB)
+          </LoadingButton>
         </CardContent>
       </Card>
 

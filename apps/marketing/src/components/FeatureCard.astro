@@ -1,0 +1,20 @@
+---
+export interface Props {
+  title: string;
+  description: string;
+  delay?: number;
+}
+
+const { title, description, delay = 1 } = Astro.props;
+---
+
+<div
+  class="group relative rounded-2xl border border-white/6 bg-surface-850/50 p-8 hover:border-brand-500/20 hover:bg-surface-800/50 transition-all duration-300 card-glow reveal"
+  class:list={[`reveal-delay-${delay}`]}
+>
+  <div class="w-11 h-11 rounded-xl bg-brand-500/10 flex items-center justify-center mb-5">
+    <slot name="icon" />
+  </div>
+  <h3 class="text-lg font-semibold text-white mb-2">{title}</h3>
+  <p class="text-sm text-surface-200 leading-relaxed">{description}</p>
+</div>

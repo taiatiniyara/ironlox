@@ -2,14 +2,14 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useVault } from "@/lib/vault-context";
 import { usePageTitle } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { AuthFormCard } from "@/components/shared/auth-form-card";
+import { FormField } from "@/components/shared/form-field";
+import { LoadingButton } from "@/components/shared/loading-button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import Link from "next/link";
 import { Shield } from "lucide-react";
 
 export default function RecoverPage() {
@@ -37,50 +37,48 @@ export default function RecoverPage() {
   }
 
   return (
-    <Card>
-      <CardHeader className="text-center">
-        <div className="mx-auto rounded-full bg-primary/10 p-3 mb-2">
-          <Shield className="size-6 text-primary" />
-        </div>
-        <CardTitle>Recover Your Account</CardTitle>
-        <CardDescription>
-          Enter your email and 32-character recovery key to regain access.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="key">Recovery Key</Label>
-            <Input
-              id="key"
-              required
-              value={key}
-              onChange={(e) => setKey(e.target.value)}
-              placeholder="Enter your 32-character recovery key"
-              className="font-mono text-xs"
-            />
-          </div>
-          <Button type="submit" className="w-full" disabled={loading || key.length < 32}>
-            {loading ? "Recovering..." : "Recover Vault"}
-          </Button>
-          <p className="text-center text-xs text-muted-foreground">
-            <Link href="/login" className="text-primary hover:underline">
-              Back to sign in
-            </Link>
-          </p>
-        </form>
-      </CardContent>
-    </Card>
+    <AuthFormCard
+      title="Recover Your Account"
+      description="Enter your email and 32-character recovery key to regain access."
+      icon={Shield}
+      onSubmit={handleSubmit}
+      footer={
+        <p className="pt-4 text-center text-xs text-muted-foreground">
+          <Link href="/login" className="text-primary hover:underline">
+            Back to sign in
+          </Link>
+        </p>
+      }
+    >
+      <FormField id="email" label="Email">
+        <Input
+          id="email"
+          type="email"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="you@example.com"
+        />
+      </FormField>
+      <FormField id="key" label="Recovery Key">
+        <Input
+          id="key"
+          required
+          value={key}
+          onChange={(e) => setKey(e.target.value)}
+          placeholder="Enter your 32-character recovery key"
+          className="font-mono text-xs"
+        />
+      </FormField>
+      <LoadingButton
+        type="submit"
+        className="w-full"
+        loading={loading}
+        loadingText="Recovering..."
+        disabled={key.length < 32}
+      >
+        Recover Vault
+      </LoadingButton>
+    </AuthFormCard>
   );
 }

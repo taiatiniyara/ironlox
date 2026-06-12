@@ -1,0 +1,62 @@
+---
+export interface Props {
+  title: string;
+  status: "done" | "in-progress" | "planned";
+  description: string;
+  delay?: number;
+}
+
+const { title, status, description, delay = 1 } = Astro.props;
+
+const statusConfig = {
+  done: {
+    bg: "bg-green-500/20 border-green-500/30",
+    iconBg: "bg-green-400",
+    labelBg: "bg-green-500/10 text-green-400",
+    label: "Done",
+  },
+  "in-progress": {
+    bg: "bg-brand-500/20 border-brand-500/30",
+    iconBg: "bg-brand-400",
+    labelBg: "bg-brand-500/10 text-brand-300",
+    label: "In progress",
+  },
+  planned: {
+    bg: "bg-surface-700/30 border-white/6",
+    iconBg: "bg-surface-700",
+    labelBg: "bg-surface-700/50 text-surface-200",
+    label: "Planned",
+  },
+};
+
+const cfg = statusConfig[status];
+---
+
+<div class="flex items-start gap-4 reveal" class:list={[`reveal-delay-${delay}`]}>
+  <div
+    class:list={[
+      "w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-0.5",
+      cfg.bg,
+    ]}
+  >
+    <svg class="w-4 h-4" class:list={[cfg.iconBg]} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      {status === "done" ? (
+        <polyline points="20 6 9 17 4 12" />
+      ) : (
+        <>
+          <circle cx="12" cy="12" r="10" />
+          {status === "in-progress" && <polyline points="12 6 12 12 16 14" />}
+        </>
+      )}
+    </svg>
+  </div>
+  <div>
+    <div class="flex items-center gap-2 mb-1">
+      <h3 class="text-sm font-semibold text-white">{title}</h3>
+      <span class:list={["px-2 py-0.5 rounded-full text-[10px] font-medium", cfg.labelBg]}>
+        {cfg.label}
+      </span>
+    </div>
+    <p class="text-xs text-surface-200">{description}</p>
+  </div>
+</div>

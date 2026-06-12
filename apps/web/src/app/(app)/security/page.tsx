@@ -3,10 +3,11 @@
 import { useMemo, useState, useCallback } from "react";
 import { useVault } from "@/lib/vault-context";
 import { usePageTitle } from "@/lib/utils";
+import { EmptyState } from "@/components/shared/empty-state";
+import { LoadingButton } from "@/components/shared/loading-button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   ShieldCheck,
   ShieldAlert,
@@ -15,7 +16,6 @@ import {
   CheckCircle2,
   Key,
   Clock,
-  Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -124,7 +124,7 @@ export default function SecurityPage() {
       } catch {
         /* skip network errors */
       }
-      await new Promise((r) => setTimeout(r, 1600)); // rate limit: ~1 req/sec
+      await new Promise((r) => setTimeout(r, 1600));
     }
     setHibpResults(results);
     setHibpRunning(false);
@@ -137,14 +137,10 @@ export default function SecurityPage() {
     return (
       <div className="max-w-lg mx-auto p-4">
         <h1 className="text-xl font-semibold mb-4">Security Dashboard</h1>
-        <Card>
-          <CardContent className="py-8 text-center">
-            <ShieldCheck className="size-10 text-muted-foreground mx-auto mb-3" />
-            <p className="text-sm text-muted-foreground">
-              Add some login items to see your vault health report.
-            </p>
-          </CardContent>
-        </Card>
+        <EmptyState
+          icon={ShieldCheck}
+          title="Add some login items to see your vault health report."
+        />
       </div>
     );
   }
@@ -241,24 +237,16 @@ export default function SecurityPage() {
               All passwords are safe. No breaches found.
             </p>
           )}
-          <Button
+          <LoadingButton
             variant="outline"
             size="sm"
             className="w-full"
             onClick={runHibpCheck}
-            disabled={hibpRunning}
+            loading={hibpRunning}
+            loadingText="Checking..."
           >
-            {hibpRunning ? (
-              <>
-                <Loader2 className="size-3.5 mr-1 animate-spin" />
-                Checking...
-              </>
-            ) : hibpDone ? (
-              "Re-run Breach Check"
-            ) : (
-              "Run Breach Check"
-            )}
-          </Button>
+            {hibpDone ? "Re-run Breach Check" : "Run Breach Check"}
+          </LoadingButton>
         </CardContent>
       </Card>
 

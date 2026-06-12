@@ -1,5 +1,21 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import NavBar from "../components/NavBar.astro";
+import SectionHeading from "../components/SectionHeading.astro";
+import FeatureCard from "../components/FeatureCard.astro";
+import TestimonialCard from "../components/TestimonialCard.astro";
+import FaqItem from "../components/FaqItem.astro";
+import RoadmapItem from "../components/RoadmapItem.astro";
+import CtaButton from "../components/CtaButton.astro";
+import CheckIcon from "../components/icons/CheckIcon.astro";
+import ChevronDown from "../components/icons/ChevronDown.astro";
+import GitHubIcon from "../components/icons/GitHubIcon.astro";
+import ArrowRight from "../components/icons/ArrowRight.astro";
+import ShieldIcon from "../components/icons/ShieldIcon.astro";
+import LockIcon from "../components/icons/LockIcon.astro";
+import EyeOffIcon from "../components/icons/EyeOffIcon.astro";
+import CrossIcon from "../components/icons/CrossIcon.astro";
+import InfoIcon from "../components/icons/InfoIcon.astro";
 
 const faqSchema = {
   "@context": "https://schema.org",
@@ -58,37 +74,7 @@ const faqSchema = {
 ---
 
 <Layout>
-  <!-- Nav -->
-  <header class="fixed top-0 inset-x-0 z-50 border-b border-white/4 bg-surface-950/80 backdrop-blur-xl">
-    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-      <a href="/" class="flex items-center shrink-0" aria-label="Ironlox home">
-        <img src="/logo.svg" alt="Ironlox" class="h-8 w-auto" />
-      </a>
-
-      <input type="checkbox" id="mobile-menu-toggle" class="peer sr-only" />
-      <label for="mobile-menu-toggle" class="md:hidden p-2 -mr-2 cursor-pointer text-surface-200 hover:text-white peer-checked:hidden" aria-label="Open menu">
-        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-          <path d="M4 6h16M4 12h16M4 18h16" />
-        </svg>
-      </label>
-      <label for="mobile-menu-toggle" class="md:hidden p-2 -mr-2 cursor-pointer text-surface-200 hover:text-white hidden peer-checked:inline-block" aria-label="Close menu">
-        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-          <path d="M6 6l12 12M18 6l-12 12" />
-        </svg>
-      </label>
-
-      <div class="hidden peer-checked:flex md:flex flex-col md:flex-row absolute md:static top-16 left-0 right-0 bg-surface-950/95 md:bg-transparent backdrop-blur-xl md:backdrop-blur-none border-b md:border-0 border-white/4 p-6 md:p-0 gap-4 md:gap-6 items-start md:items-center text-sm">
-        <a href="#features" class="text-surface-200 hover:text-white transition-colors">Features</a>
-        <a href="#how-it-works" class="text-surface-200 hover:text-white transition-colors">How it works</a>
-        <a href="#comparison" class="text-surface-200 hover:text-white transition-colors">Compare</a>
-        <a href="#pricing" class="text-surface-200 hover:text-white transition-colors">Pricing</a>
-        <a href="https://github.com/taiatiniyara/ironlox" class="text-surface-200 hover:text-white transition-colors">Docs</a>
-        <a href="https://app.ironlox.com" class="inline-flex items-center px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white text-sm font-medium rounded-lg transition-colors">
-          Sign up free
-        </a>
-      </div>
-    </div>
-  </header>
+  <NavBar />
 
   <main id="main-content">
     <!-- Hero -->
@@ -113,14 +99,11 @@ const faqSchema = {
           your data. Not now. Not ever.
         </p>
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
-          <a href="https://app.ironlox.com" class="inline-flex items-center gap-2 px-8 py-4 bg-brand-500 hover:bg-brand-600 text-white font-semibold rounded-xl transition-all shadow-lg shadow-brand-500/25">
-            Sign up free &mdash; no credit card
-          </a>
+          <CtaButton>Sign up free &mdash; no credit card</CtaButton>
           <div class="flex flex-col items-center gap-1">
-            <a href="https://github.com/taiatiniyara/ironlox" class="inline-flex items-center gap-2 px-8 py-4 border border-white/10 hover:border-white/20 text-white font-semibold rounded-xl transition-all">
-              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-              Star on GitHub
-            </a>
+            <CtaButton href="https://github.com/taiatiniyara/ironlox" variant="secondary">
+              <GitHubIcon /> Star on GitHub
+            </CtaButton>
             <img src="https://img.shields.io/github/stars/taiatiniyara/ironlox?style=social" alt="GitHub stars" class="h-5" loading="lazy" />
           </div>
         </div>
@@ -182,13 +165,11 @@ const faqSchema = {
       <div class="max-w-5xl mx-auto px-6 py-8">
         <div class="flex flex-wrap items-center justify-center gap-x-10 gap-y-6">
           <div class="flex items-center gap-3 reveal reveal-delay-1">
-            <svg class="w-5 h-5 text-brand-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-            <span class="text-xs text-surface-200 font-medium">AES-256-GCM</span>
+            <LockIcon /> <span class="text-xs text-surface-200 font-medium">AES-256-GCM</span>
           </div>
           <span class="text-surface-700 hidden sm:inline">&middot;</span>
           <div class="flex items-center gap-3 reveal reveal-delay-2">
-            <svg class="w-5 h-5 text-brand-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-            <span class="text-xs text-surface-200 font-medium">Argon2id</span>
+            <ShieldIcon /> <span class="text-xs text-surface-200 font-medium">Argon2id</span>
           </div>
           <span class="text-surface-700 hidden sm:inline">&middot;</span>
           <div class="flex items-center gap-3 reveal reveal-delay-3">
@@ -197,8 +178,7 @@ const faqSchema = {
           </div>
           <span class="text-surface-700 hidden sm:inline">&middot;</span>
           <div class="flex items-center gap-3 reveal reveal-delay-4">
-            <svg class="w-5 h-5 text-brand-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/></svg>
-            <span class="text-xs text-surface-200 font-medium">Zero-Knowledge</span>
+            <EyeOffIcon /> <span class="text-xs text-surface-200 font-medium">Zero-Knowledge</span>
           </div>
           <span class="text-surface-700 hidden sm:inline">&middot;</span>
           <div class="flex items-center gap-3 reveal reveal-delay-5">
@@ -212,53 +192,26 @@ const faqSchema = {
     <!-- Features -->
     <section id="features" class="py-24 px-6">
       <div class="max-w-6xl mx-auto">
-      <div class="text-center mb-16">
-        <h2 class="text-3xl sm:text-4xl font-bold text-white mb-4 reveal">One vault for your entire digital life</h2>
-        <p class="text-surface-200 max-w-xl mx-auto reveal reveal-delay-1">Passwords, payments, notes, identities, files, and 2FA codes. All encrypted. All in one place.</p>
-      </div>
-      <div class="grid md:grid-cols-3 gap-8">
-        <div class="group relative rounded-2xl border border-white/6 bg-surface-850/50 p-8 hover:border-brand-500/20 hover:bg-surface-800/50 transition-all duration-300 card-glow reveal reveal-delay-1">
-            <div class="w-11 h-11 rounded-xl bg-brand-500/10 flex items-center justify-center mb-5">
-              <svg class="w-5 h-5 text-brand-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-            </div>
-            <h3 class="text-lg font-semibold text-white mb-2">End-to-End Encrypted</h3>
-            <p class="text-sm text-surface-200 leading-relaxed">AES-256-GCM encryption locks your vault on your device. Your master password never leaves your browser. We couldn&rsquo;t read your data if we wanted to.</p>
-          </div>
-          <div class="group relative rounded-2xl border border-white/6 bg-surface-850/50 p-8 hover:border-brand-500/20 hover:bg-surface-800/50 transition-all duration-300 card-glow reveal reveal-delay-2">
-          <div class="w-11 h-11 rounded-xl bg-brand-500/10 flex items-center justify-center mb-5">
-            <svg class="w-5 h-5 text-brand-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-            </div>
-            <h3 class="text-lg font-semibold text-white mb-2">One-Click Autofill</h3>
-            <p class="text-sm text-surface-200 leading-relaxed">Instantly fill usernames, passwords, credit cards, and TOTP codes on any site. Works on Chrome and Firefox. Saves you hundreds of keystrokes every day.</p>
-          </div>
-          <div class="group relative rounded-2xl border border-white/6 bg-surface-850/50 p-8 hover:border-brand-500/20 hover:bg-surface-800/50 transition-all duration-300 card-glow reveal reveal-delay-3">
-            <div class="w-11 h-11 rounded-xl bg-brand-500/10 flex items-center justify-center mb-5">
-              <svg class="w-5 h-5 text-brand-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
-            </div>
-            <h3 class="text-lg font-semibold text-white mb-2">Smart Generator</h3>
-            <p class="text-sm text-surface-200 leading-relaxed">Create strong, unique passwords and passphrases with customizable rules. Length, symbols, numbers &mdash; generated locally on your device. Never reused. Never weak.</p>
-          </div>
-          <div class="group relative rounded-2xl border border-white/6 bg-surface-850/50 p-8 hover:border-brand-500/20 hover:bg-surface-800/50 transition-all duration-300 card-glow reveal reveal-delay-4">
-            <div class="w-11 h-11 rounded-xl bg-brand-500/10 flex items-center justify-center mb-5">
-              <svg class="w-5 h-5 text-brand-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-            </div>
-            <h3 class="text-lg font-semibold text-white mb-2">Cross-Device Sync</h3>
-            <p class="text-sm text-surface-200 leading-relaxed">Your vault syncs seamlessly across all your devices. Add a login on your desktop, it appears instantly on your phone. Your cards, notes, and files are always with you. Always encrypted.</p>
-          </div>
-          <div class="group relative rounded-2xl border border-white/6 bg-surface-850/50 p-8 hover:border-brand-500/20 hover:bg-surface-800/50 transition-all duration-300 card-glow reveal reveal-delay-5">
-            <div class="w-11 h-11 rounded-xl bg-brand-500/10 flex items-center justify-center mb-5">
-              <svg class="w-5 h-5 text-brand-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
-            </div>
-            <h3 class="text-lg font-semibold text-white mb-2">Vault Health Reports</h3>
-            <p class="text-sm text-surface-200 leading-relaxed">Scan your vault for weak, reused, and breached passwords. Get actionable recommendations. Premium feature with automatic breach monitoring.</p>
-          </div>
-          <div class="group relative rounded-2xl border border-white/6 bg-surface-850/50 p-8 hover:border-brand-500/20 hover:bg-surface-800/50 transition-all duration-300 card-glow reveal reveal-delay-6">
-            <div class="w-11 h-11 rounded-xl bg-brand-500/10 flex items-center justify-center mb-5">
-              <svg class="w-5 h-5 text-brand-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            </div>
-            <h3 class="text-lg font-semibold text-white mb-2">More Than Passwords</h3>
-            <p class="text-sm text-surface-200 leading-relaxed">Store credit cards, secure notes, identities, file attachments, and TOTP codes. One vault for all your sensitive digital life.</p>
-          </div>
+        <SectionHeading title="One vault for your entire digital life" subtitle="Passwords, payments, notes, identities, files, and 2FA codes. All encrypted. All in one place." />
+        <div class="grid md:grid-cols-3 gap-8">
+          <FeatureCard title="End-to-End Encrypted" description="AES-256-GCM encryption locks your vault on your device. Your master password never leaves your browser. We couldn&rsquo;t read your data if we wanted to." delay={1}>
+            <svg slot="icon" class="w-5 h-5 text-brand-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+          </FeatureCard>
+          <FeatureCard title="One-Click Autofill" description="Instantly fill usernames, passwords, credit cards, and TOTP codes on any site. Works on Chrome and Firefox. Saves you hundreds of keystrokes every day." delay={2}>
+            <svg slot="icon" class="w-5 h-5 text-brand-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          </FeatureCard>
+          <FeatureCard title="Smart Generator" description="Create strong, unique passwords and passphrases with customizable rules. Length, symbols, numbers &mdash; generated locally on your device. Never reused. Never weak." delay={3}>
+            <svg slot="icon" class="w-5 h-5 text-brand-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
+          </FeatureCard>
+          <FeatureCard title="Cross-Device Sync" description="Your vault syncs seamlessly across all your devices. Add a login on your desktop, it appears instantly on your phone. Your cards, notes, and files are always with you. Always encrypted." delay={4}>
+            <svg slot="icon" class="w-5 h-5 text-brand-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          </FeatureCard>
+          <FeatureCard title="Vault Health Reports" description="Scan your vault for weak, reused, and breached passwords. Get actionable recommendations. Premium feature with automatic breach monitoring." delay={5}>
+            <svg slot="icon" class="w-5 h-5 text-brand-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+          </FeatureCard>
+          <FeatureCard title="More Than Passwords" description="Store credit cards, secure notes, identities, file attachments, and TOTP codes. One vault for all your sensitive digital life." delay={6}>
+            <svg slot="icon" class="w-5 h-5 text-brand-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </FeatureCard>
         </div>
       </div>
     </section>
@@ -304,63 +257,18 @@ const faqSchema = {
           <p class="text-surface-200">Join thousands of developers, security engineers, and privacy-conscious individuals.</p>
         </div>
         <div class="grid md:grid-cols-3 gap-8 mb-14">
-          <div class="rounded-2xl border border-white/6 bg-surface-850/50 p-8 card-glow reveal reveal-delay-1">
-            <div class="flex items-center gap-1 mb-4">
-              <svg class="w-4 h-4 text-yellow-400" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-              <svg class="w-4 h-4 text-yellow-400" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-              <svg class="w-4 h-4 text-yellow-400" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-              <svg class="w-4 h-4 text-yellow-400" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-              <svg class="w-4 h-4 text-yellow-400" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            </div>
-            <blockquote class="text-sm text-surface-200 leading-relaxed mb-4">
-              &ldquo;Finally, a password manager where I can actually read the encryption code. As a security engineer, Ironlox gives me what 1Password never could: verifiable trust.&rdquo;
-            </blockquote>
-            <div class="flex items-center gap-3">
-              <div class="w-8 h-8 rounded-full bg-brand-500/20 flex items-center justify-center text-brand-400 text-xs font-bold">SK</div>
-              <div>
-                <div class="text-xs font-medium text-white">Sarah K.</div>
-                <div class="text-[11px] text-surface-700">Security Engineer</div>
-              </div>
-            </div>
-          </div>
-          <div class="rounded-2xl border border-white/6 bg-surface-850/50 p-8 card-glow reveal reveal-delay-2">
-            <div class="flex items-center gap-1 mb-4">
-              <svg class="w-4 h-4 text-yellow-400" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-              <svg class="w-4 h-4 text-yellow-400" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-              <svg class="w-4 h-4 text-yellow-400" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-              <svg class="w-4 h-4 text-yellow-400" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-              <svg class="w-4 h-4 text-yellow-400" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            </div>
-            <blockquote class="text-sm text-surface-200 leading-relaxed mb-4">
-              &ldquo;Switched from LastPass after the breaches. Ironlox is zero-knowledge done right. The import took 30 seconds and I had my 400+ passwords migrated.&rdquo;
-            </blockquote>
-            <div class="flex items-center gap-3">
-              <div class="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center text-green-400 text-xs font-bold">MR</div>
-              <div>
-                <div class="text-xs font-medium text-white">Marcus R.</div>
-                <div class="text-[11px] text-surface-700">Full-Stack Developer</div>
-              </div>
-            </div>
-          </div>
-          <div class="rounded-2xl border border-white/6 bg-surface-850/50 p-8 card-glow reveal reveal-delay-3">
-            <div class="flex items-center gap-1 mb-4">
-              <svg class="w-4 h-4 text-yellow-400" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-              <svg class="w-4 h-4 text-yellow-400" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-              <svg class="w-4 h-4 text-yellow-400" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-              <svg class="w-4 h-4 text-yellow-400" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-              <svg class="w-4 h-4 text-yellow-400" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            </div>
-            <blockquote class="text-sm text-surface-200 leading-relaxed mb-4">
-              &ldquo;I&rsquo;m not technical, but I needed something I could trust after my bank account got hacked. Ironlox makes security simple without being condescending. The autofill just works.&rdquo;
-            </blockquote>
-            <div class="flex items-center gap-3">
-              <div class="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 text-xs font-bold">LP</div>
-              <div>
-                <div class="text-xs font-medium text-white">Lisa P.</div>
-                <div class="text-[11px] text-surface-700">Graphic Designer</div>
-              </div>
-            </div>
-          </div>
+          <TestimonialCard
+            quote="Finally, a password manager where I can actually read the encryption code. As a security engineer, Ironlox gives me what 1Password never could: verifiable trust."
+            name="Sarah K." role="Security Engineer" initials="SK" delay={1}
+          />
+          <TestimonialCard
+            quote="Switched from LastPass after the breaches. Ironlox is zero-knowledge done right. The import took 30 seconds and I had my 400+ passwords migrated."
+            name="Marcus R." role="Full-Stack Developer" initials="MR" initialsColor="green" delay={2}
+          />
+          <TestimonialCard
+            quote="I&rsquo;m not technical, but I needed something I could trust after my bank account got hacked. Ironlox makes security simple without being condescending. The autofill just works."
+            name="Lisa P." role="Graphic Designer" initials="LP" initialsColor="purple" delay={3}
+          />
         </div>
         <div class="flex flex-wrap items-center justify-center gap-x-12 gap-y-6 text-center">
           <div>
@@ -393,8 +301,7 @@ const faqSchema = {
           <div class="flex flex-col md:flex-row items-center gap-10">
             <div class="flex-1">
               <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-300 text-xs font-medium mb-4">
-                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                Security
+                <ShieldIcon class="w-3.5 h-3.5" /> Security
               </div>
               <h2 class="text-3xl sm:text-4xl font-bold text-white mb-4">We never see your data. Ever.</h2>
               <p class="text-surface-200 leading-relaxed mb-6">
@@ -404,20 +311,16 @@ const faqSchema = {
               </p>
               <ul class="space-y-3">
                 <li class="flex items-start gap-3 text-sm text-surface-200">
-                  <svg class="w-5 h-5 text-brand-400 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-                  <span>Client-side encryption. Server is zero-knowledge.</span>
+                  <CheckIcon /> <span>Client-side encryption. Server is zero-knowledge.</span>
                 </li>
                 <li class="flex items-start gap-3 text-sm text-surface-200">
-                  <svg class="w-5 h-5 text-brand-400 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-                  <span>Master password never leaves your device.</span>
+                  <CheckIcon /> <span>Master password never leaves your device.</span>
                 </li>
                 <li class="flex items-start gap-3 text-sm text-surface-200">
-                  <svg class="w-5 h-5 text-brand-400 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-                  <span>Every line of crypto code is open source &mdash; audit it yourself.</span>
+                  <CheckIcon /> <span>Every line of crypto code is open source &mdash; audit it yourself.</span>
                 </li>
                 <li class="flex items-start gap-3 text-sm text-surface-200">
-                  <svg class="w-5 h-5 text-brand-400 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-                  <span>Export your data anytime &mdash; CSV, JSON, encrypted backup. No lock-in. Leave in 60 seconds.</span>
+                  <CheckIcon /> <span>Export your data anytime &mdash; CSV, JSON, encrypted backup. No lock-in. Leave in 60 seconds.</span>
                 </li>
               </ul>
             </div>
@@ -439,8 +342,7 @@ const faqSchema = {
     <section class="py-16 px-6">
       <div class="max-w-3xl mx-auto text-center reveal">
         <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-brand-500/20 bg-brand-500/5 text-brand-300 text-sm mb-6">
-          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-          Built on trust, verified by code
+          <ShieldIcon class="w-4 h-4" /> Built on trust, verified by code
         </div>
         <div class="flex flex-wrap items-center justify-center gap-x-10 gap-y-4 mb-6">
           <div class="flex items-center gap-2 text-sm text-surface-200">
@@ -448,8 +350,7 @@ const faqSchema = {
             <span>100% open source</span>
           </div>
           <div class="flex items-center gap-2 text-sm text-surface-200">
-            <svg class="w-5 h-5 text-brand-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-            <span>AES-256-GCM + Argon2id</span>
+            <LockIcon /> <span>AES-256-GCM + Argon2id</span>
           </div>
           <div class="flex items-center gap-2 text-sm text-surface-200">
             <svg class="w-5 h-5 text-brand-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -484,31 +385,31 @@ const faqSchema = {
             <tbody class="divide-y divide-white/4">
               <tr class="hover:bg-surface-850/30 transition-colors">
                 <td class="px-6 py-4 text-surface-200">Open source</td>
-                <td class="px-6 py-4"><svg class="w-5 h-5 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></td>
-                <td class="px-6 py-4"><svg class="w-5 h-5 text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></td>
-                <td class="px-6 py-4 hidden sm:table-cell"><svg class="w-5 h-5 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></td>
-                <td class="px-6 py-4 hidden sm:table-cell"><svg class="w-5 h-5 text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></td>
+                <td class="px-6 py-4"><CheckIcon /></td>
+                <td class="px-6 py-4"><CrossIcon /></td>
+                <td class="px-6 py-4 hidden sm:table-cell"><CheckIcon /></td>
+                <td class="px-6 py-4 hidden sm:table-cell"><CrossIcon /></td>
               </tr>
               <tr class="hover:bg-surface-850/30 transition-colors">
                 <td class="px-6 py-4 text-surface-200">Zero-knowledge</td>
-                <td class="px-6 py-4"><svg class="w-5 h-5 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></td>
-                <td class="px-6 py-4"><svg class="w-5 h-5 text-yellow-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></td>
-                <td class="px-6 py-4 hidden sm:table-cell"><svg class="w-5 h-5 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></td>
-                <td class="px-6 py-4 hidden sm:table-cell"><svg class="w-5 h-5 text-yellow-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></td>
+                <td class="px-6 py-4"><CheckIcon /></td>
+                <td class="px-6 py-4"><InfoIcon /></td>
+                <td class="px-6 py-4 hidden sm:table-cell"><CheckIcon /></td>
+                <td class="px-6 py-4 hidden sm:table-cell"><InfoIcon /></td>
               </tr>
               <tr class="hover:bg-surface-850/30 transition-colors">
                 <td class="px-6 py-4 text-surface-200">No third-party trackers</td>
-                <td class="px-6 py-4"><svg class="w-5 h-5 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></td>
-                <td class="px-6 py-4"><svg class="w-5 h-5 text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></td>
-                <td class="px-6 py-4 hidden sm:table-cell"><svg class="w-5 h-5 text-yellow-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></td>
-                <td class="px-6 py-4 hidden sm:table-cell"><svg class="w-5 h-5 text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></td>
+                <td class="px-6 py-4"><CheckIcon /></td>
+                <td class="px-6 py-4"><CrossIcon /></td>
+                <td class="px-6 py-4 hidden sm:table-cell"><InfoIcon /></td>
+                <td class="px-6 py-4 hidden sm:table-cell"><CrossIcon /></td>
               </tr>
               <tr class="hover:bg-surface-850/30 transition-colors">
                 <td class="px-6 py-4 text-surface-200">Unlimited devices (free)</td>
-                <td class="px-6 py-4"><svg class="w-5 h-5 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></td>
-                <td class="px-6 py-4"><svg class="w-5 h-5 text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></td>
-                <td class="px-6 py-4 hidden sm:table-cell"><svg class="w-5 h-5 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></td>
-                <td class="px-6 py-4 hidden sm:table-cell"><svg class="w-5 h-5 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></td>
+                <td class="px-6 py-4"><CheckIcon /></td>
+                <td class="px-6 py-4"><CrossIcon /></td>
+                <td class="px-6 py-4 hidden sm:table-cell"><CheckIcon /></td>
+                <td class="px-6 py-4 hidden sm:table-cell"><CheckIcon /></td>
               </tr>
               <tr class="hover:bg-surface-850/30 transition-colors">
                 <td class="px-6 py-4 text-surface-200">TOTP authenticator</td>
@@ -533,17 +434,17 @@ const faqSchema = {
               </tr>
               <tr class="hover:bg-surface-850/30 transition-colors">
                 <td class="px-6 py-4 text-surface-200">Web-first, no installs</td>
-                <td class="px-6 py-4"><svg class="w-5 h-5 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></td>
-                <td class="px-6 py-4"><svg class="w-5 h-5 text-yellow-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></td>
-                <td class="px-6 py-4 hidden sm:table-cell"><svg class="w-5 h-5 text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></td>
-                <td class="px-6 py-4 hidden sm:table-cell"><svg class="w-5 h-5 text-yellow-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></td>
+                <td class="px-6 py-4"><CheckIcon /></td>
+                <td class="px-6 py-4"><InfoIcon /></td>
+                <td class="px-6 py-4 hidden sm:table-cell"><CrossIcon /></td>
+                <td class="px-6 py-4 hidden sm:table-cell"><InfoIcon /></td>
               </tr>
               <tr class="hover:bg-surface-850/30 transition-colors">
                 <td class="px-6 py-4 text-surface-200">No telemetry (free tier)</td>
-                <td class="px-6 py-4"><svg class="w-5 h-5 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></td>
-                <td class="px-6 py-4"><svg class="w-5 h-5 text-yellow-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></td>
-                <td class="px-6 py-4 hidden sm:table-cell"><svg class="w-5 h-5 text-yellow-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></td>
-                <td class="px-6 py-4 hidden sm:table-cell"><svg class="w-5 h-5 text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></td>
+                <td class="px-6 py-4"><CheckIcon /></td>
+                <td class="px-6 py-4"><InfoIcon /></td>
+                <td class="px-6 py-4 hidden sm:table-cell"><InfoIcon /></td>
+                <td class="px-6 py-4 hidden sm:table-cell"><CrossIcon /></td>
               </tr>
             </tbody>
           </table>
@@ -558,7 +459,6 @@ const faqSchema = {
         <div class="text-center mb-16 reveal">
           <h2 class="text-3xl sm:text-4xl font-bold text-white mb-4">Simple, transparent pricing</h2>
           <p class="text-surface-200 mb-6">Start free. Upgrade when you&rsquo;re ready. No hidden fees. Cancel anytime.</p>
-
           <div class="inline-flex items-center gap-3 bg-surface-850/50 rounded-full p-1 border border-white/6">
             <button id="billing-monthly" class="px-4 py-1.5 rounded-full text-sm font-medium bg-brand-500 text-white transition-colors">Monthly</button>
             <button id="billing-annual" class="px-4 py-1.5 rounded-full text-sm font-medium text-surface-200 hover:text-white transition-colors">Annual <span class="text-brand-400 text-xs font-semibold">Save 25%</span></button>
@@ -571,26 +471,12 @@ const faqSchema = {
             <p class="text-4xl font-extrabold text-white mb-1">$0</p>
             <p class="text-xs text-surface-700 mb-8">Free forever. No credit card.</p>
             <ul class="space-y-3 mb-8 flex-1">
-              <li class="flex items-center gap-3 text-sm text-surface-200">
-                <svg class="w-5 h-5 text-brand-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-                Unlimited passwords
-              </li>
-              <li class="flex items-center gap-3 text-sm text-surface-200">
-                <svg class="w-5 h-5 text-brand-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-                Unlimited devices
-              </li>
-              <li class="flex items-center gap-3 text-sm text-surface-200">
-                <svg class="w-5 h-5 text-brand-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-                Autofill (Chrome + Firefox)
-              </li>
-              <li class="flex items-center gap-3 text-sm text-surface-200">
-                <svg class="w-5 h-5 text-brand-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-                Password generator
-              </li>
+              <li class="flex items-center gap-3 text-sm text-surface-200"><CheckIcon /> Unlimited passwords</li>
+              <li class="flex items-center gap-3 text-sm text-surface-200"><CheckIcon /> Unlimited devices</li>
+              <li class="flex items-center gap-3 text-sm text-surface-200"><CheckIcon /> Autofill (Chrome + Firefox)</li>
+              <li class="flex items-center gap-3 text-sm text-surface-200"><CheckIcon /> Password generator</li>
             </ul>
-            <a href="https://app.ironlox.com" class="block text-center w-full py-3 rounded-xl border border-white/10 text-white font-medium hover:bg-white/3 transition-colors text-sm">
-              Get started free
-            </a>
+            <CtaButton variant="outline">Get started free</CtaButton>
           </div>
           <div class="rounded-2xl border border-brand-500/30 bg-linear-to-b from-brand-500/5 to-transparent p-8 flex flex-col relative card-glow reveal reveal-delay-2 animate-pulse-glow">
             <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-brand-500 text-white text-xs font-semibold px-4 py-1.5 rounded-full whitespace-nowrap">
@@ -601,26 +487,11 @@ const faqSchema = {
             <p class="text-4xl font-extrabold text-white mb-1"><span class="price-monthly">$4</span><span class="price-annual hidden">$3</span><span class="text-lg text-surface-200 font-normal">/mo</span></p>
             <p class="text-xs text-surface-700 mb-8"><span class="price-monthly">Billed monthly, cancel anytime.</span><span class="price-annual hidden">Billed $36 annually &mdash; save $12.</span></p>
             <ul class="space-y-3 mb-8 flex-1">
-              <li class="flex items-center gap-3 text-sm text-surface-200">
-                <svg class="w-5 h-5 text-brand-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-                Everything in Free
-              </li>
-              <li class="flex items-center gap-3 text-sm text-surface-200">
-                <svg class="w-5 h-5 text-brand-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-                TOTP 2FA authenticator codes
-              </li>
-              <li class="flex items-center gap-3 text-sm text-surface-200">
-                <svg class="w-5 h-5 text-brand-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-                File attachments (2 GB)
-              </li>
-              <li class="flex items-center gap-3 text-sm text-surface-200">
-                <svg class="w-5 h-5 text-brand-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-                Vault health &amp; breach reports
-              </li>
-              <li class="flex items-center gap-3 text-sm text-surface-200">
-                <svg class="w-5 h-5 text-brand-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-                Priority support
-              </li>
+              <li class="flex items-center gap-3 text-sm text-surface-200"><CheckIcon /> Everything in Free</li>
+              <li class="flex items-center gap-3 text-sm text-surface-200"><CheckIcon /> TOTP 2FA authenticator codes</li>
+              <li class="flex items-center gap-3 text-sm text-surface-200"><CheckIcon /> File attachments (2 GB)</li>
+              <li class="flex items-center gap-3 text-sm text-surface-200"><CheckIcon /> Vault health &amp; breach reports</li>
+              <li class="flex items-center gap-3 text-sm text-surface-200"><CheckIcon /> Priority support</li>
             </ul>
             <a href="https://app.ironlox.com" class="block text-center w-full py-3 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-semibold transition-colors text-sm">
               Upgrade to Premium
@@ -638,60 +509,12 @@ const faqSchema = {
           <h2 class="text-3xl sm:text-4xl font-bold text-white mb-4">Frequently asked questions</h2>
         </div>
         <div class="space-y-4">
-          <details class="group rounded-xl border border-white/6 bg-surface-850/50 reveal reveal-delay-1">
-            <summary class="flex items-center justify-between px-6 py-4 cursor-pointer select-none">
-              <span class="text-sm font-medium text-white">What happens if I forget my master password?</span>
-              <svg class="w-4 h-4 text-surface-700 group-open:rotate-180 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
-            </summary>
-            <div class="px-6 pb-4 text-sm text-surface-200 leading-relaxed">
-              Your master password is the only key to your vault. We cannot reset it and cannot recover your data without it. Write it down. Store it somewhere safe. Export your vault regularly as a backup.
-            </div>
-          </details>
-          <details class="group rounded-xl border border-white/6 bg-surface-850/50 reveal reveal-delay-2">
-            <summary class="flex items-center justify-between px-6 py-4 cursor-pointer select-none reveal reveal-delay-2">
-              <span class="text-sm font-medium text-white">Can Ironlox see any of my data?</span>
-              <svg class="w-4 h-4 text-surface-700 group-open:rotate-180 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
-            </summary>
-            <div class="px-6 pb-4 text-sm text-surface-200 leading-relaxed">
-              No. Your vault is encrypted on your device with your master password. We receive only an encrypted blob. Even with full database access, your data is mathematically unreadable without your password.
-            </div>
-          </details>
-          <details class="group rounded-xl border border-white/6 bg-surface-850/50">
-            <summary class="flex items-center justify-between px-6 py-4 cursor-pointer select-none reveal reveal-delay-3">
-              <span class="text-sm font-medium text-white">Is Ironlox really open source?</span>
-              <svg class="w-4 h-4 text-surface-700 group-open:rotate-180 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
-            </summary>
-            <div class="px-6 pb-4 text-sm text-surface-200 leading-relaxed">
-              Yes. Every line of code &mdash; the client apps, the encryption library, the server &mdash; is public on GitHub. You can read it, audit it, and build it yourself. Trust through transparency.
-            </div>
-          </details>
-          <details class="group rounded-xl border border-white/6 bg-surface-850/50">
-            <summary class="flex items-center justify-between px-6 py-4 cursor-pointer select-none reveal reveal-delay-4">
-              <span class="text-sm font-medium text-white">How do I switch from another password manager?</span>
-              <svg class="w-4 h-4 text-surface-700 group-open:rotate-180 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
-            </summary>
-            <div class="px-6 pb-4 text-sm text-surface-200 leading-relaxed">
-              Export your data from your current manager as CSV, then import into Ironlox. We support formats from 1Password, Bitwarden, LastPass, Dashlane, and others. The import takes under a minute.
-            </div>
-          </details>
-          <details class="group rounded-xl border border-white/6 bg-surface-850/50">
-            <summary class="flex items-center justify-between px-6 py-4 cursor-pointer select-none reveal reveal-delay-5">
-              <span class="text-sm font-medium text-white">Does Ironlox work offline?</span>
-              <svg class="w-4 h-4 text-surface-700 group-open:rotate-180 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
-            </summary>
-            <div class="px-6 pb-4 text-sm text-surface-200 leading-relaxed">
-              Yes. Your vault is cached locally on each device. You can access, edit, and use your passwords offline. Changes sync automatically when you reconnect.
-            </div>
-          </details>
-          <details class="group rounded-xl border border-white/6 bg-surface-850/50">
-            <summary class="flex items-center justify-between px-6 py-4 cursor-pointer select-none reveal reveal-delay-6">
-              <span class="text-sm font-medium text-white">How do you make money if the free tier is so generous?</span>
-              <svg class="w-4 h-4 text-surface-700 group-open:rotate-180 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
-            </summary>
-            <div class="px-6 pb-4 text-sm text-surface-200 leading-relaxed">
-              We charge for Premium features ($3/mo). We never sell your data, show ads, or track you. Our business model is simple: you pay for extra features, and we keep your data private. Always.
-            </div>
-          </details>
+          <FaqItem question="What happens if I forget my master password?" answer="Your master password is the only key to your vault. We cannot reset it and cannot recover your data without it. Write it down. Store it somewhere safe. Export your vault regularly as a backup." delay={1} />
+          <FaqItem question="Can Ironlox see any of my data?" answer="No. Your vault is encrypted on your device with your master password. We receive only an encrypted blob. Even with full database access, your data is mathematically unreadable without your password." delay={2} />
+          <FaqItem question="Is Ironlox really open source?" answer="Yes. Every line of code &mdash; the client apps, the encryption library, the server &mdash; is public on GitHub. You can read it, audit it, and build it yourself. Trust through transparency." delay={3} />
+          <FaqItem question="How do I switch from another password manager?" answer="Export your data from your current manager as CSV, then import into Ironlox. We support formats from 1Password, Bitwarden, LastPass, Dashlane, and others. The import takes under a minute." delay={4} />
+          <FaqItem question="Does Ironlox work offline?" answer="Yes. Your vault is cached locally on each device. You can access, edit, and use your passwords offline. Changes sync automatically when you reconnect." delay={5} />
+          <FaqItem question="How do you make money if the free tier is so generous?" answer="We charge for Premium features ($3/mo). We never sell your data, show ads, or track you. Our business model is simple: you pay for extra features, and we keep your data private. Always." delay={6} />
         </div>
       </div>
     </section>
@@ -703,10 +526,9 @@ const faqSchema = {
       <div class="max-w-lg mx-auto text-center">
         <h2 class="text-3xl sm:text-4xl font-bold text-white mb-4 reveal">Start securing your data</h2>
         <p class="text-surface-200 mb-8 reveal reveal-delay-1">Free forever. Unlimited passwords and devices. No credit card required.</p>
-        <a href="https://app.ironlox.com" class="inline-flex items-center gap-2 px-10 py-4 bg-brand-500 hover:bg-brand-600 text-white font-semibold rounded-xl transition-all shadow-lg shadow-brand-500/25 text-sm reveal reveal-delay-2">
-          Create your free account
-          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-        </a>
+        <CtaButton size="lg" class="reveal reveal-delay-2">
+          Create your free account <ArrowRight />
+        </CtaButton>
         <p class="text-[11px] text-surface-700 mt-4">Works on Chrome and Firefox. iOS &amp; Android coming soon.</p>
       </div>
     </section>
@@ -719,66 +541,11 @@ const faqSchema = {
           <p class="text-surface-200">We&rsquo;re shipping fast. Here&rsquo;s the roadmap.</p>
         </div>
         <div class="space-y-6">
-          <div class="flex items-start gap-4 reveal reveal-delay-1">
-            <div class="w-8 h-8 rounded-full bg-green-500/20 border border-green-500/30 flex items-center justify-center shrink-0 mt-0.5">
-              <svg class="w-4 h-4 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-            </div>
-            <div>
-              <div class="flex items-center gap-2 mb-1">
-                <h3 class="text-sm font-semibold text-white">Chrome &amp; Firefox extensions</h3>
-                <span class="px-2 py-0.5 rounded-full bg-green-500/10 text-green-400 text-[10px] font-medium">Done</span>
-              </div>
-              <p class="text-xs text-surface-200">Autofill, password generator, and vault access from your browser toolbar.</p>
-            </div>
-          </div>
-          <div class="flex items-start gap-4 reveal reveal-delay-2">
-            <div class="w-8 h-8 rounded-full bg-brand-500/20 border border-brand-500/30 flex items-center justify-center shrink-0 mt-0.5">
-              <svg class="w-4 h-4 text-brand-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            </div>
-            <div>
-              <div class="flex items-center gap-2 mb-1">
-                <h3 class="text-sm font-semibold text-white">Web app dashboard</h3>
-                <span class="px-2 py-0.5 rounded-full bg-brand-500/10 text-brand-300 text-[10px] font-medium">In progress</span>
-              </div>
-              <p class="text-xs text-surface-200">Full vault management, import/export, health reports, and account settings.</p>
-            </div>
-          </div>
-          <div class="flex items-start gap-4">
-            <div class="w-8 h-8 rounded-full bg-surface-700/30 border border-white/6 flex items-center justify-center shrink-0 mt-0.5">
-              <svg class="w-4 h-4 text-surface-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/></svg>
-            </div>
-            <div>
-              <div class="flex items-center gap-2 mb-1">
-                <h3 class="text-sm font-semibold text-white">iOS &amp; Android apps</h3>
-                <span class="px-2 py-0.5 rounded-full bg-surface-700/50 text-surface-200 text-[10px] font-medium">Planned</span>
-              </div>
-              <p class="text-xs text-surface-200">Native mobile apps with biometric unlock, autofill, and offline access.</p>
-            </div>
-          </div>
-          <div class="flex items-start gap-4">
-            <div class="w-8 h-8 rounded-full bg-surface-700/30 border border-white/6 flex items-center justify-center shrink-0 mt-0.5">
-              <svg class="w-4 h-4 text-surface-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/></svg>
-            </div>
-            <div>
-              <div class="flex items-center gap-2 mb-1">
-                <h3 class="text-sm font-semibold text-white">Desktop app (macOS, Windows, Linux)</h3>
-                <span class="px-2 py-0.5 rounded-full bg-surface-700/50 text-surface-200 text-[10px] font-medium">Planned</span>
-              </div>
-              <p class="text-xs text-surface-200">Standalone desktop app with system tray integration and biometric unlock.</p>
-            </div>
-          </div>
-          <div class="flex items-start gap-4">
-            <div class="w-8 h-8 rounded-full bg-surface-700/30 border border-white/6 flex items-center justify-center shrink-0 mt-0.5">
-              <svg class="w-4 h-4 text-surface-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/></svg>
-            </div>
-            <div>
-              <div class="flex items-center gap-2 mb-1">
-                <h3 class="text-sm font-semibold text-white">Sharing &amp; family plans</h3>
-                <span class="px-2 py-0.5 rounded-full bg-surface-700/50 text-surface-200 text-[10px] font-medium">Planned</span>
-              </div>
-              <p class="text-xs text-surface-200">Securely share passwords with family members or teammates. Encrypted end-to-end.</p>
-            </div>
-          </div>
+          <RoadmapItem title="Chrome &amp; Firefox extensions" status="done" description="Autofill, password generator, and vault access from your browser toolbar." delay={1} />
+          <RoadmapItem title="Web app dashboard" status="in-progress" description="Full vault management, import/export, health reports, and account settings." delay={2} />
+          <RoadmapItem title="iOS &amp; Android apps" status="planned" description="Native mobile apps with biometric unlock, autofill, and offline access." delay={3} />
+          <RoadmapItem title="Desktop app (macOS, Windows, Linux)" status="planned" description="Standalone desktop app with system tray integration and biometric unlock." delay={4} />
+          <RoadmapItem title="Sharing &amp; family plans" status="planned" description="Securely share passwords with family members or teammates. Encrypted end-to-end." delay={5} />
         </div>
       </div>
     </section>
@@ -789,13 +556,10 @@ const faqSchema = {
         <h2 class="text-3xl sm:text-4xl font-bold text-white mb-4">Start securing your data today</h2>
         <p class="text-surface-200 mb-8 max-w-lg mx-auto">Zero-knowledge. Open source. Free to start. Your passwords, cards, notes, and files &mdash; all encrypted, all yours.</p>
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <a href="https://app.ironlox.com" class="inline-flex items-center gap-2 px-8 py-4 bg-brand-500 hover:bg-brand-600 text-white font-semibold rounded-xl transition-all shadow-lg shadow-brand-500/25">
-            Create your free account
-          </a>
-          <a href="https://github.com/taiatiniyara/ironlox" class="inline-flex items-center gap-2 px-8 py-4 border border-white/10 hover:border-white/20 text-white font-medium rounded-xl transition-all">
-            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-            Star on GitHub
-          </a>
+          <CtaButton>Create your free account</CtaButton>
+          <CtaButton href="https://github.com/taiatiniyara/ironlox" variant="secondary">
+            <GitHubIcon /> Star on GitHub
+          </CtaButton>
         </div>
       </div>
     </section>
@@ -823,26 +587,20 @@ const faqSchema = {
 </Layout>
 
 <script>
-  // Hero staggered entrance
   requestAnimationFrame(() => {
     document.getElementById("hero-content")?.classList.add("hero-visible");
   });
 
-  // Scroll-triggered reveals
   const observer = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("revealed");
-        }
+        if (entry.isIntersecting) entry.target.classList.add("revealed");
       });
     },
     { threshold: 0.12, rootMargin: "0px 0px -40px 0px" }
   );
-
   document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
 
-  // Billing toggle
   document.getElementById("billing-monthly")?.addEventListener("click", () => {
     document.getElementById("billing-monthly")?.classList.add("bg-brand-500", "text-white");
     document.getElementById("billing-monthly")?.classList.remove("text-surface-200");
@@ -859,5 +617,4 @@ const faqSchema = {
     document.querySelectorAll(".price-annual").forEach(e => e.classList.remove("hidden"));
     document.querySelectorAll(".price-monthly").forEach(e => e.classList.add("hidden"));
   });
-
 </script>

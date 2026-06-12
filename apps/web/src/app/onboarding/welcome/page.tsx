@@ -55,6 +55,12 @@ const demoItems: VaultItem[] = [
   },
 ];
 
+const demoIcons: Record<string, React.ComponentType<{ className?: string }>> = {
+  login: Globe,
+  card: CreditCard,
+  note: FileText,
+};
+
 export default function WelcomePage() {
   usePageTitle("Welcome");
   const { addItem, vault } = useVault();
@@ -73,12 +79,6 @@ export default function WelcomePage() {
     toast.success("Demo vault loaded. Explore your vault!");
     router.push("/vault");
   }
-
-  const demoIcons: Record<string, React.ComponentType<{ className?: string }>> = {
-    login: Globe,
-    card: CreditCard,
-    note: FileText,
-  };
 
   return (
     <Card>

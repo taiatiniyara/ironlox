@@ -1,0 +1,39 @@
+---
+export interface Props {
+  quote: string;
+  name: string;
+  role: string;
+  initials: string;
+  initialsColor?: "brand" | "green" | "purple";
+  delay?: number;
+}
+
+const { quote, name, role, initials, initialsColor = "brand", delay = 1 } = Astro.props;
+
+const colorMap = {
+  brand: { bg: "bg-brand-500/20", text: "text-brand-400" },
+  green: { bg: "bg-green-500/20", text: "text-green-400" },
+  purple: { bg: "bg-purple-500/20", text: "text-purple-400" },
+};
+
+import StarIcon from "./icons/StarIcon.astro";
+---
+
+<div
+  class="rounded-2xl border border-white/6 bg-surface-850/50 p-8 card-glow reveal"
+  class:list={[`reveal-delay-${delay}`]}
+>
+  <div class="flex items-center gap-1 mb-4">
+    <StarIcon /><StarIcon /><StarIcon /><StarIcon /><StarIcon />
+  </div>
+  <blockquote class="text-sm text-surface-200 leading-relaxed mb-4">&ldquo;{quote}&rdquo;</blockquote>
+  <div class="flex items-center gap-3">
+    <div class:list={["w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold", colorMap[initialsColor].bg, colorMap[initialsColor].text]}>
+      {initials}
+    </div>
+    <div>
+      <div class="text-xs font-medium text-white">{name}</div>
+      <div class="text-[11px] text-surface-700">{role}</div>
+    </div>
+  </div>
+</div>

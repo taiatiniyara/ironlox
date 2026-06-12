@@ -3,20 +3,12 @@
 import { useVault } from "@/lib/vault-context";
 import { usePageTitle } from "@/lib/utils";
 import { useTheme } from "next-themes";
+import { FormField } from "@/components/shared/form-field";
+import { FormDialog } from "@/components/shared/form-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -244,127 +236,100 @@ export default function SettingsPage() {
             variant="outline"
             size="sm"
             className="w-full justify-start gap-2"
-            onClick={() => toast.error("Premium upgrades coming soon")}
+            onClick={() => toast("Premium upgrades coming soon")}
           >
             <span className="text-yellow-500">&#9733;</span> Upgrade to Premium ($3/mo)
           </Button>
           <Separator />
-          <Dialog open={emailOpen} onOpenChange={setEmailOpen}>
-            <DialogTrigger>
+          <FormDialog
+            open={emailOpen}
+            onOpenChange={setEmailOpen}
+            title="Change Email"
+            description="A verification code will be sent to your new email."
+            trigger={
               <Button variant="outline" size="sm" className="w-full justify-start gap-2">
                 <Mail className="size-4" />
                 Change Email
               </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Change Email</DialogTitle>
-                <DialogDescription>
-                  A verification code will be sent to your new email.
-                </DialogDescription>
-              </DialogHeader>
-              <form onSubmit={handleChangeEmail} className="space-y-3">
-                <div className="space-y-2">
-                  <Label>New Email</Label>
-                  <Input
-                    type="email"
-                    required
-                    value={newEmail}
-                    onChange={(e) => setNewEmail(e.target.value)}
-                    placeholder="new@example.com"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Master Password</Label>
-                  <Input
-                    type="password"
-                    required
-                    value={emailPassword}
-                    onChange={(e) => setEmailPassword(e.target.value)}
-                  />
-                </div>
-                <DialogFooter>
-                  <Button variant="outline" type="button" onClick={() => setEmailOpen(false)}>
-                    Cancel
-                  </Button>
-                  <Button type="submit" disabled={changingEmail}>
-                    {changingEmail ? "Sending..." : "Change Email"}
-                  </Button>
-                </DialogFooter>
-              </form>
-            </DialogContent>
-          </Dialog>
-          <Dialog open={passOpen} onOpenChange={setPassOpen}>
-            <DialogTrigger>
+            }
+            onSubmit={handleChangeEmail}
+            submitLabel="Change Email"
+            submitLoading={changingEmail}
+            submitLoadingLabel="Sending..."
+          >
+            <FormField label="New Email">
+              <Input
+                type="email"
+                required
+                value={newEmail}
+                onChange={(e) => setNewEmail(e.target.value)}
+                placeholder="new@example.com"
+              />
+            </FormField>
+            <FormField label="Master Password">
+              <Input
+                type="password"
+                required
+                value={emailPassword}
+                onChange={(e) => setEmailPassword(e.target.value)}
+              />
+            </FormField>
+          </FormDialog>
+          <FormDialog
+            open={passOpen}
+            onOpenChange={setPassOpen}
+            title="Change Master Password"
+            description="This re-wraps your vault key. Vault contents stay the same."
+            trigger={
               <Button variant="outline" size="sm" className="w-full justify-start gap-2">
                 <Key className="size-4" />
                 Change Master Password
               </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Change Master Password</DialogTitle>
-                <DialogDescription>
-                  This re-wraps your vault key. Vault contents stay the same.
-                </DialogDescription>
-              </DialogHeader>
-              <form onSubmit={handleChangePassword} className="space-y-3">
-                <div className="space-y-2">
-                  <Label>Current Password</Label>
-                  <Input
-                    type="password"
-                    required
-                    value={currentPass}
-                    onChange={(e) => setCurrentPass(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>New Password</Label>
-                  <Input
-                    type="password"
-                    required
-                    value={newPass}
-                    onChange={(e) => setNewPass(e.target.value)}
-                    placeholder="Min 12 characters"
-                  />
-                </div>
-                <DialogFooter>
-                  <Button variant="outline" type="button" onClick={() => setPassOpen(false)}>
-                    Cancel
-                  </Button>
-                  <Button type="submit" disabled={changingPass}>
-                    {changingPass ? "Changing..." : "Change Password"}
-                  </Button>
-                </DialogFooter>
-              </form>
-            </DialogContent>
-          </Dialog>
+            }
+            onSubmit={handleChangePassword}
+            submitLabel="Change Password"
+            submitLoading={changingPass}
+            submitLoadingLabel="Changing..."
+          >
+            <FormField label="Current Password">
+              <Input
+                type="password"
+                required
+                value={currentPass}
+                onChange={(e) => setCurrentPass(e.target.value)}
+              />
+            </FormField>
+            <FormField label="New Password">
+              <Input
+                type="password"
+                required
+                value={newPass}
+                onChange={(e) => setNewPass(e.target.value)}
+                placeholder="Min 12 characters"
+              />
+            </FormField>
+          </FormDialog>
           <Separator />
-          <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-            <DialogTrigger>
+          <FormDialog
+            open={deleteOpen}
+            onOpenChange={setDeleteOpen}
+            title="Delete Account"
+            description="Your account will be permanently deleted after a 7-day grace period. You can cancel deletion by logging in within those 7 days."
+            trigger={
               <Button variant="destructive" size="sm" className="gap-2">
                 <Trash2 className="size-4" />
                 Delete Account
               </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Delete Account</DialogTitle>
-                <DialogDescription>
-                  Your account will be permanently deleted after a 7-day grace period. You can
-                  cancel deletion by logging in within those 7 days.
-                </DialogDescription>
-              </DialogHeader>
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setDeleteOpen(false)}>
-                  Cancel
-                </Button>
-                <Button variant="destructive" onClick={handleDelete} disabled={deleting}>
-                  {deleting ? "Deleting..." : "Yes, Delete My Account"}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+            }
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleDelete();
+            }}
+            submitLabel="Yes, Delete My Account"
+            submitLoading={deleting}
+            submitLoadingLabel="Deleting..."
+            variant="destructive"
+          />
         </CardContent>
       </Card>
 
@@ -468,7 +433,7 @@ export default function SettingsPage() {
                   try {
                     if (apiClient) await apiClient.mfaDisable();
                   } catch {
-                    /* API 501 stub — still toggle for UX */
+                    /* API 501 stub */
                   }
                   setMfaEnabled(false);
                   toast.success("MFA disabled");
@@ -491,40 +456,31 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
 
-      <Dialog open={mfaOpen} onOpenChange={setMfaOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Set Up Authenticator</DialogTitle>
-            <DialogDescription>
-              Scan this QR code with your authenticator app, then enter the code to verify.
-            </DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleEnableMfa} className="space-y-3">
-            <div className="bg-muted rounded-lg p-3 space-y-2">
-              <p className="text-[10px] text-muted-foreground">Manual entry key:</p>
-              <p className="font-mono text-xs text-center break-all">{mfaSecret}</p>
-            </div>
-            <div className="space-y-2">
-              <Label>Verification Code</Label>
-              <Input
-                placeholder="000000"
-                maxLength={6}
-                value={mfaCode}
-                onChange={(e) => setMfaCode(e.target.value)}
-                className="font-mono text-center text-lg tracking-widest"
-              />
-            </div>
-            <DialogFooter>
-              <Button variant="outline" type="button" onClick={() => setMfaOpen(false)}>
-                Cancel
-              </Button>
-              <Button type="submit" disabled={enablingMfa || mfaCode.length !== 6}>
-                {enablingMfa ? "Verifying..." : "Enable MFA"}
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+      <FormDialog
+        open={mfaOpen}
+        onOpenChange={setMfaOpen}
+        title="Set Up Authenticator"
+        description="Scan this QR code with your authenticator app, then enter the code to verify."
+        onSubmit={handleEnableMfa}
+        submitLabel="Enable MFA"
+        submitLoading={enablingMfa}
+        submitLoadingLabel="Verifying..."
+        submitDisabled={mfaCode.length !== 6}
+      >
+        <div className="bg-muted rounded-lg p-3 space-y-2">
+          <p className="text-[10px] text-muted-foreground">Manual entry key:</p>
+          <p className="font-mono text-xs text-center break-all">{mfaSecret}</p>
+        </div>
+        <FormField label="Verification Code">
+          <Input
+            placeholder="000000"
+            maxLength={6}
+            value={mfaCode}
+            onChange={(e) => setMfaCode(e.target.value)}
+            className="font-mono text-center text-lg tracking-widest"
+          />
+        </FormField>
+      </FormDialog>
 
       <Card>
         <CardHeader>

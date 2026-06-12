@@ -1,0 +1,21 @@
+---
+export interface Props {
+  question: string;
+  answer: string;
+  delay?: number;
+}
+
+const { question, answer, delay = 1 } = Astro.props;
+
+import ChevronDown from "./icons/ChevronDown.astro";
+---
+
+<details
+  class="group rounded-xl border border-white/6 bg-surface-850/50 reveal reveal-delay-{delay}"
+>
+  <summary class="flex items-center justify-between px-6 py-4 cursor-pointer select-none">
+    <span class="text-sm font-medium text-white">{question}</span>
+    <ChevronDown />
+  </summary>
+  <div class="px-6 pb-4 text-sm text-surface-200 leading-relaxed">{answer}</div>
+</details>

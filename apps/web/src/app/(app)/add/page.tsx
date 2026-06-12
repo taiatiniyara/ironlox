@@ -1,20 +1,21 @@
 "use client";
 
-import { useState, useReducer } from "react";
+import { useReducer, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useVault } from "@/lib/vault-context";
 import { usePageTitle } from "@/lib/utils";
+import { PageHeader } from "@/components/shared/page-header";
+import { FormField } from "@/components/shared/form-field";
+import { LoadingButton } from "@/components/shared/loading-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PasswordInput } from "@/components/vault/password-input";
 import { PasswordGenerator } from "@/components/vault/password-generator";
 import { UriManager } from "@/components/vault/uri-manager";
 import { CustomFieldsEditor } from "@/components/vault/custom-fields-editor";
-import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import type { VaultItem } from "@ironlox/schemas";
 
@@ -204,14 +205,9 @@ export default function AddPage() {
 
   return (
     <div className="max-w-lg mx-auto p-4">
-      <div className="flex items-center gap-3 mb-4">
-        <Button variant="ghost" size="icon" onClick={() => router.push("/vault")}>
-          <ArrowLeft className="size-4" />
-        </Button>
-        <h1 className="text-lg font-semibold">{existingItem ? "Edit Item" : "Add Item"}</h1>
-      </div>
+      <PageHeader title={existingItem ? "Edit Item" : "Add Item"} />
 
-      <Card>
+      <Card className="mt-4">
         <CardContent className="pt-4">
           <form onSubmit={handleSubmit} className="space-y-4">
             {!existingItem && (
@@ -226,8 +222,7 @@ export default function AddPage() {
               </Tabs>
             )}
 
-            <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
+            <FormField id="name" label="Name">
               <Input
                 id="name"
                 required
@@ -235,20 +230,19 @@ export default function AddPage() {
                 onChange={(e) => setField("name")(e.target.value)}
                 placeholder="Item name"
               />
-            </div>
+            </FormField>
 
             {type === "login" && (
               <>
                 <UriManager uris={uris} onChange={setUris} />
-                <div className="space-y-2">
-                  <Label htmlFor="user">Username</Label>
+                <FormField id="user" label="Username">
                   <Input
                     id="user"
                     value={form.username}
                     onChange={(e) => setField("username")(e.target.value)}
                     placeholder="Username"
                   />
-                </div>
+                </FormField>
                 <div className="space-y-2">
                   <Label htmlFor="pass">Password</Label>
                   <div className="flex gap-2">
@@ -267,24 +261,22 @@ export default function AddPage() {
 
             {type === "card" && (
               <>
-                <div className="space-y-2">
-                  <Label htmlFor="cardholder">Cardholder Name</Label>
+                <FormField id="cardholder" label="Cardholder Name">
                   <Input
                     id="cardholder"
                     value={form.username}
                     onChange={(e) => setField("username")(e.target.value)}
                     placeholder="Name on card"
                   />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="cardnum">Card Number</Label>
+                </FormField>
+                <FormField id="cardnum" label="Card Number">
                   <Input
                     id="cardnum"
                     value={form.password}
                     onChange={(e) => setField("password")(e.target.value)}
                     placeholder="1234 5678 9012 3456"
                   />
-                </div>
+                </FormField>
                 <div className="flex gap-2">
                   <div className="flex-1 space-y-2">
                     <Label>Expiry Month</Label>
@@ -319,30 +311,55 @@ export default function AddPage() {
             )}
 
             {type === "identity" && (
-              <div className="space-y-2">
-                {(["firstName", "lastName", "email", "phone", "address"] as const).map((key) => (
-                  <div key={key} className="space-y-1.5">
-                    <Label className="text-xs capitalize">{key}</Label>
+              <>
+                <div className="flex gap-2">
+                  <div className="flex-1 space-y-2">
+                    <Label>First Name</Label>
                     <Input
-                      value={form[key]}
-                      onChange={(e) => setField(key)(e.target.value)}
-                      placeholder={key.charAt(0).toUpperCase() + key.slice(1)}
+                      value={form.firstName}
+                      onChange={(e) => setField("firstName")(e.target.value)}
                     />
                   </div>
-                ))}
-              </div>
+                  <div className="flex-1 space-y-2">
+                    <Label>Last Name</Label>
+                    <Input
+                      value={form.lastName}
+                      onChange={(e) => setField("lastName")(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <FormField id="ide-mail" label="Email">
+                  <Input
+                    id="ide-mail"
+                    type="email"
+                    value={form.email}
+                    onChange={(e) => setField("email")(e.target.value)}
+                  />
+                </FormField>
+                <FormField id="ide-phone" label="Phone">
+                  <Input
+                    id="ide-phone"
+                    value={form.phone}
+                    onChange={(e) => setField("phone")(e.target.value)}
+                  />
+                </FormField>
+                <FormField id="ide-addr" label="Address">
+                  <Input
+                    id="ide-addr"
+                    value={form.address}
+                    onChange={(e) => setField("address")(e.target.value)}
+                  />
+                </FormField>
+              </>
             )}
 
-            <div className="space-y-2">
-              <Label htmlFor="notes">Notes</Label>
-              <Textarea
-                id="notes"
+            <FormField id="item-notes" label="Notes">
+              <Input
+                id="item-notes"
                 value={form.notes}
                 onChange={(e) => setField("notes")(e.target.value)}
-                placeholder="Optional notes"
-                rows={3}
               />
-            </div>
+            </FormField>
 
             <CustomFieldsEditor fields={customFields} onChange={setCustomFields} />
 
@@ -355,9 +372,15 @@ export default function AddPage() {
               >
                 Cancel
               </Button>
-              <Button type="submit" className="flex-1" disabled={!form.name || saving}>
-                {saving ? "Saving..." : existingItem ? "Save Changes" : "Save Item"}
-              </Button>
+              <LoadingButton
+                type="submit"
+                className="flex-1"
+                loading={saving}
+                loadingText="Saving..."
+                disabled={!form.name}
+              >
+                {existingItem ? "Save Changes" : "Save Item"}
+              </LoadingButton>
             </div>
           </form>
         </CardContent>

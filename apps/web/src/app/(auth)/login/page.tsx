@@ -6,10 +6,10 @@ import Link from "next/link";
 import { useTranslation } from "react-i18next";
 import { useVault } from "@/lib/vault-context";
 import { usePageTitle } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { AuthFormCard } from "@/components/shared/auth-form-card";
+import { FormField } from "@/components/shared/form-field";
+import { LoadingButton } from "@/components/shared/loading-button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 
 export default function LoginPage() {
@@ -46,39 +46,12 @@ export default function LoginPage() {
   }
 
   return (
-    <Card>
-      <CardHeader className="text-center">
-        <CardTitle>{t("auth.signIn")}</CardTitle>
-        <CardDescription>{t("app.tagline")}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">{t("auth.email")}</Label>
-            <Input
-              id="email"
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder={t("auth.emailPlaceholder")}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="password">{t("auth.masterPassword")}</Label>
-            <Input
-              id="password"
-              type="password"
-              required
-              value={masterPassword}
-              onChange={(e) => setMasterPassword(e.target.value)}
-              placeholder={t("auth.passwordPlaceholder")}
-            />
-          </div>
-          {error && <p className="text-xs text-destructive">{error}</p>}
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? t("auth.unlocking") : t("auth.unlockVault")}
-          </Button>
+    <AuthFormCard
+      title={t("auth.signIn")}
+      description={t("app.tagline")}
+      onSubmit={handleSubmit}
+      footer={
+        <div className="pt-4 space-y-1">
           <p className="text-center text-xs text-muted-foreground">
             {t("auth.noAccount")}{" "}
             <Link href="/signup" className="text-primary hover:underline">
@@ -91,8 +64,38 @@ export default function LoginPage() {
               Use recovery key
             </Link>
           </p>
-        </form>
-      </CardContent>
-    </Card>
+        </div>
+      }
+    >
+      <FormField id="email" label={t("auth.email")}>
+        <Input
+          id="email"
+          type="email"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder={t("auth.emailPlaceholder")}
+        />
+      </FormField>
+      <FormField id="password" label={t("auth.masterPassword")}>
+        <Input
+          id="password"
+          type="password"
+          required
+          value={masterPassword}
+          onChange={(e) => setMasterPassword(e.target.value)}
+          placeholder={t("auth.passwordPlaceholder")}
+        />
+      </FormField>
+      {error && <p className="text-xs text-destructive">{error}</p>}
+      <LoadingButton
+        type="submit"
+        className="w-full"
+        loading={loading}
+        loadingText={t("auth.unlocking")}
+      >
+        {t("auth.unlockVault")}
+      </LoadingButton>
+    </AuthFormCard>
   );
 }

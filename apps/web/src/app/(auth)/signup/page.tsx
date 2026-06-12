@@ -6,10 +6,10 @@ import Link from "next/link";
 import { useTranslation } from "react-i18next";
 import { useVault } from "@/lib/vault-context";
 import { usePageTitle } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { AuthFormCard } from "@/components/shared/auth-form-card";
+import { FormField } from "@/components/shared/form-field";
+import { LoadingButton } from "@/components/shared/loading-button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { RecoveryKeyDisplay } from "@/components/vault/recovery-key";
 import { toast } from "sonner";
 
@@ -81,48 +81,49 @@ export default function SignupPage() {
   }
 
   return (
-    <Card>
-      <CardHeader className="text-center">
-        <CardTitle>{t("auth.createAccount")}</CardTitle>
-        <CardDescription>{t("app.tagline")}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">{t("auth.email")}</Label>
-            <Input
-              id="email"
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder={t("auth.emailPlaceholder")}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="password">{t("auth.masterPassword")}</Label>
-            <Input
-              id="password"
-              type="password"
-              required
-              value={masterPassword}
-              onChange={(e) => checkStrength(e.target.value)}
-              placeholder={t("auth.minCharsRecommend")}
-            />
-            {masterPassword && <StrengthBar strength={strength} />}
-          </div>
-          {error && <p className="text-xs text-destructive">{error}</p>}
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? t("auth.loading") : t("auth.createAccount")}
-          </Button>
-          <p className="text-center text-xs text-muted-foreground">
-            {t("auth.haveAccount")}{" "}
-            <Link href="/login" className="text-primary hover:underline">
-              {t("auth.signInAction")}
-            </Link>
-          </p>
-        </form>
-      </CardContent>
-    </Card>
+    <AuthFormCard
+      title={t("auth.createAccount")}
+      description={t("app.tagline")}
+      onSubmit={handleSubmit}
+      footer={
+        <p className="pt-4 text-center text-xs text-muted-foreground">
+          {t("auth.haveAccount")}{" "}
+          <Link href="/login" className="text-primary hover:underline">
+            {t("auth.signInAction")}
+          </Link>
+        </p>
+      }
+    >
+      <FormField id="email" label={t("auth.email")}>
+        <Input
+          id="email"
+          type="email"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder={t("auth.emailPlaceholder")}
+        />
+      </FormField>
+      <FormField id="password" label={t("auth.masterPassword")}>
+        <Input
+          id="password"
+          type="password"
+          required
+          value={masterPassword}
+          onChange={(e) => checkStrength(e.target.value)}
+          placeholder={t("auth.minCharsRecommend")}
+        />
+        {masterPassword && <StrengthBar strength={strength} />}
+      </FormField>
+      {error && <p className="text-xs text-destructive">{error}</p>}
+      <LoadingButton
+        type="submit"
+        className="w-full"
+        loading={loading}
+        loadingText={t("auth.loading")}
+      >
+        {t("auth.createAccount")}
+      </LoadingButton>
+    </AuthFormCard>
   );
 }

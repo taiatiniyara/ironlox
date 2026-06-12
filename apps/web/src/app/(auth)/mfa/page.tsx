@@ -2,14 +2,14 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useVault } from "@/lib/vault-context";
 import { usePageTitle } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { AuthFormCard } from "@/components/shared/auth-form-card";
+import { FormField } from "@/components/shared/form-field";
+import { LoadingButton } from "@/components/shared/loading-button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import Link from "next/link";
 import { Shield } from "lucide-react";
 
 export default function MfaPage() {
@@ -57,41 +57,40 @@ export default function MfaPage() {
   }
 
   return (
-    <Card>
-      <CardHeader className="text-center">
-        <div className="mx-auto rounded-full bg-primary/10 p-3 mb-2">
-          <Shield className="size-6 text-primary" />
-        </div>
-        <CardTitle>Two-Factor Authentication</CardTitle>
-        <CardDescription>Enter the 6-digit code from your authenticator app</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {storedEmail && (
-            <p className="text-sm text-center text-muted-foreground">{storedEmail}</p>
-          )}
-          <div className="space-y-2">
-            <Label htmlFor="code">Verification Code</Label>
-            <Input
-              id="code"
-              required
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-              placeholder="000000"
-              maxLength={6}
-              className="font-mono text-center text-2xl tracking-widest"
-            />
-          </div>
-          <Button type="submit" className="w-full" disabled={loading || code.length !== 6}>
-            {loading ? "Verifying..." : "Verify & Continue"}
-          </Button>
-          <p className="text-center text-xs text-muted-foreground">
-            <Link href="/login" className="text-primary hover:underline">
-              Back to sign in
-            </Link>
-          </p>
-        </form>
-      </CardContent>
-    </Card>
+    <AuthFormCard
+      title="Two-Factor Authentication"
+      description="Enter the 6-digit code from your authenticator app"
+      icon={Shield}
+      onSubmit={handleSubmit}
+      footer={
+        <p className="pt-4 text-center text-xs text-muted-foreground">
+          <Link href="/login" className="text-primary hover:underline">
+            Back to sign in
+          </Link>
+        </p>
+      }
+    >
+      {storedEmail && <p className="text-sm text-center text-muted-foreground">{storedEmail}</p>}
+      <FormField id="code" label="Verification Code">
+        <Input
+          id="code"
+          required
+          value={code}
+          onChange={(e) => setCode(e.target.value)}
+          placeholder="000000"
+          maxLength={6}
+          className="font-mono text-center text-2xl tracking-widest"
+        />
+      </FormField>
+      <LoadingButton
+        type="submit"
+        className="w-full"
+        loading={loading}
+        loadingText="Verifying..."
+        disabled={code.length !== 6}
+      >
+        Verify & Continue
+      </LoadingButton>
+    </AuthFormCard>
   );
 }

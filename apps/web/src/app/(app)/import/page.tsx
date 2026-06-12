@@ -1,13 +1,15 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useVault } from "@/lib/vault-context";
 import { usePageTitle } from "@/lib/utils";
+import { PageHeader } from "@/components/shared/page-header";
+import { LoadingButton } from "@/components/shared/loading-button";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Upload, Download } from "lucide-react";
+import { Upload, Download } from "lucide-react";
 import { toast } from "sonner";
 import { importExportCsv } from "@ironlox/crypto";
 import type { VaultItem } from "@ironlox/schemas";
@@ -70,12 +72,7 @@ export default function ImportPage() {
 
   return (
     <div className="max-w-lg mx-auto p-4 space-y-4">
-      <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={() => router.push("/vault")}>
-          <ArrowLeft className="size-4" />
-        </Button>
-        <h1 className="text-xl font-semibold">Import Passwords</h1>
-      </div>
+      <PageHeader title="Import Passwords" />
 
       {preview.length === 0 ? (
         <Card>
@@ -128,9 +125,14 @@ export default function ImportPage() {
               <Button variant="outline" className="flex-1" onClick={() => setPreview([])}>
                 Cancel
               </Button>
-              <Button className="flex-1" onClick={handleImport} disabled={importing}>
-                {importing ? "Importing..." : `Import ${preview.length} Items`}
-              </Button>
+              <LoadingButton
+                className="flex-1"
+                onClick={handleImport}
+                loading={importing}
+                loadingText="Importing..."
+              >
+                Import {preview.length} Items
+              </LoadingButton>
             </div>
           </CardContent>
         </Card>

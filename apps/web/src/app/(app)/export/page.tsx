@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { useVault } from "@/lib/vault-context";
 import { usePageTitle } from "@/lib/utils";
+import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import {
@@ -15,25 +15,24 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { ArrowLeft, Download, FileDown, AlertTriangle } from "lucide-react";
+import { FileDown, Download, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { exportVaultToCsv } from "@ironlox/crypto";
+
+function downloadFile(content: string, filename: string, mime: string) {
+  const blob = new Blob([content], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
 export default function ExportPage() {
   usePageTitle("Export");
   const { vault } = useVault();
-  const router = useRouter();
   const [warnOpen, setWarnOpen] = useState(false);
-
-  function downloadFile(content: string, filename: string, mime: string) {
-    const blob = new Blob([content], { type: mime });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    a.click();
-    URL.revokeObjectURL(url);
-  }
 
   function handleCsvExport() {
     if (!vault) return;
@@ -48,19 +47,13 @@ export default function ExportPage() {
     const json = JSON.stringify(vault, null, 2);
     downloadFile(json, "ironlox-export.json", "application/json");
     toast.success("Vault exported as JSON");
-    setWarnOpen(false);
   }
 
   const itemCount = vault?.items.filter((i) => !i.deleted).length ?? 0;
 
   return (
     <div className="max-w-lg mx-auto p-4 space-y-4">
-      <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={() => router.push("/vault")}>
-          <ArrowLeft className="size-4" />
-        </Button>
-        <h1 className="text-xl font-semibold">Export Vault</h1>
-      </div>
+      <PageHeader title="Export Vault" />
 
       <Card>
         <CardHeader>

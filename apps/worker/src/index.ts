@@ -7,6 +7,7 @@ import { accountRoutes } from "./routes/account.js";
 import { healthRoute } from "./routes/health.js";
 import { webhookRoutes } from "./routes/webhooks.js";
 import { mfaRoutes } from "./routes/mfa.js";
+import { adminRoutes } from "./routes/admin.js";
 import { errorHandler } from "./middleware/error.js";
 import { logger } from "./middleware/logger.js";
 import { securityHeaders } from "./middleware/security.js";
@@ -17,6 +18,7 @@ export type Env = {
   VAULT: R2Bucket;
   KV: KVNamespace;
   JWT_SECRET: string;
+  ADMIN_SECRET: string;
   TURNSTILE_SECRET_KEY: string;
   STRIPE_SECRET_KEY: string;
   STRIPE_WEBHOOK_SECRET: string;
@@ -55,5 +57,6 @@ app.route("/auth", mfaRoutes);
 app.route("/vault", vaultRoutes);
 app.route("/account", accountRoutes);
 app.route("/webhooks", webhookRoutes);
+app.route("/admin", adminRoutes);
 
 export default app;

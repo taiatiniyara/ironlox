@@ -550,6 +550,17 @@ ironlox/
 | DELETE | /account               | JWT | Initiate account deletion |
 | POST   | /account/undelete      | No  | Cancel deletion (grace period) |
 | PUT    | /account/password      | JWT | Change master password (re-wrap key) |
+| POST   | /admin/login           | Admin JWT | Admin authentication with shared secret |
+| GET    | /admin/stats           | Admin JWT | Aggregate system statistics |
+| GET    | /admin/users           | Admin JWT | Paginated user list |
+| GET    | /admin/users/:id       | Admin JWT | User detail |
+| PATCH  | /admin/users/:id/tier  | Admin JWT | Change user tier |
+| POST   | /admin/users/:id/suspend | Admin JWT | Soft-delete user |
+| POST   | /admin/users/:id/unsuspend | Admin JWT | Restore user |
+| GET    | /admin/users/:id/events  | Admin JWT | User login events |
+| GET    | /admin/audit-log       | Admin JWT | Admin audit trail |
+| GET    | /admin/feature-flags   | Admin JWT | List feature flags |
+| PUT    | /admin/feature-flags/:key | Admin JWT | Set feature flag |
 | GET    | /health                | No  | Health check |
 
 All routes generated from Hono + Zod schemas. OpenAPI 3.1 spec auto-generated.
@@ -775,7 +786,100 @@ Each guide: export instructions + CSV field mapping table + import walkthrough.
 - Email alert on login from new device (new IP + user-agent combo).
 - IP addresses stored hashed (SHA-256). No raw IPs.
 
-## 45. Feature Flags
+## 46. Super Admin Portal
+
+### 46.1 Purpose
+
+Internal operations portal for managing the Ironlox platform. Provides user management, system statistics, feature flag toggling, and an audit trail of all administrative actions. Access is gated by a shared `ADMIN_SECRET` environment variable — no admin user accounts exist in the database.
+
+### 46.2 Admin Authentication
+
+- **Not** a user role on the `users` table. Orthogonal auth path.
+- Admin secret stored in Cloudflare Worker env var `ADMIN_SECRET`.
+- Admin login: `POST /admin/login` accepts `{ secret }`, verifies against env var, returns a 30-minute admin JWT with payload `{ sub: "admin", role: "admin", jti, exp }`.
+- Admin JWT stored in `sessionStorage` (cleared on tab close). Not shared with consumer vault auth.
+- No refresh tokens for admin — re-enter secret to extend session.
+- Admin login rate limited: 5 requests per 15 minutes per IP.
+- Admin endpoint rate limit: 30 requests per 15 minutes per IP.
+- Admin JWT cannot be used on consumer endpoints (role check in middleware).
+
+### 46.3 API Endpoints
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| POST   | /admin/login              | No  | Authenticate with admin secret, return JWT |
+| GET    | /admin/stats              | Admin JWT | Aggregate system statistics |
+| GET    | /admin/users              | Admin JWT | Paginated user list with search + tier filter |
+| GET    | /admin/users/:id          | Admin JWT | Full user detail (metadata, attachments, login events) |
+| PATCH  | /admin/users/:id/tier     | Admin JWT | Change user tier (free / premium) |
+| POST   | /admin/users/:id/suspend  | Admin JWT | Soft-delete user account |
+| POST   | /admin/users/:id/unsuspend | Admin JWT | Restore soft-deleted account |
+| GET    | /admin/users/:id/events   | Admin JWT | Paginated login events for a user |
+| GET    | /admin/audit-log          | Admin JWT | Paginated admin audit trail |
+| GET    | /admin/feature-flags      | Admin JWT | List all KV feature flags |
+| PUT    | /admin/feature-flags/:key | Admin JWT | Set a feature flag value |
+
+All admin endpoints exclude auth hashes, salts, and vault blob contents. Zero-knowledge boundary is maintained — admin cannot access user vault plaintext.
+
+### 46.4 Web App Pages
+
+| Route | Description |
+|-------|-------------|
+| `/admin/login` | Single-field secret entry form |
+| `/admin/dashboard` | 10 stat cards (total users, premium, free, suspended, signups today/week/month, login events, storage, premium rate). Auto-refresh every 60s. |
+| `/admin/users` | Paginated user table with email search, tier filter (All/Free/Premium/Suspended), MFA indicator, storage usage |
+| `/admin/users/[id]` | User detail: metadata cards, tier toggle, suspend/unsuspend actions, attachment list, login events timeline |
+| `/admin/audit-log` | Filterable audit trail (by action type, by target ID). Actions logged: tier_change, user_suspend, user_unsuspend, feature_flag_update |
+| `/admin/feature-flags` | KV feature flag management: list flags with toggle switches, create new flags |
+
+### 46.5 Audit Log
+
+Every admin mutation is logged to the `admin_audit_log` D1 table:
+
+| Column | Description |
+|--------|-------------|
+| `action` | Action type: `tier_change`, `user_suspend`, `user_unsuspend`, `feature_flag_update` |
+| `target_type` | Affected resource: `user`, `feature_flag` |
+| `target_id` | Affected resource ID |
+| `details` | JSON string with before/after context |
+
+No user-identifying data is stored in the audit log beyond the target user's UUID.
+
+### 46.6 Feature Flags
+
+Feature flags are stored in Cloudflare KV under the `feature:` key prefix. Each key has a value of `"true"` or `"false"` (string). The admin portal provides a GUI to list, toggle, and create feature flags. All changes are audit-logged.
+
+Three-layer config remains:
+1. **KV**: runtime feature kill switches — instantly toggleable from admin portal.
+2. **D1**: per-user tier/state (free vs. premium).
+3. **Environment variables**: deploy-time config (API keys, secrets, thresholds).
+
+### 46.7 Security Considerations
+
+- Admin secret should be a long random string (128+ chars, generated with `openssl rand -base64 64`).
+- Admin JWT is short-lived (30 min), no silent refresh.
+- All admin actions are audit-logged.
+- Admin cannot access user vault contents (zero-knowledge boundary intact).
+- Admin cannot read auth hashes or encryption salts from the user detail view.
+- Admin pages use `sessionStorage` for the JWT (cleared on tab close), not `localStorage`.
+- Separate rate limits for admin login (5/min) and admin operations (30/min).
+
+### 46.8 Database
+
+```sql
+CREATE TABLE IF NOT EXISTS admin_audit_log (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  action TEXT NOT NULL,
+  target_type TEXT,
+  target_id TEXT,
+  details TEXT,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX idx_admin_audit_created ON admin_audit_log(created_at DESC);
+CREATE INDEX idx_admin_audit_action ON admin_audit_log(action);
+```
+
+Migration file: `002_add_admin.sql`.
 
 Three-layer config:
 1. **KV**: runtime feature kill switches (instant toggle, ~60s global propagation).

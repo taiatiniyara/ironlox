@@ -284,3 +284,5 @@ export const apiClient = new ApiClient({ baseUrl: "" });
 export function createApiClient(baseUrl: string): ApiClient {
   return new ApiClient({ baseUrl });
 }
+
+export { AdminApiClient, getAdminApiClient } from "./admin.js";

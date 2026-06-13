@@ -167,6 +167,108 @@ export const ChangeEmailRequestSchema = z.object({
   otp: z.string(),
 });
 
+// Admin schemas
+export const AdminLoginRequestSchema = z.object({
+  secret: z.string().min(1),
+});
+
+export const AdminLoginResponseSchema = z.object({
+  accessToken: z.string(),
+});
+
+export const AdminStatsResponseSchema = z.object({
+  totalUsers: z.number(),
+  premiumUsers: z.number(),
+  freeUsers: z.number(),
+  suspendedUsers: z.number(),
+  signupsToday: z.number(),
+  signupsThisWeek: z.number(),
+  signupsThisMonth: z.number(),
+  totalAttachmentBytes: z.number(),
+  loginEventsToday: z.number(),
+});
+
+export const AdminUserItemSchema = z.object({
+  id: z.string(),
+  email: z.string().email(),
+  tier: z.enum(["free", "premium"]),
+  mfaEnabled: z.boolean(),
+  attachmentUsed: z.number(),
+  deleted: z.boolean(),
+  createdAt: z.string(),
+});
+
+export const AdminUserListResponseSchema = z.object({
+  users: z.array(AdminUserItemSchema),
+  total: z.number(),
+  page: z.number(),
+  limit: z.number(),
+});
+
+export const AdminUserDetailResponseSchema = z.object({
+  id: z.string(),
+  email: z.string().email(),
+  tier: z.enum(["free", "premium"]),
+  mfaEnabled: z.boolean(),
+  attachmentUsed: z.number(),
+  attachmentQuota: z.number(),
+  deleted: z.boolean(),
+  subscriptionStatus: z.string(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+  deletedAt: z.string().nullable(),
+  attachments: z.array(
+    z.object({
+      id: z.string(),
+      name: z.string(),
+      size: z.number(),
+      contentType: z.string().nullable(),
+      createdAt: z.string(),
+    }),
+  ),
+  loginEvents: z.array(
+    z.object({
+      timestamp: z.string(),
+      ipHash: z.string(),
+      userAgent: z.string(),
+      cityCountry: z.string(),
+    }),
+  ),
+});
+
+export const AdminUpdateTierRequestSchema = z.object({
+  tier: z.enum(["free", "premium"]),
+});
+
+export const AdminAuditLogItemSchema = z.object({
+  id: z.number(),
+  action: z.string(),
+  targetType: z.string().nullable(),
+  targetId: z.string().nullable(),
+  details: z.string().nullable(),
+  createdAt: z.string(),
+});
+
+export const AdminAuditLogResponseSchema = z.object({
+  entries: z.array(AdminAuditLogItemSchema),
+  total: z.number(),
+  page: z.number(),
+  limit: z.number(),
+});
+
+export const AdminFeatureFlagItemSchema = z.object({
+  key: z.string(),
+  value: z.string(),
+});
+
+export const AdminFeatureFlagListResponseSchema = z.object({
+  flags: z.array(AdminFeatureFlagItemSchema),
+});
+
+export const AdminFeatureFlagUpdateRequestSchema = z.object({
+  value: z.string(),
+});
+
 // Type exports
 export type LoginFields = z.infer<typeof LoginFieldsSchema>;
 export type CardFields = z.infer<typeof CardFieldsSchema>;
@@ -189,6 +291,18 @@ export type PutVaultResponse = z.infer<typeof PutVaultResponseSchema>;
 export type AccountInfoResponse = z.infer<typeof AccountInfoResponseSchema>;
 export type ChangePasswordRequest = z.infer<typeof ChangePasswordRequestSchema>;
 export type ChangeEmailRequest = z.infer<typeof ChangeEmailRequestSchema>;
+export type AdminLoginRequest = z.infer<typeof AdminLoginRequestSchema>;
+export type AdminLoginResponse = z.infer<typeof AdminLoginResponseSchema>;
+export type AdminStatsResponse = z.infer<typeof AdminStatsResponseSchema>;
+export type AdminUserItem = z.infer<typeof AdminUserItemSchema>;
+export type AdminUserListResponse = z.infer<typeof AdminUserListResponseSchema>;
+export type AdminUserDetailResponse = z.infer<typeof AdminUserDetailResponseSchema>;
+export type AdminUpdateTierRequest = z.infer<typeof AdminUpdateTierRequestSchema>;
+export type AdminAuditLogItem = z.infer<typeof AdminAuditLogItemSchema>;
+export type AdminAuditLogResponse = z.infer<typeof AdminAuditLogResponseSchema>;
+export type AdminFeatureFlagItem = z.infer<typeof AdminFeatureFlagItemSchema>;
+export type AdminFeatureFlagListResponse = z.infer<typeof AdminFeatureFlagListResponseSchema>;
+export type AdminFeatureFlagUpdateRequest = z.infer<typeof AdminFeatureFlagUpdateRequestSchema>;
 
 // Typed item helpers — narrow VaultItem.fields to the correct subtype
 export type TypedVaultItem<T extends VaultItem["type"]> = Omit<VaultItem, "fields"> & {

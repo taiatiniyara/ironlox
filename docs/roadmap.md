@@ -2,7 +2,7 @@
 
 > **Status key**: ✅ complete &nbsp; 🔶 partial / stub &nbsp; ❌ not started
 >
-> **Overall**: Foundation (Phase 0) done. Core Backend (Phase 1) done except passkey WebAuthn endpoints (501 stubs). MFA enable/verify and recovery key login are live. MFA login flow is complete (server returns `mfaRequired` flag, client redirects to `/mfa`, verify + complete login). **Web app (Phase 2) complete** — 16 static pages, 21 shadcn/ui components, full vault CRUD with server sync + conflict resolution, security dashboard with HIBP k-anonymity, import/export with template, file attachments, onboarding + demo vault, i18n, 7 unit tests, 12 E2E + axe-core tests. CSP hardened with `_headers` for Cloudflare Pages. Vault upload protocol aligned (blob sent directly in PUT body, no broken two-step flow). Password visibility fixed in read-only mode. Card/CVV show/hide toggles added. Sync failure toasts added. `useSearchParams` Suspense boundaries added. Hook rules violation fixed. Error handler now handles Hono HTTPException + logs 500s. Fonts now loaded via Google Fonts import. Logo SVGs used in sidebar, auth pages, loading states, favicon. Light mode fixed (custom theme tokens moved to :root/.dark). Muted text contrast improved. Dialog overlay opacity fixed. Page titles set per route. Vault search/toolbar made sticky. **Extension (Phase 3) ~90%** — real auth, vault sync with IndexedDB + conflict resolution, autofill with TOTP + inline dropdown suggestions, add/edit/delete for all 4 item types, keyboard shortcuts (Ctrl+Shift+L/C/U/K), PIN unlock, context menu, 5 recents, 55 domain rules. **Marketing site (Phase 4)** content-complete. **Infrastructure**: Husky pre-commit hooks with lint-staged, 7 worker API integration tests, CSP/security headers configured for production.
+> **Overall**: Foundation (Phase 0) done. Core Backend (Phase 1) done except passkey WebAuthn endpoints (501 stubs). MFA enable/verify and recovery key login are live. MFA login flow is complete (server returns `mfaRequired` flag, client redirects to `/mfa`, verify + complete login). **Super Admin Portal** complete — 11 API endpoints, 6 web app pages, admin audit log, feature flag management via KV. **Web app (Phase 2) complete** — 16 static pages + 6 admin pages, 21 shadcn/ui components, full vault CRUD with server sync + conflict resolution, security dashboard with HIBP k-anonymity, import/export with template, file attachments, onboarding + demo vault, i18n, 7 unit tests, 12 E2E + axe-core tests. CSP hardened with `_headers` for Cloudflare Pages. Vault upload protocol aligned (blob sent directly in PUT body, no broken two-step flow). Password visibility fixed in read-only mode. Card/CVV show/hide toggles added. Sync failure toasts added. `useSearchParams` Suspense boundaries added. Hook rules violation fixed. Error handler now handles Hono HTTPException + logs 500s. Fonts now loaded via Google Fonts import. Logo SVGs used in sidebar, auth pages, loading states, favicon. Light mode fixed (custom theme tokens moved to :root/.dark). Muted text contrast improved. Dialog overlay opacity fixed. Page titles set per route. Vault search/toolbar made sticky. **Extension (Phase 3) ~90%** — real auth, vault sync with IndexedDB + conflict resolution, autofill with TOTP + inline dropdown suggestions, add/edit/delete for all 4 item types, keyboard shortcuts (Ctrl+Shift+L/C/U/K), PIN unlock, context menu, 5 recents, 55 domain rules. **Marketing site (Phase 4)** content-complete. **Infrastructure**: Husky pre-commit hooks with lint-staged, 7 worker API integration tests, CSP/security headers configured for production.
 
 ---
 
@@ -82,9 +82,26 @@
 - [x] MailChannels integration (email verification, alerts) ✅
 - [x] Stripe webhook handler (subscription create/update/cancel) ✅
 - [x] KV rate limiting (Turnstile trigger + IP cooldown) ✅
-- [ ] KV feature flags (kill switches) ❌
+- [x] KV feature flags (kill switches) — admin-managed via `/admin/feature-flags` ✅
 - [x] `GET /health` endpoint ✅
 - [ ] Sentry (Workers SDK) error tracking ❌
+
+### Super Admin Portal (Backend)
+- [x] D1 migration: `admin_audit_log` table (`002_add_admin.sql`) ✅
+- [x] `ADMIN_SECRET` env var for shared-secret authentication ✅
+- [x] Admin auth middleware: JWT verification with `role === "admin"` claim check ✅
+- [x] Admin rate limiting: 5/min (login), 30/min (operations) ✅
+- [x] `POST /admin/login` — authenticate with shared secret, return 30-min admin JWT ✅
+- [x] `GET /admin/stats` — total users, premium/free/suspended counts, signups today/week/month, storage, login events ✅
+- [x] `GET /admin/users` — paginated user list with email search + tier filter ✅
+- [x] `GET /admin/users/:id` — full user detail (metadata, attachments, login events) — excludes auth hashes/salts ✅
+- [x] `PATCH /admin/users/:id/tier` — change user tier, audit-logged ✅
+- [x] `POST /admin/users/:id/suspend` — soft-delete user, audit-logged ✅
+- [x] `POST /admin/users/:id/unsuspend` — restore user, audit-logged ✅
+- [x] `GET /admin/users/:id/events` — paginated login events for a user ✅
+- [x] `GET /admin/audit-log` — paginated admin audit trail with action/target filters ✅
+- [x] `GET /admin/feature-flags` — list all KV feature flags ✅
+- [x] `PUT /admin/feature-flags/:key` — set feature flag value, audit-logged ✅
 
 ---
 
@@ -182,6 +199,17 @@
 - [x] AuthGuard / GuestGuard redirect components ✅
 - [x] `useSearchParams` wrapped in `<Suspense>` boundaries ✅
 - [x] TanStack Query — `QueryClientProvider` + devtools, query key factory, `useAccountQuery`, `useLoginEventsQuery`, 9 mutation hooks (change email, change password, delete account, MFA enable/disable/verify, upload/delete attachment, recover), Settings/Attachments/Billing/MFA/Recover pages migrated from manual `useEffect` fetches, `onlineManager` wired to `useOnlineStatus` for automatic query pause/resume ✅
+
+### Super Admin Portal (Web App) — Phase 2.5
+- [x] `(admin)` route group at `/admin/*` with independent `AdminProvider` + `AdminGuard` + `AdminLayout` ✅
+- [x] `AdminApiClient` class — sessionStorage-backed admin JWT, no refresh tokens, separate from consumer `ApiClient` ✅
+- [x] `/admin/login` — single-field secret entry, validates against `POST /admin/login`, stores JWT in sessionStorage ✅
+- [x] `/admin/dashboard` — 10 stat cards (total users, premium, free, suspended, signups today/week/month, storage, login events, premium rate), auto-refresh 60s ✅
+- [x] `/admin/users` — paginated table with email search (debounced), tier filter dropdown (All/Free/Premium/Suspended), MFA indicator, storage, joined date, clickable rows ✅
+- [x] `/admin/users/[id]` — user detail with metadata cards, tier toggle button, suspend/unsuspend actions with confirmation, attachment list, login events timeline ✅
+- [x] `/admin/audit-log` — filterable table (action type dropdown, target search), paginated, badge-coded action types ✅
+- [x] `/admin/feature-flags` — KV-backed flag list with toggle switches, create new flag form, all changes audit-logged ✅
+- [x] 14 admin Zod schemas in `@ironlox/schemas` ✅
 
 ---
 

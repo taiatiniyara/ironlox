@@ -33,7 +33,9 @@
   "vault": {
     "title": "Vault",
     "search": "Search items...",
+    "searchItems": "Search {{count}} items...",
     "noItems": "No items in your vault yet",
+    "noItemsDesc": "Click \"Add your first item\" to get started securing your passwords.",
     "addFirstItem": "Add your first item",
     "noMatches": "No items match your search",
     "copy": "Copy",
@@ -44,6 +46,10 @@
     "created": "Created",
     "updated": "Updated",
     "decrypting": "Decrypting vault...",
+    "unlock": "Unlock",
+    "unlocking": "Unlocking...",
+    "masterPassword": "Master Password",
+    "lockedVaultDesc": "Enter your master password to unlock your vault.",
     "website": "Website",
     "totpCode": "2FA Code",
     "cardholder": "Cardholder",
@@ -58,7 +64,14 @@
     "typeLogin": "Login",
     "typeCard": "Card",
     "typeNote": "Note",
-    "typeIdentity": "Identity"
+    "typeIdentity": "Identity",
+    "categories": {
+      "all": "All",
+      "login": "Logins",
+      "card": "Cards",
+      "note": "Notes",
+      "identity": "Identities"
+    }
   },
   "addItem": {
     "title": "Add Item",
@@ -311,5 +324,11 @@
     "redirecting": "Redirecting...",
     "undo": "Undo",
     "download": "Download"
+  },
+  "sort": {
+    "recentlyUpdated": "Recently Updated",
+    "recentlyCreated": "Recently Created",
+    "nameAz": "Name (A-Z)",
+    "nameZa": "Name (Z-A)"
   }
 }

@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import type { Context } from "hono";
 import { sign } from "hono/jwt";
 import type { Env, Variables } from "../index.js";
-import { RegisterRequestSchema, LoginRequestSchema } from "@ironlox/schemas";
+import { RegisterRequestSchema, LoginRequestSchema, PreloginRequestSchema } from "@ironlox/schemas";
 import { AuthError, ValidationError, RateLimitError } from "../middleware/error.js";
 import { verifyTurnstile } from "../middleware/rate-limit.js";
 import { sendEmail, getVerificationEmail, getLoginAlertEmail } from "../services/email.js";
@@ -82,6 +82,41 @@ app.post("/register", async (c) => {
     vaultVersion: 1,
     wrappedVaultKey,
     encryptionSalt,
+  });
+});
+
+/**
+ * POST /auth/prelogin
+ * Returns the stored authSalt and KDF parameters for the given email.
+ * Client uses this salt to derive the correct authHash before login.
+ */
+app.post("/prelogin", async (c) => {
+  const body = await c.req.json();
+  const parsed = PreloginRequestSchema.safeParse(body);
+  if (!parsed.success) {
+    throw new ValidationError("Invalid prelogin data");
+  }
+
+  const { email } = parsed.data;
+
+  const user = await c.env.DB.prepare(
+    "SELECT auth_salt FROM users WHERE email = ? AND deleted_at IS NULL",
+  )
+    .bind(email)
+    .first<{ auth_salt: string }>();
+
+  const KDF_PARAMS = { t: 3, m: 65536, p: 4 };
+
+  if (!user) {
+    return c.json({
+      authSalt: crypto.randomUUID().replace(/-/g, ""), // dummy salt to prevent email enumeration
+      kdfParams: KDF_PARAMS,
+    });
+  }
+
+  return c.json({
+    authSalt: user.auth_salt,
+    kdfParams: KDF_PARAMS,
   });
 });
 

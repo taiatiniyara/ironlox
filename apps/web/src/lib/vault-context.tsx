@@ -185,8 +185,9 @@ export function VaultProvider({ children }: { children: ReactNode }) {
       const client = apiClientRef.current;
       if (!client) throw new Error("API client not initialized");
 
-      const authSalt = generateSalt();
-      const authHashRaw = await deriveAuthHash(masterPassword, userEmail, authSalt);
+      const { authSalt } = await client.preLogin({ email: userEmail });
+      const saltBytes = hexToBytes(authSalt);
+      const authHashRaw = await deriveAuthHash(masterPassword, userEmail, saltBytes);
       const authHash = toHex(authHashRaw);
 
       const loginResponse = await client.login({ email: userEmail, authHash });

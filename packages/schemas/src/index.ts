@@ -70,6 +70,19 @@ export const LoginRequestSchema = z.object({
   authHash: z.string().min(64).max(128),
 });
 
+export const PreloginRequestSchema = z.object({
+  email: z.string().email().max(320),
+});
+
+export const PreloginResponseSchema = z.object({
+  authSalt: z.string().min(16).max(128),
+  kdfParams: z.object({
+    t: z.number(),
+    m: z.number(),
+    p: z.number(),
+  }),
+});
+
 export const LoginResponseSchema = z.object({
   accessToken: z.string(),
   refreshToken: z.string(),
@@ -164,6 +177,8 @@ export type VaultItem = z.infer<typeof VaultItemSchema>;
 export type Vault = z.infer<typeof VaultSchema>;
 export type RegisterRequest = z.infer<typeof RegisterRequestSchema>;
 export type LoginRequest = z.infer<typeof LoginRequestSchema>;
+export type PreloginRequest = z.infer<typeof PreloginRequestSchema>;
+export type PreloginResponse = z.infer<typeof PreloginResponseSchema>;
 export type LoginResponse = z.infer<typeof LoginResponseSchema>;
 export type RefreshRequest = z.infer<typeof RefreshRequestSchema>;
 export type MfaEnableRequest = z.infer<typeof MfaEnableRequestSchema>;

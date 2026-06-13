@@ -1,4 +1,9 @@
-import type { LoginResponse, AccountInfoResponse, PutVaultResponse } from "@ironlox/schemas";
+import type {
+  LoginResponse,
+  AccountInfoResponse,
+  PutVaultResponse,
+  PreloginResponse,
+} from "@ironlox/schemas";
 
 /**
  * Ironlox API client.
@@ -56,6 +61,10 @@ export class ApiClient {
     turnstileToken?: string;
   }): Promise<LoginResponse> {
     return this.post("/auth/login", body);
+  }
+
+  async preLogin(body: { email: string }): Promise<PreloginResponse> {
+    return this.post("/auth/prelogin", body, false);
   }
 
   async refresh(): Promise<LoginResponse> {

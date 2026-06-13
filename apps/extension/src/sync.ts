@@ -108,8 +108,9 @@ export class VaultSync {
   }
 
   async login(masterPassword: string, email: string): Promise<Credentials> {
-    const authSalt = crypto.getRandomValues(new Uint8Array(32));
-    const authHashRaw = await deriveAuthHash(masterPassword, email, authSalt);
+    const { authSalt } = await this.apiClient.preLogin({ email });
+    const saltBytes = new Uint8Array(authSalt.match(/.{2}/g)!.map((b) => parseInt(b, 16)));
+    const authHashRaw = await deriveAuthHash(masterPassword, email, saltBytes);
     const authHash = toHex(new Uint8Array(authHashRaw));
 
     const loginResponse = await this.apiClient.login({ email, authHash });

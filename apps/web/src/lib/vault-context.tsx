@@ -29,6 +29,7 @@ import {
   hexToBytes,
 } from "@ironlox/crypto";
 import { createApiClient, type ApiClient, ApiError } from "@ironlox/api-client";
+import { queryClient } from "@/lib/query-client";
 import { toast } from "sonner";
 
 const STORAGE_KEYS = {
@@ -120,6 +121,7 @@ export function VaultProvider({ children }: { children: ReactNode }) {
     setIsVaultLoaded(false);
     setEmail(null);
     setIsAuthenticated(false);
+    queryClient.clear();
   }, []);
 
   const syncVaultToServer = useCallback(async (updatedVault: Vault): Promise<void> => {
@@ -209,6 +211,7 @@ export function VaultProvider({ children }: { children: ReactNode }) {
       }
 
       setIsVaultLoaded(true);
+      queryClient.invalidateQueries({ queryKey: ["account"] });
       return false;
     },
     [persistSession],
@@ -247,6 +250,8 @@ export function VaultProvider({ children }: { children: ReactNode }) {
       const emptyVault = createEmptyVault();
       setVaultState(emptyVault);
       setIsVaultLoaded(true);
+
+      queryClient.invalidateQueries({ queryKey: ["account"] });
 
       try {
         await syncVaultToServer(emptyVault);

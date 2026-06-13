@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "react-i18next";
 import { useVault } from "@/lib/vault-context";
 import { usePageTitle } from "@/lib/utils";
 import { PageHeader } from "@/components/shared/page-header";
@@ -29,6 +30,7 @@ function downloadTemplate() {
 
 export default function ImportPage() {
   usePageTitle("Import");
+  const { t } = useTranslation();
   const { bulkAddItems } = useVault();
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -50,9 +52,9 @@ export default function ImportPage() {
           folderId: null,
         })) as VaultItem[];
         setPreview(items);
-        toast.success(`Parsed ${items.length} items`);
+        toast.success(t("import.itemsParsed", { count: items.length }));
       } catch {
-        toast.error("Failed to parse CSV file");
+        toast.error(t("import.parseError"));
       }
     };
     reader.readAsText(file);
@@ -65,24 +67,21 @@ export default function ImportPage() {
       id: crypto.randomUUID(),
     }));
     await bulkAddItems(items);
-    toast.success(`Imported ${items.length} items`);
+    toast.success(t("import.imported", { count: items.length }));
     setImporting(false);
     router.push("/vault");
   }
 
   return (
     <div className="max-w-lg mx-auto p-4 space-y-4">
-      <PageHeader title="Import Passwords" />
+      <PageHeader title={t("import.title")} />
 
       {preview.length === 0 ? (
         <Card>
           <CardHeader className="text-center">
             <Upload className="size-8 text-muted-foreground mx-auto mb-2" />
-            <CardTitle>Upload CSV</CardTitle>
-            <CardDescription>
-              Import from 1Password, Bitwarden, LastPass, or Chrome. Expected columns: type, name,
-              uri, username, password, notes, tags.
-            </CardDescription>
+            <CardTitle>{t("import.uploadCsv")}</CardTitle>
+            <CardDescription>{t("import.csvDescription")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
             <input
@@ -94,18 +93,20 @@ export default function ImportPage() {
             />
             <Button className="w-full" onClick={() => fileRef.current?.click()}>
               <Upload className="size-4 mr-2" />
-              Choose CSV File
+              {t("import.chooseFile")}
             </Button>
             <Button variant="outline" className="w-full" onClick={downloadTemplate}>
               <Download className="size-4 mr-2" />
-              Download Template
+              {t("import.downloadTemplate")}
             </Button>
           </CardContent>
         </Card>
       ) : (
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">{preview.length} items ready to import</CardTitle>
+            <CardTitle className="text-base">
+              {t("import.itemsReady", { count: preview.length })}
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="max-h-64 overflow-auto space-y-1">
@@ -123,15 +124,15 @@ export default function ImportPage() {
             </div>
             <div className="flex gap-2">
               <Button variant="outline" className="flex-1" onClick={() => setPreview([])}>
-                Cancel
+                {t("import.cancel")}
               </Button>
               <LoadingButton
                 className="flex-1"
                 onClick={handleImport}
                 loading={importing}
-                loadingText="Importing..."
+                loadingText={t("import.importing")}
               >
-                Import {preview.length} Items
+                {t("import.importButton", { count: preview.length })}
               </LoadingButton>
             </div>
           </CardContent>

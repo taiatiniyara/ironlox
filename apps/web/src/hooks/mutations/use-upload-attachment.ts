@@ -1,0 +1,15 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useVault } from "@/lib/vault-context";
+import { queryKeys } from "@/lib/query-keys";
+
+export function useUploadAttachmentMutation() {
+  const { apiClient } = useVault();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, buffer }: { id: string; buffer: ArrayBuffer }) =>
+      apiClient!.uploadAttachment(id, buffer),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.account });
+    },
+  });
+}

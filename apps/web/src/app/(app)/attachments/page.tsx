@@ -1,8 +1,12 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useVault } from "@/lib/vault-context";
 import { usePageTitle } from "@/lib/utils";
+import { useAccountQuery } from "@/hooks/queries/use-account";
+import { useUploadAttachmentMutation } from "@/hooks/mutations/use-upload-attachment";
+import { useDeleteAttachmentMutation } from "@/hooks/mutations/use-delete-attachment";
 import { PageHeader } from "@/components/shared/page-header";
 import { LoadingButton } from "@/components/shared/loading-button";
 import { Button } from "@/components/ui/button";
@@ -19,63 +23,52 @@ interface AttachedFile {
 
 export default function AttachmentsPage() {
   usePageTitle("Attachments");
+  const { t } = useTranslation();
   const { apiClient } = useVault();
   const fileRef = useRef<HTMLInputElement>(null);
-  const [quota, setQuota] = useState({ used: 0, total: 250 });
   const [files, setFiles] = useState<AttachedFile[]>([]);
-  const [uploading, setUploading] = useState(false);
 
-  useEffect(() => {
-    if (!apiClient) return;
-    let cancelled = false;
-    apiClient
-      .getAccount()
-      .then((acct) => {
-        if (cancelled) return;
-        setQuota({ used: acct.attachmentUsed || 0, total: acct.attachmentQuota || 250 });
-      })
-      .catch(() => {});
-    return () => {
-      cancelled = true;
-    };
-  }, [apiClient]);
+  const { data: account } = useAccountQuery();
+  const uploadMutation = useUploadAttachmentMutation();
+  const deleteMutation = useDeleteAttachmentMutation();
+
+  const quota = {
+    used: account?.attachmentUsed ?? 0,
+    total: account?.attachmentQuota ?? 250,
+  };
 
   async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
-    if (!file || !apiClient) return;
+    if (!file) return;
     if (file.size > 25 * 1024 * 1024) {
-      toast.error("File exceeds 25MB limit");
+      toast.error(t("attachments.fileTooBig"));
       return;
     }
-    setUploading(true);
-    try {
-      const id = crypto.randomUUID();
-      const buffer = await file.arrayBuffer();
-      await apiClient.uploadAttachment(id, buffer);
-      setFiles((prev) => [...prev, { id, name: file.name, size: file.size }]);
-      setQuota((prev) => ({ ...prev, used: prev.used + Math.round(file.size / (1024 * 1024)) }));
-      toast.success(`${file.name} uploaded`);
-    } catch {
-      toast.error("Upload failed");
-    } finally {
-      setUploading(false);
-      if (fileRef.current) fileRef.current.value = "";
-    }
+    const id = crypto.randomUUID();
+    const buffer = await file.arrayBuffer();
+    uploadMutation.mutate(
+      { id, buffer },
+      {
+        onSuccess: () => {
+          setFiles((prev) => [...prev, { id, name: file.name, size: file.size }]);
+          toast.success(t("attachments.uploaded", { name: file.name }));
+        },
+        onError: () => toast.error(t("attachments.uploadFailed")),
+        onSettled: () => {
+          if (fileRef.current) fileRef.current.value = "";
+        },
+      },
+    );
   }
 
-  async function handleDelete(id: string, name: string, size: number) {
-    if (!apiClient) return;
-    try {
-      await apiClient.deleteAttachment(id);
-      setFiles((prev) => prev.filter((f) => f.id !== id));
-      setQuota((prev) => ({
-        ...prev,
-        used: Math.max(0, prev.used - Math.round(size / (1024 * 1024))),
-      }));
-      toast.success(`${name} deleted`);
-    } catch {
-      toast.error("Delete failed");
-    }
+  function handleDelete(id: string, name: string) {
+    deleteMutation.mutate(id, {
+      onSuccess: () => {
+        setFiles((prev) => prev.filter((f) => f.id !== id));
+        toast.success(t("attachments.deleted", { name }));
+      },
+      onError: () => toast.error(t("attachments.deleteFailed")),
+    });
   }
 
   async function handleDownload(id: string) {
@@ -84,7 +77,7 @@ export default function AttachmentsPage() {
       const { attachmentUrl } = await apiClient.getAttachmentUrl(id);
       window.open(attachmentUrl, "_blank");
     } catch {
-      toast.error("Download failed");
+      toast.error(t("attachments.downloadFailed"));
     }
   }
 
@@ -92,13 +85,13 @@ export default function AttachmentsPage() {
 
   return (
     <div className="max-w-lg mx-auto p-4 space-y-4">
-      <PageHeader title="File Attachments" />
+      <PageHeader title={t("attachments.title")} />
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Storage</CardTitle>
+          <CardTitle className="text-base">{t("attachments.storage")}</CardTitle>
           <CardDescription>
-            {quota.used}MB of {quota.total}MB used
+            {t("attachments.mbUsed", { used: quota.used, total: quota.total })}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -108,11 +101,11 @@ export default function AttachmentsPage() {
             variant="outline"
             className="w-full gap-2"
             onClick={() => fileRef.current?.click()}
-            loading={uploading}
-            loadingText="Uploading..."
+            loading={uploadMutation.isPending}
+            loadingText={t("attachments.uploading")}
           >
             <Upload className="size-4" />
-            Upload File (max 25MB)
+            {t("attachments.upload")}
           </LoadingButton>
         </CardContent>
       </Card>
@@ -145,7 +138,7 @@ export default function AttachmentsPage() {
                     variant="ghost"
                     size="icon"
                     className="size-7 text-destructive"
-                    onClick={() => handleDelete(f.id, f.name, f.size)}
+                    onClick={() => handleDelete(f.id, f.name)}
                   >
                     <Trash2 className="size-3.5" />
                   </Button>
@@ -158,10 +151,8 @@ export default function AttachmentsPage() {
         <Card>
           <CardContent className="py-8 text-center">
             <Paperclip className="size-10 text-muted-foreground mx-auto mb-3" />
-            <p className="text-sm text-muted-foreground">No file attachments yet.</p>
-            <p className="text-xs text-muted-foreground mt-1">
-              Attach files up to 25MB each. 250MB free, 2GB with Premium.
-            </p>
+            <p className="text-sm text-muted-foreground">{t("attachments.noFiles")}</p>
+            <p className="text-xs text-muted-foreground mt-1">{t("attachments.noFilesDesc")}</p>
           </CardContent>
         </Card>
       )}

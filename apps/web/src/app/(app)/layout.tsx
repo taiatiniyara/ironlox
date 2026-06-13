@@ -1,9 +1,11 @@
 "use client";
 
 import { Suspense } from "react";
+import { ErrorBoundary } from "@/components/error-boundary";
 import { AuthGuard } from "@/components/auth-guard";
 import { LogoImage } from "@/components/shared/logo-image";
 import { useVault } from "@/lib/vault-context";
+import { OfflineBanner } from "@/lib/offline";
 import { useTranslation } from "react-i18next";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -93,18 +95,21 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <aside className="w-56 border-r border-border bg-card shrink-0 hidden md:flex flex-col">
           <AppSidebar />
         </aside>
-        <main className="flex-1 overflow-auto">
-          <Suspense
-            fallback={
-              <div className="flex flex-col h-full p-4 space-y-3">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Skeleton key={i} className="h-14 w-full animate-pulse" />
-                ))}
-              </div>
-            }
-          >
-            <PageTransition>{children}</PageTransition>
-          </Suspense>
+        <main id="main-content" className="flex-1 overflow-auto">
+          <OfflineBanner />
+          <ErrorBoundary>
+            <Suspense
+              fallback={
+                <div className="flex flex-col h-full p-4 space-y-3">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Skeleton key={i} className="h-14 w-full animate-pulse" />
+                  ))}
+                </div>
+              }
+            >
+              <PageTransition>{children}</PageTransition>
+            </Suspense>
+          </ErrorBoundary>
         </main>
       </div>
     </AuthGuard>

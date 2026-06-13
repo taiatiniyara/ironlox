@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { useVault } from "@/lib/vault-context";
 import { usePageTitle } from "@/lib/utils";
 import { EmptyState } from "@/components/shared/empty-state";
@@ -54,7 +55,8 @@ async function checkHibp(password: string): Promise<number> {
 }
 
 export default function SecurityPage() {
-  usePageTitle("Security Dashboard");
+  const { t } = useTranslation();
+  usePageTitle(t("security.title"));
   const { vault } = useVault();
   const [hibpRunning, setHibpRunning] = useState(false);
   const [hibpResults, setHibpResults] = useState<Array<{ name: string; count: number }>>([]);
@@ -129,25 +131,22 @@ export default function SecurityPage() {
     setHibpResults(results);
     setHibpRunning(false);
     setHibpDone(true);
-    if (results.length === 0) toast.success("No breaches found");
-    else toast.warning(`${results.length} passwords found in breaches`);
-  }, [logins]);
+    if (results.length === 0) toast.success(t("security.noBreachesFound"));
+    else toast.warning(t("security.breachesFound", { count: results.length }));
+  }, [logins, t]);
 
   if (!vault || logins.length === 0) {
     return (
       <div className="max-w-lg mx-auto p-4">
-        <h1 className="text-xl font-semibold mb-4">Security Dashboard</h1>
-        <EmptyState
-          icon={ShieldCheck}
-          title="Add some login items to see your vault health report."
-        />
+        <h1 className="text-xl font-semibold mb-4">{t("security.title")}</h1>
+        <EmptyState icon={ShieldCheck} title={t("security.noLogins")} />
       </div>
     );
   }
 
   return (
     <div className="max-w-lg mx-auto p-4 space-y-4">
-      <h1 className="text-xl font-semibold">Security Dashboard</h1>
+      <h1 className="text-xl font-semibold">{t("security.title")}</h1>
       <Card>
         <CardContent className="pt-6">
           <div className="flex items-center gap-4 mb-4">
@@ -164,12 +163,15 @@ export default function SecurityPage() {
             </div>
             <div>
               <p className="text-2xl font-bold">{score}%</p>
-              <p className="text-xs text-muted-foreground">Vault Health Score</p>
+              <p className="text-xs text-muted-foreground">{t("security.vaultHealth")}</p>
             </div>
           </div>
           <Progress value={score} />
           <p className="text-xs text-muted-foreground mt-2">
-            Based on {logins.length} login {logins.length === 1 ? "item" : "items"}
+            {t("security.basedOn", {
+              count: logins.length,
+              itemText: logins.length === 1 ? "item" : "items",
+            })}
           </p>
         </CardContent>
       </Card>
@@ -178,45 +180,68 @@ export default function SecurityPage() {
         <IssueCard
           icon={AlertTriangle}
           color="yellow"
-          title="Weak Passwords"
+          title={t("security.weakPasswords")}
           count={weak.length}
-          items={weak.map((l) => `${l.name} (${l.password.length} chars)`)}
+          items={weak.map(
+            (l) => `${l.name} (${t("security.chars", { count: l.password.length })})`,
+          )}
+          andMoreText={
+            weak.length > 5 ? t("security.andMore", { count: weak.length - 5 }) : undefined
+          }
         />
       )}
       {reused.length > 0 && (
         <IssueCard
           icon={Key}
           color="red"
-          title="Reused Passwords"
+          title={t("security.reusedPasswords")}
           count={reused.length}
           items={reused.map((l) => l.name)}
+          andMoreText={
+            reused.length > 5 ? t("security.andMore", { count: reused.length - 5 }) : undefined
+          }
         />
       )}
       {old.length > 0 && (
         <IssueCard
           icon={Clock}
           color="yellow"
-          title="Aging Passwords"
+          title={t("security.agingPasswords")}
           count={old.length}
-          items={old.map((l) => `${l.name} (not changed in >2 years)`)}
+          items={old.map((l) => `${l.name} (${t("security.agingDesc")})`)}
+          andMoreText={
+            old.length > 5 ? t("security.andMore", { count: old.length - 5 }) : undefined
+          }
         />
       )}
       {missing2fa.length > 0 && (
         <IssueCard
           icon={ShieldAlert}
           color="yellow"
-          title="Missing 2FA"
+          title={t("security.missing2fa")}
           count={missing2fa.length}
           items={missing2fa.map((l) => l.name)}
+          andMoreText={
+            missing2fa.length > 5
+              ? t("security.andMore", { count: missing2fa.length - 5 })
+              : undefined
+          }
         />
       )}
       {hibpResults.length > 0 && (
         <IssueCard
           icon={AlertTriangle}
           color="red"
-          title="Found in Breaches"
+          title={t("security.foundInBreaches")}
           count={hibpResults.length}
-          items={hibpResults.map((r) => `${r.name} (${r.count.toLocaleString()} times)`)}
+          items={hibpResults.map(
+            (r) => `${r.name} (${r.count.toLocaleString()} ${t("security.times")})`,
+          )}
+          andMoreText={
+            hibpResults.length > 5
+              ? t("security.andMore", { count: hibpResults.length - 5 })
+              : undefined
+          }
         />
       )}
 
@@ -224,18 +249,13 @@ export default function SecurityPage() {
         <CardHeader>
           <CardTitle className="text-sm flex items-center gap-2">
             <AlertTriangle className="size-4 text-yellow-500" />
-            Breach Check
+            {t("security.breachCheck")}
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-xs text-muted-foreground mb-2">
-            Check passwords against Have I Been Pwned using k-anonymity (passwords never leave your
-            device).
-          </p>
+          <p className="text-xs text-muted-foreground mb-2">{t("security.breachDesc")}</p>
           {hibpDone && hibpResults.length === 0 && (
-            <p className="text-xs text-green-600 mb-2">
-              All passwords are safe. No breaches found.
-            </p>
+            <p className="text-xs text-green-600 mb-2">{t("security.allSafe")}</p>
           )}
           <LoadingButton
             variant="outline"
@@ -243,9 +263,9 @@ export default function SecurityPage() {
             className="w-full"
             onClick={runHibpCheck}
             loading={hibpRunning}
-            loadingText="Checking..."
+            loadingText={t("security.checking")}
           >
-            {hibpDone ? "Re-run Breach Check" : "Run Breach Check"}
+            {hibpDone ? t("security.rerunCheck") : t("security.runCheck")}
           </LoadingButton>
         </CardContent>
       </Card>
@@ -254,10 +274,8 @@ export default function SecurityPage() {
         <Card>
           <CardContent className="py-6 text-center">
             <CheckCircle2 className="size-10 text-green-500 mx-auto mb-3" />
-            <p className="text-sm font-medium">Your vault looks great!</p>
-            <p className="text-xs text-muted-foreground">
-              All passwords are strong, unique, and not found in breaches.
-            </p>
+            <p className="text-sm font-medium">{t("security.allGreat")}</p>
+            <p className="text-xs text-muted-foreground">{t("security.allGreatDesc")}</p>
           </CardContent>
         </Card>
       )}
@@ -271,12 +289,14 @@ function IssueCard({
   title,
   count,
   items,
+  andMoreText,
 }: {
   icon: React.ComponentType<{ className?: string }>;
   color: "red" | "yellow";
   title: string;
   count: number;
   items: string[];
+  andMoreText: string | undefined;
 }) {
   const colorIcon = color === "red" ? "text-red-500" : "text-yellow-500";
   return (
@@ -297,9 +317,7 @@ function IssueCard({
               {item}
             </li>
           ))}
-          {items.length > 5 && (
-            <li className="text-xs text-muted-foreground">...and {items.length - 5} more</li>
-          )}
+          {items.length > 5 && <li className="text-xs text-muted-foreground">{andMoreText}</li>}
         </ul>
       </CardContent>
     </Card>

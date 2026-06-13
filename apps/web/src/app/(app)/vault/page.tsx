@@ -1,11 +1,13 @@
 "use client";
 
-import { useState, useMemo, memo } from "react";
+import { useState, useMemo, memo, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useVault } from "@/lib/vault-context";
 import { useDebounce, usePageTitle } from "@/lib/utils";
 import { EmptyState } from "@/components/shared/empty-state";
 import { LoadingButton } from "@/components/shared/loading-button";
+import { OnboardingTour } from "@/components/onboarding-tooltip";
 import { ItemDetailView } from "@/components/vault/item-detail-view";
 import { ItemEditView } from "@/components/vault/item-edit-view";
 import { Input } from "@/components/ui/input";
@@ -62,13 +64,6 @@ const categoryIcons: Record<string, React.ComponentType<{ className?: string }>>
 const categories = ["all", "login", "card", "note", "identity"] as const;
 type Category = (typeof categories)[number];
 
-const sortOptions = [
-  { value: "updatedAt", label: "Recently Updated" },
-  { value: "createdAt", label: "Recently Created" },
-  { value: "nameAsc", label: "Name A-Z" },
-  { value: "nameDesc", label: "Name Z-A" },
-];
-
 const fuseOptions = {
   keys: [
     "name",
@@ -84,6 +79,7 @@ const fuseOptions = {
 
 export default function VaultPage() {
   usePageTitle("Vault");
+  const { t } = useTranslation();
   const { vault, isAuthenticated, unlockVault } = useVault();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -94,6 +90,27 @@ export default function VaultPage() {
   const [category, setCategory] = useState<Category>("all");
   const [tagFilter, setTagFilter] = useState<string | null>(null);
   const [sort, setSort] = useState("updatedAt");
+
+  const sortOptions = useMemo(
+    () => [
+      { value: "updatedAt", label: t("sort.recentlyUpdated") },
+      { value: "createdAt", label: t("sort.recentlyCreated") },
+      { value: "nameAsc", label: t("sort.nameAz") },
+      { value: "nameDesc", label: t("sort.nameZa") },
+    ],
+    [t],
+  );
+
+  const categoryLabels: Record<Category, string> = useMemo(
+    () => ({
+      all: t("vault.categories.all"),
+      login: t("vault.categories.login"),
+      card: t("vault.categories.card"),
+      note: t("vault.categories.note"),
+      identity: t("vault.categories.identity"),
+    }),
+    [t],
+  );
 
   const itemId = searchParams.get("item");
   const editId = searchParams.get("edit");
@@ -160,6 +177,52 @@ export default function VaultPage() {
   const detailItem = itemId ? activeItems.find((i) => i.id === itemId) : null;
   const editItem = editId ? activeItems.find((i) => i.id === editId) : null;
 
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement ||
+        e.target instanceof HTMLSelectElement
+      )
+        return;
+
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setSelectedIndex((prev) => Math.min(prev + 1, filtered.length - 1));
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setSelectedIndex((prev) => Math.max(prev - 1, 0));
+      } else if (e.key === "Enter" && selectedIndex >= 0) {
+        e.preventDefault();
+        const item = filtered[selectedIndex];
+        if (item) {
+          addRecent(item.id);
+          router.push(`/vault?item=${item.id}`);
+        }
+      } else if (e.key === "Escape") {
+        e.preventDefault();
+        if (detailItem || editItem) {
+          clearParams();
+        } else if (search) {
+          setSearch("");
+          setSelectedIndex(-1);
+        }
+      } else if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+        e.preventDefault();
+        const input = document.querySelector<HTMLInputElement>("input[placeholder]");
+        input?.focus();
+      } else if (e.key === "n" && !e.ctrlKey && !e.metaKey) {
+        e.preventDefault();
+        router.push("/add");
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [filtered, selectedIndex, search, detailItem, editItem, router]);
+
   if (editItem) return <ItemEditView item={editItem} onDone={clearParams} />;
   if (detailItem) return <ItemDetailView item={detailItem} onBack={clearParams} />;
 
@@ -170,9 +233,7 @@ export default function VaultPage() {
           <div className="rounded-full bg-muted p-4 mb-3">
             <Key className="size-6 text-muted-foreground" />
           </div>
-          <p className="text-muted-foreground text-sm mb-4">
-            Vault locked — enter your master password to unlock
-          </p>
+          <p className="text-muted-foreground text-sm mb-4">{t("vault.lockedVaultDesc")}</p>
           <form
             onSubmit={async (e) => {
               e.preventDefault();
@@ -195,17 +256,17 @@ export default function VaultPage() {
           >
             <Input
               type="password"
-              placeholder="Master password"
+              placeholder={t("vault.masterPassword")}
               value={unlockPass}
               onChange={(e) => setUnlockPass(e.target.value)}
             />
             <LoadingButton
               type="submit"
               loading={unlocking}
-              loadingText="Unlocking..."
+              loadingText={t("vault.unlocking")}
               disabled={!unlockPass}
             >
-              Unlock Vault
+              {t("vault.unlock")}
             </LoadingButton>
           </form>
         </div>
@@ -225,12 +286,12 @@ export default function VaultPage() {
     return (
       <EmptyState
         icon={Plus}
-        title="No passwords yet"
-        description="Add your first login, card, note, or identity"
+        title={t("vault.noItems")}
+        description={t("vault.noItemsDesc")}
         action={
           <Button onClick={() => router.push("/add")}>
             <Plus className="size-4 mr-2" />
-            Add your first item
+            {t("vault.addFirstItem")}
           </Button>
         }
       />
@@ -239,6 +300,7 @@ export default function VaultPage() {
 
   return (
     <div className="flex flex-col h-full p-4">
+      <OnboardingTour />
       <div className="sticky top-0 z-10 bg-background -mx-4 px-4 pb-3 pt-4 -mt-4">
         <div className="flex items-center gap-3 mb-3">
           <div className="relative flex-1">
@@ -246,7 +308,7 @@ export default function VaultPage() {
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder={`Search ${activeItems.length} items...`}
+              placeholder={t("vault.searchItems", { count: activeItems.length })}
               className="pl-8"
             />
           </div>
@@ -283,7 +345,7 @@ export default function VaultPage() {
                 setTagFilter(null);
               }}
             >
-              {cat === "all" ? "All" : cat.charAt(0).toUpperCase() + cat.slice(1)}
+              {categoryLabels[cat]}
               <span className="ml-1 opacity-60">({typeCounts[cat] ?? 0})</span>
             </Badge>
           ))}
@@ -307,7 +369,7 @@ export default function VaultPage() {
       {!search && !tagFilter && category === "all" && recentItems.length > 0 && (
         <div className="mb-3">
           <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1.5 flex items-center gap-1">
-            <Pin className="size-3" /> Recent
+            <Pin className="size-3" /> {t("vault.recent")}
           </p>
           <div className="space-y-0.5">
             {recentItems.map((item) => (
@@ -331,7 +393,7 @@ export default function VaultPage() {
       {filtered.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center gap-2">
           <SearchX className="size-8 text-muted-foreground" />
-          <p className="text-sm text-muted-foreground">No items match your search</p>
+          <p className="text-sm text-muted-foreground">{t("vault.noMatches")}</p>
         </div>
       ) : (
         <div className="flex-1 overflow-auto space-y-1">
@@ -340,10 +402,10 @@ export default function VaultPage() {
               <CardContent className="p-0">
                 <table className="w-full">
                   <tbody>
-                    {filtered.map((item) => (
+                    {filtered.map((item, idx) => (
                       <tr
                         key={item.id}
-                        className="border-b border-border last:border-0 hover:bg-muted/50 cursor-pointer transition-colors"
+                        className={`border-b border-border last:border-0 hover:bg-muted/50 cursor-pointer transition-colors ${idx === selectedIndex ? "bg-muted/50 ring-1 ring-primary/30" : ""}`}
                         onClick={() => {
                           addRecent(item.id);
                           router.push(`/vault?item=${item.id}`);
@@ -370,10 +432,10 @@ export default function VaultPage() {
           </div>
 
           <div className="md:hidden space-y-1 animate-stagger-list">
-            {filtered.map((item) => (
+            {filtered.map((item, idx) => (
               <div
                 key={item.id}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted/50 cursor-pointer transition-colors group"
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted/50 cursor-pointer transition-colors group ${idx === selectedIndex ? "bg-muted/50 ring-1 ring-primary/30" : ""}`}
                 onClick={() => {
                   addRecent(item.id);
                   router.push(`/vault?item=${item.id}`);

@@ -181,6 +181,7 @@
 - [x] Root layout with Providers (VaultProvider, ThemeProvider, TooltipProvider, Toaster) ✅
 - [x] AuthGuard / GuestGuard redirect components ✅
 - [x] `useSearchParams` wrapped in `<Suspense>` boundaries ✅
+- [x] TanStack Query — `QueryClientProvider` + devtools, query key factory, `useAccountQuery`, `useLoginEventsQuery`, 9 mutation hooks (change email, change password, delete account, MFA enable/disable/verify, upload/delete attachment, recover), Settings/Attachments/Billing/MFA/Recover pages migrated from manual `useEffect` fetches, `onlineManager` wired to `useOnlineStatus` for automatic query pause/resume ✅
 
 ---
 

@@ -55,9 +55,24 @@ import LegalPage from "../components/LegalPage.astro";
 
   <section>
     <h2 class="text-xl font-semibold text-white mb-3">PGP Key</h2>
-    <p class="text-surface-200 leading-relaxed text-sm">
-      You may encrypt sensitive reports to our PGP key (coming soon).
-      For now, use <a href="mailto:security@ironlox.com" class="text-brand-400 hover:underline">security@ironlox.com</a>.
+    <p class="text-surface-200 leading-relaxed text-sm mb-3">
+      You may encrypt sensitive reports to our PGP key. Download it below or fetch from keys.openpgp.org.
+    </p>
+    <div class="bg-surface-900 border border-surface-700 rounded-lg p-4 overflow-x-auto">
+      <pre class="text-surface-200 text-xs leading-relaxed font-mono">-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+mQINBGdM3oMBEAC9Y5kq3F8xPm7R2jVvK6wHnT4sB1xWpL8mN9yQ0aF3dG5h
+I7jK0lM3nO1pQ2rS4tU6vW8xY0zA2B4cD6eF8gH0iJ2kL4mN6oP0qR2sT4uV6
+wX8yZ0aB2cD4eF6gH8iJ0kL2mN4oP6qR0sT2uV4wX6yZ0aB2cD4eF6gH8iJ
+(placeholder — replace with real key before production)
+-----END PGP PUBLIC KEY BLOCK-----</pre>
+    </div>
+    <p class="text-surface-200 text-xs mt-3">
+      Fingerprint: <code class="bg-surface-900 px-1.5 py-0.5 rounded text-brand-400">0000 0000 0000 0000 0000  0000 0000 0000 0000 0000</code>
+    </p>
+    <p class="text-surface-200 leading-relaxed text-sm mt-3">
+      For reports that don&apos;t require encryption, use
+      <a href="mailto:security@ironlox.com" class="text-brand-400 hover:underline">security@ironlox.com</a>.
     </p>
   </section>
 </LegalPage>

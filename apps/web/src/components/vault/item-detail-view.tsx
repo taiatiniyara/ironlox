@@ -1,7 +1,8 @@
 "use client";
 
-import { memo } from "react";
+import { memo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "react-i18next";
 import { useVault } from "@/lib/vault-context";
 import { CopyButton } from "@/components/shared/copy-button";
 import { Button } from "@/components/ui/button";
@@ -9,10 +10,28 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { PasswordInput } from "@/components/vault/password-input";
 import { TotpDisplay } from "@/components/vault/totp-display";
 import { toast } from "sonner";
-import { Globe, CreditCard, FileText, User, Pencil, LinkIcon, Key } from "lucide-react";
+import {
+  Globe,
+  CreditCard,
+  FileText,
+  User,
+  Pencil,
+  LinkIcon,
+  Key,
+  ArrowLeft,
+  Trash2,
+} from "lucide-react";
 import type {
   VaultItem,
   LoginFields,
@@ -35,9 +54,35 @@ export const ItemDetailView = memo(function ItemDetailView({
   item: VaultItem;
   onBack: () => void;
 }) {
+  const { t } = useTranslation();
   const { removeItem } = useVault();
   const router = useRouter();
   const Icon = categoryIcons[item.type] ?? FileText;
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const typeLabels: Record<string, string> = {
+    login: t("vault.typeLogin"),
+    card: t("vault.typeCard"),
+    note: t("vault.typeNote"),
+    identity: t("vault.typeIdentity"),
+  };
+
+  async function handleDelete() {
+    setDeleting(true);
+    try {
+      await removeItem(item.id);
+      toast.success(t("vault.itemDeleted"), {
+        action: { label: t("common.undo"), onClick: () => onBack() },
+      });
+      setDeleteOpen(false);
+      onBack();
+    } catch {
+      toast.error(t("vault.deleteFailed"));
+    } finally {
+      setDeleting(false);
+    }
+  }
 
   return (
     <div className="max-w-lg mx-auto p-4 space-y-4">
@@ -48,13 +93,20 @@ export const ItemDetailView = memo(function ItemDetailView({
         <Icon className="size-5 text-muted-foreground shrink-0" />
         <div className="flex-1 min-w-0">
           <h1 className="text-lg font-semibold truncate">{item.name}</h1>
-          <Badge variant="secondary" className="text-[10px]">
-            {item.type}
-          </Badge>
+          <div className="flex items-center gap-1.5 mt-0.5">
+            <Badge variant="secondary" className="text-[10px]">
+              {typeLabels[item.type] ?? item.type}
+            </Badge>
+            {item.tags.map((tag) => (
+              <Badge key={tag} variant="outline" className="text-[10px]">
+                {tag}
+              </Badge>
+            ))}
+          </div>
         </div>
         <Button variant="outline" size="sm" onClick={() => router.push(`/vault?edit=${item.id}`)}>
           <Pencil className="size-3.5 mr-1" />
-          Edit
+          {t("common.edit")}
         </Button>
       </div>
 
@@ -91,29 +143,46 @@ export const ItemDetailView = memo(function ItemDetailView({
       )}
 
       <div className="flex items-center justify-between text-xs text-muted-foreground px-1">
-        <span>Created: {new Date(item.createdAt).toLocaleDateString()}</span>
-        <span>Updated: {new Date(item.updatedAt).toLocaleDateString()}</span>
+        <span>
+          {t("vault.createdLabel")} {new Date(item.createdAt).toLocaleDateString()}
+        </span>
+        <span>
+          {t("vault.updatedLabel")} {new Date(item.updatedAt).toLocaleDateString()}
+        </span>
       </div>
 
       <Button
         variant="ghost"
         size="sm"
         className="w-full text-destructive"
-        onClick={async () => {
-          await removeItem(item.id);
-          toast.success("Item deleted");
-          onBack();
-        }}
+        onClick={() => setDeleteOpen(true)}
       >
-        Delete Item
+        <Trash2 className="size-3.5 mr-1" />
+        {t("vault.deleteItem")}
       </Button>
+
+      <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("vault.deleteConfirmTitle", { name: item.name })}</DialogTitle>
+            <DialogDescription>{t("vault.deleteConfirmDesc")}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteOpen(false)}>
+              {t("common.cancel")}
+            </Button>
+            <Button variant="destructive" onClick={handleDelete} disabled={deleting}>
+              {deleting ? t("vault.deleting") : t("common.delete")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 });
 
-import { ArrowLeft } from "lucide-react";
-
 const LoginFieldsDetail = memo(function LoginFieldsDetail({ item }: { item: VaultItem }) {
+  const { t } = useTranslation();
   const f = item.fields as LoginFields;
   return (
     <div className="space-y-3">
@@ -121,7 +190,7 @@ const LoginFieldsDetail = memo(function LoginFieldsDetail({ item }: { item: Vaul
         <div className="space-y-1">
           <Label className="text-xs text-muted-foreground">
             <LinkIcon className="size-3 inline mr-1" />
-            Website
+            {t("vault.website")}
           </Label>
           <div className="space-y-1">
             {f.uris.map((uri, i) => (
@@ -139,16 +208,16 @@ const LoginFieldsDetail = memo(function LoginFieldsDetail({ item }: { item: Vaul
         </div>
       ) : null}
       <div className="space-y-1">
-        <Label className="text-xs text-muted-foreground">Username</Label>
+        <Label className="text-xs text-muted-foreground">{t("addItem.username")}</Label>
         <div className="flex items-center gap-2">
           <Input value={f.username} readOnly className="h-8 text-sm font-mono flex-1" />
-          <CopyButton value={f.username} label="Copy" />
+          <CopyButton value={f.username} label={t("vault.copy")} />
         </div>
       </div>
       <div className="space-y-1">
         <Label className="text-xs text-muted-foreground">
           <Key className="size-3 inline mr-1" />
-          Password
+          {t("addItem.password")}
         </Label>
         <div className="flex items-center gap-2">
           <PasswordInput value={f.password} readOnly />
@@ -157,7 +226,7 @@ const LoginFieldsDetail = memo(function LoginFieldsDetail({ item }: { item: Vaul
       </div>
       {f.totpSecret ? (
         <div className="space-y-1">
-          <Label className="text-xs text-muted-foreground">2FA Code</Label>
+          <Label className="text-xs text-muted-foreground">{t("vault.totpCode")}</Label>
           <TotpDisplay secret={f.totpSecret} />
         </div>
       ) : null}
@@ -169,19 +238,20 @@ const LoginFieldsDetail = memo(function LoginFieldsDetail({ item }: { item: Vaul
 });
 
 const CardFieldsDetail = memo(function CardFieldsDetail({ item }: { item: VaultItem }) {
+  const { t } = useTranslation();
   const f = item.fields as CardFields;
   return (
     <div className="space-y-3">
       {f.brand ? <Badge variant="outline">{f.brand}</Badge> : null}
       <div className="space-y-1">
-        <Label className="text-xs text-muted-foreground">Cardholder</Label>
+        <Label className="text-xs text-muted-foreground">{t("vault.cardholder")}</Label>
         <div className="flex items-center gap-2">
           <Input value={f.cardholder} readOnly className="h-8 text-sm flex-1" />
           <CopyButton value={f.cardholder} />
         </div>
       </div>
       <div className="space-y-1">
-        <Label className="text-xs text-muted-foreground">Card Number</Label>
+        <Label className="text-xs text-muted-foreground">{t("addItem.cardNumber")}</Label>
         <div className="flex items-center gap-2">
           <PasswordInput value={f.number} readOnly />
           <CopyButton value={f.number} />
@@ -189,7 +259,7 @@ const CardFieldsDetail = memo(function CardFieldsDetail({ item }: { item: VaultI
       </div>
       <div className="flex gap-4">
         <div className="flex-1 space-y-1">
-          <Label className="text-xs text-muted-foreground">Expiry</Label>
+          <Label className="text-xs text-muted-foreground">{t("vault.expiry")}</Label>
           <Input
             value={f.expiryMonth && f.expiryYear ? `${f.expiryMonth}/${f.expiryYear}` : ""}
             readOnly
@@ -197,7 +267,7 @@ const CardFieldsDetail = memo(function CardFieldsDetail({ item }: { item: VaultI
           />
         </div>
         <div className="flex-1 space-y-1">
-          <Label className="text-xs text-muted-foreground">CVV</Label>
+          <Label className="text-xs text-muted-foreground">{t("addItem.cvv")}</Label>
           <div className="flex items-center gap-2">
             <PasswordInput value={f.cvv} readOnly />
             <CopyButton value={f.cvv} />

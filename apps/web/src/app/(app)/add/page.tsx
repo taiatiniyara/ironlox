@@ -10,6 +10,7 @@ import { LoadingButton } from "@/components/shared/loading-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PasswordInput } from "@/components/vault/password-input";
@@ -17,6 +18,7 @@ import { PasswordGenerator } from "@/components/vault/password-generator";
 import { UriManager } from "@/components/vault/uri-manager";
 import { CustomFieldsEditor } from "@/components/vault/custom-fields-editor";
 import { toast } from "sonner";
+import { X } from "lucide-react";
 import type { VaultItem } from "@ironlox/schemas";
 
 type ItemType = "login" | "card" | "note" | "identity";
@@ -125,6 +127,8 @@ export default function AddPage() {
   const [customFields, setCustomFields] = useState<CustomField[]>(
     () => existingItem?.customFields ?? [],
   );
+  const [tags, setTags] = useState<string[]>(() => existingItem?.tags ?? []);
+  const [tagInput, setTagInput] = useState("");
   const [saving, setSaving] = useState(false);
   const [form, dispatch] = useReducer(formReducer, {
     ...emptyForm,
@@ -184,7 +188,7 @@ export default function AddPage() {
       id: existingItem?.id ?? crypto.randomUUID(),
       type,
       name: form.name,
-      tags: existingItem?.tags ?? [],
+      tags: tags,
       folderId: null,
       createdAt: existingItem?.createdAt ?? now,
       updatedAt: now,
@@ -360,6 +364,60 @@ export default function AddPage() {
                 onChange={(e) => setField("notes")(e.target.value)}
               />
             </FormField>
+
+            <div className="space-y-2">
+              <Label className="text-sm">Tags</Label>
+              {tags.length > 0 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {tags.map((tag) => (
+                    <Badge key={tag} variant="secondary" className="gap-1 pr-1">
+                      {tag}
+                      <button
+                        type="button"
+                        onClick={() => setTags((prev) => prev.filter((t) => t !== tag))}
+                        className="ml-0.5 hover:text-destructive"
+                      >
+                        <X className="size-3" />
+                      </button>
+                    </Badge>
+                  ))}
+                </div>
+              )}
+              <div className="flex gap-1">
+                <Input
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && tagInput.trim()) {
+                      e.preventDefault();
+                      const newTag = tagInput.trim().toLowerCase();
+                      if (!tags.includes(newTag)) {
+                        setTags((prev) => [...prev, newTag]);
+                      }
+                      setTagInput("");
+                    }
+                  }}
+                  placeholder="Add tag..."
+                  className="h-8 text-xs"
+                />
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  disabled={!tagInput.trim()}
+                  onClick={() => {
+                    const newTag = tagInput.trim().toLowerCase();
+                    if (newTag && !tags.includes(newTag)) {
+                      setTags((prev) => [...prev, newTag]);
+                    }
+                    setTagInput("");
+                  }}
+                  className="h-8 text-xs"
+                >
+                  Add
+                </Button>
+              </div>
+            </div>
 
             <CustomFieldsEditor fields={customFields} onChange={setCustomFields} />
 

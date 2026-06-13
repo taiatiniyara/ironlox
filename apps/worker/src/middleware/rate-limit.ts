@@ -2,36 +2,47 @@ import type { Context, Next } from "hono";
 import type { Env } from "../index.js";
 
 const RATE_LIMIT_WINDOW = 900; // 15 minutes in seconds
-const MAX_ATTEMPTS = 5;
+
+const DEFAULT_LIMITS = {
+  auth: 10,
+  account: 60,
+  vault: 60,
+} as const;
 
 /**
  * Rate limit middleware using Cloudflare KV.
- * Tracks request counts per IP and per email.
+ * Tracks request counts per IP and per path.
  */
-export async function rateLimitMiddleware(
-  c: Context<{ Bindings: Env }>,
-  next: Next,
-): Promise<void> {
-  const identifier = c.req.header("CF-Connecting-IP") ?? "unknown";
-  const key = `rate:${c.req.path}:${identifier}`;
+export function createRateLimitMiddleware(maxAttempts: number) {
+  return async function rateLimitMiddleware(
+    c: Context<{ Bindings: Env }>,
+    next: Next,
+  ): Promise<void> {
+    const identifier = c.req.header("CF-Connecting-IP") ?? "unknown";
+    const key = `rate:${c.req.path}:${identifier}`;
 
-  const current = await c.env.KV.get(key);
-  const count = current ? parseInt(current) : 0;
+    const current = await c.env.KV.get(key);
+    const count = current ? parseInt(current) : 0;
 
-  if (count >= MAX_ATTEMPTS) {
-    return c.json(
-      {
-        message: "Too many requests. Please retry later or complete the CAPTCHA.",
-        code: "RATE_LIMITED",
-        retryAfter: RATE_LIMIT_WINDOW,
-      },
-      429,
-    ) as unknown as void;
-  }
+    if (count >= maxAttempts) {
+      return c.json(
+        {
+          message: "Too many requests. Please retry later or complete the CAPTCHA.",
+          code: "RATE_LIMITED",
+          retryAfter: RATE_LIMIT_WINDOW,
+        },
+        429,
+      ) as unknown as void;
+    }
 
-  await c.env.KV.put(key, String(count + 1), { expirationTtl: RATE_LIMIT_WINDOW });
-  await next();
+    await c.env.KV.put(key, String(count + 1), { expirationTtl: RATE_LIMIT_WINDOW });
+    await next();
+  };
 }
+
+export const authRateLimit = createRateLimitMiddleware(DEFAULT_LIMITS.auth);
+export const accountRateLimit = createRateLimitMiddleware(DEFAULT_LIMITS.account);
+export const vaultRateLimit = createRateLimitMiddleware(DEFAULT_LIMITS.vault);
 
 /**
  * Verify Cloudflare Turnstile token.

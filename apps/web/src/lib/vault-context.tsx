@@ -36,6 +36,9 @@ const STORAGE_KEYS = {
   accessToken: "ironlox_access_token",
   refreshToken: "ironlox_refresh_token",
   email: "ironlox_email",
+  encryptionSalt: "ironlox_encryption_salt",
+  wrappedVaultKey: "ironlox_wrapped_vault_key",
+  vaultVersion: "ironlox_vault_version",
 } as const;
 
 async function fetchVaultBlob(client: ApiClient): Promise<string> {
@@ -101,10 +104,21 @@ export function VaultProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const persistSession = useCallback(
-    (accessToken: string, refreshToken: string, userEmail: string) => {
+    (
+      accessToken: string,
+      refreshToken: string,
+      userEmail: string,
+      encryptionSalt?: string,
+      wrappedVaultKey?: string,
+      vaultVersion?: number,
+    ) => {
       localStorage.setItem(STORAGE_KEYS.accessToken, accessToken);
       localStorage.setItem(STORAGE_KEYS.refreshToken, refreshToken);
       localStorage.setItem(STORAGE_KEYS.email, userEmail);
+      if (encryptionSalt) localStorage.setItem(STORAGE_KEYS.encryptionSalt, encryptionSalt);
+      if (wrappedVaultKey) localStorage.setItem(STORAGE_KEYS.wrappedVaultKey, wrappedVaultKey);
+      if (vaultVersion !== undefined)
+        localStorage.setItem(STORAGE_KEYS.vaultVersion, String(vaultVersion));
       apiClientRef.current?.setTokens(accessToken, refreshToken);
     },
     [],
@@ -114,6 +128,9 @@ export function VaultProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem(STORAGE_KEYS.accessToken);
     localStorage.removeItem(STORAGE_KEYS.refreshToken);
     localStorage.removeItem(STORAGE_KEYS.email);
+    localStorage.removeItem(STORAGE_KEYS.encryptionSalt);
+    localStorage.removeItem(STORAGE_KEYS.wrappedVaultKey);
+    localStorage.removeItem(STORAGE_KEYS.vaultVersion);
     apiClientRef.current?.clearTokens();
     vaultKeyRef.current = null;
     vaultVersionRef.current = 1;
@@ -188,7 +205,14 @@ export function VaultProvider({ children }: { children: ReactNode }) {
         return true;
       }
 
-      persistSession(loginResponse.accessToken, loginResponse.refreshToken, userEmail);
+      persistSession(
+        loginResponse.accessToken,
+        loginResponse.refreshToken,
+        userEmail,
+        loginResponse.encryptionSalt,
+        loginResponse.wrappedVaultKey,
+        loginResponse.vaultVersion,
+      );
       setEmail(userEmail);
       setIsAuthenticated(true);
 
@@ -240,7 +264,14 @@ export function VaultProvider({ children }: { children: ReactNode }) {
         wrappedVaultKey,
       });
 
-      persistSession(response.accessToken, response.refreshToken, userEmail);
+      persistSession(
+        response.accessToken,
+        response.refreshToken,
+        userEmail,
+        toHex(encryptionSalt),
+        wrappedVaultKey,
+        response.vaultVersion,
+      );
       setEmail(userEmail);
       setIsAuthenticated(true);
 
@@ -276,19 +307,37 @@ export function VaultProvider({ children }: { children: ReactNode }) {
       const client = apiClientRef.current;
       if (!client) throw new Error("Not authenticated");
 
-      setIsVaultLoaded(false);
-      try {
+      const storedSalt = localStorage.getItem(STORAGE_KEYS.encryptionSalt);
+      const storedWrappedKey = localStorage.getItem(STORAGE_KEYS.wrappedVaultKey);
+      const storedVersion = localStorage.getItem(STORAGE_KEYS.vaultVersion);
+
+      let encryptionSalt: string;
+      let wrappedVaultKey: string;
+      let remoteVersion: number;
+
+      if (storedSalt && storedWrappedKey && storedVersion) {
+        encryptionSalt = storedSalt;
+        wrappedVaultKey = storedWrappedKey;
+        remoteVersion = parseInt(storedVersion, 10);
+      } else {
         const account = await client.getAccount();
         if (!account.encryptionSalt || !account.wrappedVaultKey) {
           throw new Error("Account not fully initialized");
         }
-        const encryptionKey = await deriveEncryptionKey(
-          masterPassword,
-          hexToBytes(account.encryptionSalt),
-        );
-        const vaultKey = await unwrapVaultKey(account.wrappedVaultKey, encryptionKey);
+        encryptionSalt = account.encryptionSalt;
+        wrappedVaultKey = account.wrappedVaultKey;
+        remoteVersion = account.vaultVersion;
+        localStorage.setItem(STORAGE_KEYS.encryptionSalt, encryptionSalt);
+        localStorage.setItem(STORAGE_KEYS.wrappedVaultKey, wrappedVaultKey);
+        localStorage.setItem(STORAGE_KEYS.vaultVersion, String(remoteVersion));
+      }
+
+      setIsVaultLoaded(false);
+      try {
+        const encryptionKey = await deriveEncryptionKey(masterPassword, hexToBytes(encryptionSalt));
+        const vaultKey = await unwrapVaultKey(wrappedVaultKey, encryptionKey);
         vaultKeyRef.current = vaultKey;
-        vaultVersionRef.current = account.vaultVersion;
+        vaultVersionRef.current = remoteVersion;
 
         const blob = await client.getVaultBlob();
         if (!blob) {

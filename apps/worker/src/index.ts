@@ -10,7 +10,7 @@ import { mfaRoutes } from "./routes/mfa.js";
 import { errorHandler } from "./middleware/error.js";
 import { logger } from "./middleware/logger.js";
 import { securityHeaders } from "./middleware/security.js";
-import { rateLimitMiddleware } from "./middleware/rate-limit.js";
+import { authRateLimit, accountRateLimit, vaultRateLimit } from "./middleware/rate-limit.js";
 
 export type Env = {
   DB: D1Database;
@@ -44,9 +44,9 @@ app.use("*", cors({
 }));
 app.use("*", securityHeaders);
 app.use("*", logger);
-app.use("/auth/*", rateLimitMiddleware);
-app.use("/vault/*", rateLimitMiddleware);
-app.use("/account/*", rateLimitMiddleware);
+app.use("/auth/*", authRateLimit);
+app.use("/vault/*", vaultRateLimit);
+app.use("/account/*", accountRateLimit);
 app.onError(errorHandler);
 
 app.route("/health", healthRoute);

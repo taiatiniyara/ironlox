@@ -64,29 +64,42 @@ function AdminSidebar() {
   );
 }
 
+function AdminContent({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex h-screen">
+      <aside className="w-56 border-r border-border bg-card shrink-0 hidden md:flex flex-col">
+        <AdminSidebar />
+      </aside>
+      <main id="main-content" className="flex-1 overflow-auto">
+        <ErrorBoundary>
+          <Suspense
+            fallback={
+              <div className="flex flex-col h-full p-4 space-y-3">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Skeleton key={i} className="h-14 w-full animate-pulse" />
+                ))}
+              </div>
+            }
+          >
+            <div className="page-enter">{children}</div>
+          </Suspense>
+        </ErrorBoundary>
+      </main>
+    </div>
+  );
+}
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const isLoginPage = pathname === "/admin/login";
+
+  if (isLoginPage) {
+    return <>{children}</>;
+  }
+
   return (
     <AdminGuard>
-      <div className="flex h-screen">
-        <aside className="w-56 border-r border-border bg-card shrink-0 hidden md:flex flex-col">
-          <AdminSidebar />
-        </aside>
-        <main id="main-content" className="flex-1 overflow-auto">
-          <ErrorBoundary>
-            <Suspense
-              fallback={
-                <div className="flex flex-col h-full p-4 space-y-3">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Skeleton key={i} className="h-14 w-full animate-pulse" />
-                  ))}
-                </div>
-              }
-            >
-              <div className="page-enter">{children}</div>
-            </Suspense>
-          </ErrorBoundary>
-        </main>
-      </div>
+      <AdminContent>{children}</AdminContent>
     </AdminGuard>
   );
 }

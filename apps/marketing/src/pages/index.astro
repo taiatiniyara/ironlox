@@ -25,7 +25,7 @@ const faqSchema = {
       name: "What happens if I forget my master password?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Your master password is the only key to your vault. We cannot reset it and cannot recover your data without it. Write it down. Store it somewhere safe. Export your vault regularly as a backup.",
+        text: "Your master password is the only key to your vault. We cannot reset it and cannot recover your data without it. During signup you receive a recovery key — store it somewhere safe. Lost both? Your data is irretrievable by design.",
       },
     },
     {
@@ -57,7 +57,7 @@ const faqSchema = {
       name: "Does Ironlox work offline?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Yes. Your vault is cached locally on each device. You can access, edit, and use your passwords offline. Changes sync automatically when you reconnect.",
+        text: "Yes. Your vault is cached locally on each device. You can view and copy your passwords offline. Adding or editing items requires an internet connection to sync.",
       },
     },
     {
@@ -106,7 +106,7 @@ const faqSchema = {
             <img src="https://img.shields.io/github/stars/taiatiniyara/ironlox?style=social" alt="GitHub stars" class="h-5" loading="lazy" />
           </div>
         </div>
-        <p class="text-xs text-surface-700">iOS &amp; Android apps coming soon &middot; 30-day risk-free trial &middot; Cancel anytime</p>
+        <p class="text-xs text-surface-700">iOS &amp; Android apps coming soon &middot; Free forever &middot; No credit card required</p>
       </div>
 
       <!-- Product mockup -->
@@ -196,19 +196,19 @@ const faqSchema = {
           <FeatureCard title="End-to-End Encrypted" description="AES-256-GCM encryption locks your vault on your device. Your master password never leaves your browser. We couldn&rsquo;t read your data if we wanted to." delay={1}>
             <svg slot="icon" class="w-5 h-5 text-brand-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
           </FeatureCard>
-          <FeatureCard title="One-Click Autofill" description="Instantly fill usernames, passwords, credit cards, and TOTP codes on any site. Works on Chrome and Firefox. Saves you hundreds of keystrokes every day." delay={2}>
+          <FeatureCard title="One-Click Autofill" description="Fill usernames, passwords, credit cards, and TOTP codes on any site with the browser extension. Available for Chrome and Firefox. Saves you hundreds of keystrokes every day." delay={2}>
             <svg slot="icon" class="w-5 h-5 text-brand-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
           </FeatureCard>
           <FeatureCard title="Smart Generator" description="Create strong, unique passwords and passphrases with customizable rules. Length, symbols, numbers &mdash; generated locally on your device. Never reused. Never weak." delay={3}>
             <svg slot="icon" class="w-5 h-5 text-brand-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
           </FeatureCard>
-          <FeatureCard title="Cross-Device Sync" description="Your vault syncs seamlessly across all your devices. Add a login on your desktop, it appears instantly on your phone. Your cards, notes, and files are always with you. Always encrypted." delay={4}>
+          <FeatureCard title="Cross-Device Sync" description="Your vault syncs across your devices. Add a login on your desktop and access it on your laptop. Cards, notes, and files stay with you. Always encrypted." delay={4}>
             <svg slot="icon" class="w-5 h-5 text-brand-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
           </FeatureCard>
-          <FeatureCard title="Vault Health Reports" description="Scan your vault for weak, reused, and breached passwords. Get actionable recommendations. Premium feature with automatic breach monitoring." delay={5}>
+          <FeatureCard title="Vault Health Reports" description="Scan your vault for weak, reused, and breached passwords (HIBP k-anonymity). Get actionable recommendations. Premium feature." delay={5}>
             <svg slot="icon" class="w-5 h-5 text-brand-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
           </FeatureCard>
-          <FeatureCard title="More Than Passwords" description="Store credit cards, secure notes, identities, file attachments, and TOTP codes. One vault for all your sensitive digital life." delay={6}>
+          <FeatureCard title="More Than Passwords" description="Store credit cards, secure notes, and identities. Premium users also get file attachments (2 GB) and TOTP 2FA authenticator codes built in." delay={6}>
             <svg slot="icon" class="w-5 h-5 text-brand-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
           </FeatureCard>
         </div>
@@ -253,20 +253,20 @@ const faqSchema = {
       <div class="max-w-5xl mx-auto">
         <div class="text-center mb-14 reveal">
           <h2 class="text-3xl sm:text-4xl font-bold text-white mb-4">Built for people who care about privacy</h2>
-          <p class="text-surface-200">Join thousands of developers, security engineers, and privacy-conscious individuals.</p>
+          <p class="text-surface-200">Built for developers, security engineers, and privacy-conscious individuals who want verifiable security.</p>
         </div>
         <div class="grid md:grid-cols-3 gap-8 mb-14">
           <TestimonialCard
-            quote="Finally, a password manager where I can actually read the encryption code. As a security engineer, Ironlox gives me what 1Password never could: verifiable trust."
-            name="Sarah K." role="Security Engineer" initials="SK" delay={1}
+            quote="Ironlox is fully open source &mdash; client, server, and crypto library. You can audit every line of the encryption code yourself. No black boxes, no trust-us vibes."
+            name="Verifiable trust" role="Feature highlight" initials="OS" delay={1}
           />
           <TestimonialCard
-            quote="Switched from LastPass after the breaches. Ironlox is zero-knowledge done right. The import took 30 seconds and I had my 400+ passwords migrated."
-            name="Marcus R." role="Full-Stack Developer" initials="MR" initialsColor="green" delay={2}
+            quote="Zero-knowledge architecture: your vault is encrypted with AES-256-GCM on your device before anything reaches our servers. Even we can&rsquo;t read your data."
+            name="Zero-knowledge" role="Feature highlight" initials="ZK" initialsColor="green" delay={2}
           />
           <TestimonialCard
-            quote="I&rsquo;m not technical, but I needed something I could trust after my bank account got hacked. Ironlox makes security simple without being condescending. The autofill just works."
-            name="Lisa P." role="Graphic Designer" initials="LP" initialsColor="purple" delay={3}
+            quote="Import your passwords from 1Password, Bitwarden, LastPass, or Chrome in under a minute. Export as CSV or JSON. No lock-in. Your data is yours."
+            name="Data portability" role="Feature highlight" initials="DP" initialsColor="purple" delay={3}
           />
         </div>
         <div class="flex flex-wrap items-center justify-center gap-x-12 gap-y-6 text-center">
@@ -319,7 +319,7 @@ const faqSchema = {
                   <CheckIcon /> <span>Every line of crypto code is open source &mdash; audit it yourself.</span>
                 </li>
                 <li class="flex items-start gap-3 text-sm text-surface-200">
-                  <CheckIcon /> <span>Export your data anytime &mdash; CSV, JSON, encrypted backup. No lock-in. Leave in 60 seconds.</span>
+                  <CheckIcon /> <span>Export your vault (CSV, JSON) &mdash; Premium feature. No lock-in.</span>
                 </li>
               </ul>
             </div>
@@ -357,7 +357,7 @@ const faqSchema = {
           </div>
           <div class="flex items-center gap-2 text-sm text-surface-200">
             <svg class="w-5 h-5 text-brand-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            <span>GDPR &amp; CCPA ready</span>
+            <span>Zero third-party data sharing</span>
           </div>
         </div>
       </div>
@@ -472,8 +472,9 @@ const faqSchema = {
             <ul class="space-y-3 mb-8 flex-1">
               <li class="flex items-center gap-3 text-sm text-surface-200"><CheckIcon /> Unlimited passwords</li>
               <li class="flex items-center gap-3 text-sm text-surface-200"><CheckIcon /> Unlimited devices</li>
-              <li class="flex items-center gap-3 text-sm text-surface-200"><CheckIcon /> Autofill (Chrome + Firefox)</li>
+              <li class="flex items-center gap-3 text-sm text-surface-200"><CheckIcon /> Autofill (Chrome + Firefox, beta)</li>
               <li class="flex items-center gap-3 text-sm text-surface-200"><CheckIcon /> Password generator</li>
+              <li class="flex items-center gap-3 text-sm text-surface-200"><CheckIcon /> Import from other managers</li>
             </ul>
             <CtaButton variant="outline">Get started free</CtaButton>
           </div>
@@ -489,17 +490,16 @@ const faqSchema = {
               <li class="flex items-center gap-3 text-sm text-surface-200"><CheckIcon /> Everything in Free</li>
               <li class="flex items-center gap-3 text-sm text-surface-200"><CheckIcon /> TOTP 2FA authenticator codes</li>
               <li class="flex items-center gap-3 text-sm text-surface-200"><CheckIcon /> Tags &amp; custom fields</li>
-              <li class="flex items-center gap-3 text-sm text-surface-200"><CheckIcon /> Vault export (CSV, JSON, encrypted)</li>
+              <li class="flex items-center gap-3 text-sm text-surface-200"><CheckIcon /> Vault export (CSV, JSON)</li>
               <li class="flex items-center gap-3 text-sm text-surface-200"><CheckIcon /> File attachments (2 GB)</li>
               <li class="flex items-center gap-3 text-sm text-surface-200"><CheckIcon /> Vault health &amp; breach reports</li>
-              <li class="flex items-center gap-3 text-sm text-surface-200"><CheckIcon /> Priority support</li>
             </ul>
             <a href="https://app.ironlox.com" class="block text-center w-full py-3 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-semibold transition-colors text-sm">
               Upgrade to Premium
             </a>
           </div>
         </div>
-        <p class="text-center text-xs text-surface-700 mt-6">30-day money-back guarantee. Cancel anytime. No questions asked.</p>
+        <p class="text-center text-xs text-surface-700 mt-6">Premium: 30-day money-back guarantee. Cancel anytime.</p>
       </div>
     </section>
 
@@ -510,11 +510,11 @@ const faqSchema = {
           <h2 class="text-3xl sm:text-4xl font-bold text-white mb-4">Frequently asked questions</h2>
         </div>
         <div class="space-y-4">
-          <FaqItem question="What happens if I forget my master password?" answer="Your master password is the only key to your vault. We cannot reset it and cannot recover your data without it. Write it down. Store it somewhere safe. Export your vault regularly as a backup." delay={1} />
+          <FaqItem question="What happens if I forget my master password?" answer="Your master password is the only key to your vault. We cannot reset it and cannot recover your data without it. During signup you receive a recovery key &mdash; store it somewhere safe. Lost both? Your data is irretrievable by design." delay={1} />
           <FaqItem question="Can Ironlox see any of my data?" answer="No. Your vault is encrypted on your device with your master password. We receive only an encrypted blob. Even with full database access, your data is mathematically unreadable without your password." delay={2} />
           <FaqItem question="Is Ironlox really open source?" answer="Yes. Every line of code &mdash; the client apps, the encryption library, the server &mdash; is public on GitHub. You can read it, audit it, and build it yourself. Trust through transparency." delay={3} />
           <FaqItem question="How do I switch from another password manager?" answer="Export your data from your current manager as CSV, then import into Ironlox. We support formats from 1Password, Bitwarden, LastPass, Dashlane, and others. The import takes under a minute." delay={4} />
-          <FaqItem question="Does Ironlox work offline?" answer="Yes. Your vault is cached locally on each device. You can access, edit, and use your passwords offline. Changes sync automatically when you reconnect." delay={5} />
+          <FaqItem question="Does Ironlox work offline?" answer="Yes. Your vault is cached locally on each device. You can view and copy your passwords offline. Adding or editing items requires an internet connection to sync." delay={5} />
           <FaqItem question="How do you make money if the free tier is so generous?" answer="We charge for Premium features ($4/mo monthly or $3/mo annually). We never sell your data, show ads, or track you. Our business model is simple: you pay for extra features, and we keep your data private. Always." delay={6} />
         </div>
       </div>
@@ -530,7 +530,7 @@ const faqSchema = {
         <CtaButton size="lg" class="reveal reveal-delay-2">
           Create your free account <ArrowRight />
         </CtaButton>
-        <p class="text-[11px] text-surface-700 mt-4">Works on Chrome and Firefox. iOS &amp; Android coming soon.</p>
+        <p class="text-[11px] text-surface-700 mt-4">Web app accessible anywhere. Chrome &amp; Firefox extensions coming soon. iOS &amp; Android planned.</p>
       </div>
     </section>
 
@@ -542,7 +542,7 @@ const faqSchema = {
           <p class="text-surface-200">We&rsquo;re shipping fast. Here&rsquo;s the roadmap.</p>
         </div>
         <div class="space-y-6">
-          <RoadmapItem title="Chrome &amp; Firefox extensions" status="done" description="Autofill, password generator, and vault access from your browser toolbar." delay={1} />
+          <RoadmapItem title="Chrome &amp; Firefox extensions" status="in-progress" description="Autofill, password generator, and vault access from your browser toolbar. Coming to stores soon." delay={1} />
           <RoadmapItem title="Web app dashboard" status="done" description="Full vault management, import/export, health reports, billing, and account settings." delay={2} />
           <RoadmapItem title="iOS &amp; Android apps" status="planned" description="Native mobile apps with biometric unlock, autofill, and offline access." delay={3} />
           <RoadmapItem title="Desktop app (macOS, Windows, Linux)" status="planned" description="Standalone desktop app with system tray integration and biometric unlock." delay={4} />

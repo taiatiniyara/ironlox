@@ -1,12 +1,29 @@
 ---
-import LegalPage from "../components/LegalPage.astro";
+import Layout from "../layouts/Layout.astro";
+import NavBar from "../components/NavBar.astro";
 ---
 
-<LegalPage title="Blog — Ironlox" canonicalURL="https://ironlox.com/blog">
-  <section class="mb-10">
-    <h2 class="text-xl font-semibold text-white mb-3">Blog</h2>
-    <p class="text-surface-200 leading-relaxed text-sm">
-      Articles on password security, encryption, and product updates coming soon.
-    </p>
-  </section>
-</LegalPage>
+<Layout>
+  <NavBar />
+  <main id="main-content" class="min-h-screen pt-24 pb-16 px-6">
+    <div class="max-w-3xl mx-auto">
+      <h1 class="text-3xl font-bold text-white mb-2">Blog</h1>
+      <p class="text-surface-200 mb-10 text-sm leading-relaxed">
+        Articles on password security, encryption, zero-knowledge architecture, and Ironlox product updates.
+      </p>
+      <div class="rounded-2xl border border-white/6 bg-surface-850/50 p-10 text-center">
+        <svg class="w-12 h-12 text-surface-700 mx-auto mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        <h2 class="text-lg font-semibold text-white mb-2">No posts yet</h2>
+        <p class="text-sm text-surface-200">
+          We're focused on shipping the product right now. Blog content covering our encryption model,
+          password best practices, and migration guides is coming.
+        </p>
+        <p class="text-xs text-surface-700 mt-4">
+          Follow
+          <a href="https://github.com/taiatiniyara/ironlox" class="text-brand-400 hover:underline">GitHub</a>
+          for the latest updates.
+        </p>
+      </div>
+    </div>
+  </main>
+</Layout>

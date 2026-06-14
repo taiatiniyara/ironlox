@@ -2,7 +2,7 @@
 
 > **Status key**: ✅ complete &nbsp; 🔶 partial / stub &nbsp; ❌ not started
 >
-> **Overall**: Foundation (Phase 0) done. Core Backend (Phase 1) done except passkey WebAuthn endpoints (501 stubs). MFA enable/verify and recovery key login are live. MFA login flow is complete (server returns `mfaRequired` flag, client redirects to `/mfa`, verify + complete login). **Super Admin Portal** complete — 11 API endpoints, 6 web app pages, admin audit log, feature flag management via KV. **Web app (Phase 2) complete** — 16 static pages + 6 admin pages, 21 shadcn/ui components, full vault CRUD with server sync + conflict resolution, premium tier gating (TOTP, vault health, custom fields, tags, export, 2GB attachments), Stripe Checkout + Customer Portal billing, security dashboard with HIBP k-anonymity, import/export with template, file attachments, onboarding + demo vault, i18n, 7 unit tests, 12 E2E + axe-core tests. CSP hardened with `_headers` for Cloudflare Pages. Vault upload protocol aligned (blob sent directly in PUT body, no broken two-step flow). Password visibility fixed in read-only mode. Card/CVV show/hide toggles added. Sync failure toasts added. `useSearchParams` Suspense boundaries added. Hook rules violation fixed. Error handler now handles Hono HTTPException + logs 500s. Fonts now loaded via Google Fonts import. Logo SVGs used in sidebar, auth pages, loading states, favicon. Light mode fixed (custom theme tokens moved to :root/.dark). Muted text contrast improved. Dialog overlay opacity fixed. Page titles set per route. Vault search/toolbar made sticky. **Extension (Phase 3) ~90%** — real auth, vault sync with IndexedDB + conflict resolution, autofill with TOTP + inline dropdown suggestions, add/edit/delete for all 4 item types, keyboard shortcuts (Ctrl+Shift+L/C/U/K), PIN unlock, context menu, 5 recents, 55 domain rules. **Marketing site (Phase 4)** content-complete. **Infrastructure**: Husky pre-commit hooks with lint-staged, 7 worker API integration tests, CSP/security headers configured for production.
+> **Overall**: Foundation (Phase 0) done. Core Backend (Phase 1) done except passkey WebAuthn endpoints (501 stubs). MFA enable/verify and recovery key login are live. MFA login flow is complete (server returns `mfaRequired` flag, client redirects to `/mfa`, verify + complete login). **Super Admin Portal** complete — 11 API endpoints, 6 web app pages, admin audit log, feature flag management via KV. **Web app (Phase 2) complete** — 16 static pages + 6 admin pages, 21 shadcn/ui components, full vault CRUD with server sync + conflict resolution, premium tier gating (TOTP, vault health, custom fields, tags, export, 2GB attachments), Stripe Checkout + Customer Portal billing, security dashboard with HIBP k-anonymity, import/export with template, file attachments, onboarding + demo vault, i18n, 7 unit tests, 12 E2E + axe-core tests. CSP hardened with `_headers` for Cloudflare Pages. Vault upload protocol aligned (blob sent directly in PUT body, no broken two-step flow). Password visibility fixed in read-only mode. Card/CVV show/hide toggles added. Sync failure toasts added. `useSearchParams` Suspense boundaries added. Hook rules violation fixed. Error handler now handles Hono HTTPException + logs 500s. Fonts now loaded via Google Fonts import. Logo SVGs used in sidebar, auth pages, loading states, favicon. Light mode fixed (custom theme tokens moved to :root/.dark). Muted text contrast improved. Dialog overlay opacity fixed. Page titles set per route. Vault search/toolbar made sticky. **Extension (Phase 3) ~90%** — real auth, vault sync with IndexedDB + conflict resolution, autofill with TOTP + inline dropdown suggestions, add/edit/delete for all 4 item types, keyboard shortcuts (/ for search, Escape to dismiss), PIN unlock, context menu, 5 recents, 55 domain rules. **Marketing site (Phase 4)** content-complete. **Infrastructure**: Husky pre-commit hooks with lint-staged, 7 worker API integration tests, CSP/security headers configured for production.
 
 ---
 
@@ -226,10 +226,10 @@
 ### Popup UI
 - [x] Locked state: master password or PIN entry ✅
 - [x] Vault list: search + category filter ✅ (search only, no filters)
-- [ ] 5 recents pinned at top ❌
+- [x] 5 recents pinned at top ✅
 - [x] Item detail: view, copy username/password/TOTP ✅
-- [ ] Edit item ❌
-- [x] Add item 🔶 (basic form)
+- [x] Edit item ✅
+- [x] Add item ✅
 - [x] Password generator (inline popover) ✅
 - [x] Settings panel (lightweight) 🔶
 
@@ -252,17 +252,18 @@
 
 ### Keyboard Shortcuts
 - [ ] `Ctrl+Shift+L`: open popup / autofill ❌
-- [ ] `/`: focus search ❌
+- [x] `/`: focus search ✅
+- [x] `Escape`: dismiss item / navigate back ✅
 - [ ] `Ctrl+Shift+C`: copy password ❌
 - [ ] `Ctrl+Shift+U`: copy username ❌
 - [ ] `Ctrl+Shift+K`: lock vault ❌
 
 ### Clipboard & Locking
 - [x] Copy to clipboard ✅
-- [ ] Auto-clear countdown (60s default, configurable) ❌
+- [x] Auto-clear countdown (60s default, configurable) ✅
 - [ ] Auto-lock on browser close ❌
 - [ ] Idle timeout (5 min default) ❌
-- [ ] PIN re-unlock (4-6 digits) ❌
+- [x] PIN re-unlock (4-6 digits) ✅
 
 ---
 
@@ -273,15 +274,15 @@
 - [x] Home page — 14-section landing: hero, features grid, how it works, social proof, security deep dive, audit & trust, comparison table, pricing toggle, FAQ, roadmap, CTA + footer ✅
 - [x] Features grid — inline on home page (6 cards + comparison table + trust bar + security deep dive) 🔶
 - [x] Pricing — inline on home page with monthly/annual toggle ✅
-- [ ] Blog ❌
-- [ ] Docs/Knowledge Base ❌
-- [ ] Download (Chrome + Firefox extension links) ❌
+- [ ] Blog ❌ (stub page with "coming soon")
+- [ ] Docs/Knowledge Base ❌ (stub page with "coming soon")
+- [x] Download page — Chrome + Firefox links (pending store listing), source build instructions ✅
 - [x] SEO — meta tags, Open Graph, Twitter Cards, sitemap.xml, robots.txt, structured data (Organization, SoftwareApplication, FAQPage, BreadcrumbList) ✅
 - [x] `security.txt` at `.well-known/security.txt` — RFC 9116 compliant ✅
 - [x] Privacy policy — 7 sections, dark theme, breadcrumb schema ✅
 - [x] Terms of Service — 9 sections, dark theme, breadcrumb schema ✅
 - [x] Security policy — 5 sections (vulnerability disclosure, infrastructure security, supply chain) ✅
-- [ ] Migration guides: 1Password, Bitwarden, LastPass, Chrome ❌
+- [x] Migration guides: 1Password, Bitwarden, LastPass, Chrome ✅
 
 ### Design & Quality
 - [x] Dark theme with brand color palette (Plus Jakarta Sans font) ✅

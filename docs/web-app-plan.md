@@ -1,5 +1,13 @@
 # Ironlox Web App — Phase 2 Improvement Plan
 
+> **Status: COMPLETE (June 2026)**
+> 
+> This document was the implementation plan for Phase 2 of the web app. All tasks below have been completed. The web app now has 22 pages (16 user + 6 admin), 21 shadcn/ui components, TanStack Query for server state, full vault CRUD with server sync, Stripe billing, import/export, file attachments, onboarding, i18n, and admin portal. See `docs/roadmap.md` for current status and `docs/product-spec.md` for the living specification.
+>
+> Keep this document for historical reference — it documents the architecture decisions made during Phase 2.
+
+---
+
 > **Goal**: Transform the single-file prototype into a production-ready Next.js dashboard at `app.ironlox.com`.
 >
 > **Current state**: Single `page.tsx` (~500 lines). No routing, no shadcn/ui, no server sync, api client lifecycle broken, i18n unused, settings non-functional.
@@ -431,26 +439,26 @@ Ordered by dependency: foundational → core → premium → polish.
 
 ## 9. Success Criteria (Phase 2 Complete)
 
-- [ ] All routes listed in §1.1 exist and render
-- [ ] shadcn/ui is the component library; no raw `button`/`input`/`select` elements
-- [ ] All strings use i18next `t()` — zero hardcoded English strings
-- [ ] ApiClient is shared via context, tokens persist in localStorage, refresh works
-- [ ] Vault syncs to server: login → fetch → decrypt → display; mutation → encrypt → upload
-- [ ] Login, signup, MFA verify, recovery key login all functional
-- [ ] Onboarding flow: welcome (3-option) + recovery key mandatory save
-- [ ] Vault list: Fuse.js search, category filter, sort, empty state
-- [ ] Item detail: masked/unmasked fields, copy with countdown, TOTP display
-- [ ] Add/Edit item: all 4 types, password generator, custom fields, URI enforcement
-- [ ] Security dashboard: breach check, reuse, weakness, aging, 2FA audit (premium)
-- [ ] Settings: email change, password change, MFA, recovery key, preferences, delete account
-- [ ] Import CSV with field mapping, export CSV/JSON
-- [ ] File attachment upload/download/delete with quota display
-- [ ] Light/dark theme toggle
-- [ ] Loading states (skeletons) and empty states on every data view
-- [ ] Sonner toasts for success/error/info on every action
-- [ ] Responsive: cards on mobile (<768px), table on desktop (>1024px)
-- [ ] Keyboard navigable (Tab, Enter, Escape)
-- [ ] axe-core accessibility audit passes with zero critical violations
-- [ ] Component tests for critical components
-- [ ] E2E: signup → add password → sync → search → export flow
-- [ ] No secrets in client bundle
+- [x] All routes listed in §1.1 exist and render
+- [x] shadcn/ui is the component library; no raw `button`/`input`/`select` elements
+- [x] All strings use i18next `t()` — zero hardcoded English strings
+- [x] ApiClient is shared via context, tokens persist in localStorage, refresh works
+- [x] Vault syncs to server: login → fetch → decrypt → display; mutation → encrypt → upload
+- [x] Login, signup, MFA verify, recovery key login all functional
+- [x] Onboarding flow: welcome (3-option) + recovery key mandatory save
+- [x] Vault list: Fuse.js search, category filter, sort, empty state
+- [x] Item detail: masked/unmasked fields, copy with countdown, TOTP display
+- [x] Add/Edit item: all 4 types, password generator, custom fields, URI enforcement
+- [x] Security dashboard: breach check, reuse, weakness, aging, 2FA audit (premium)
+- [x] Settings: email change, password change, MFA, recovery key, preferences, delete account
+- [x] Import CSV with field mapping, export CSV/JSON
+- [x] File attachment upload/download/delete with quota display
+- [x] Light/dark theme toggle
+- [x] Loading states (skeletons) and empty states on every data view
+- [x] Sonner toasts for success/error/info on every action
+- [x] Responsive: cards on mobile (<768px), table on desktop (>1024px)
+- [x] Keyboard navigable (Tab, Enter, Escape)
+- [x] axe-core accessibility audit passes with zero critical violations
+- [x] Component tests for critical components
+- [x] E2E: signup → add password → sync → search → export flow
+- [x] No secrets in client bundle

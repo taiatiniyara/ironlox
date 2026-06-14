@@ -1,21 +1,75 @@
 ---
-import LegalPage from "../components/LegalPage.astro";
+import Layout from "../layouts/Layout.astro";
+import NavBar from "../components/NavBar.astro";
 ---
 
-<LegalPage title="Migration Guides — Ironlox" canonicalURL="https://ironlox.com/migration-guides">
-  <section class="mb-10">
-    <h2 class="text-xl font-semibold text-white mb-3">Migration Guides</h2>
-    <p class="text-surface-200 leading-relaxed text-sm mb-3">
-      Step-by-step guides for migrating your passwords from other managers.
-    </p>
-    <ul class="text-surface-200 mt-3 space-y-2.5 text-sm list-disc list-inside leading-relaxed">
-      <li>Migrating from 1Password — export as CSV, then use the Import page.</li>
-      <li>Migrating from Bitwarden — export as CSV, then use the Import page.</li>
-      <li>Migrating from LastPass — export as CSV, then use the Import page.</li>
-      <li>Migrating from Chrome Password Manager — export as CSV, then use the Import page.</li>
-    </ul>
-    <p class="text-surface-200 leading-relaxed text-sm mt-3">
-      Detailed guides with screenshots coming soon.
-    </p>
-  </section>
-</LegalPage>
+<Layout>
+  <NavBar />
+  <main id="main-content" class="min-h-screen pt-24 pb-16 px-6">
+    <div class="max-w-3xl mx-auto">
+      <h1 class="text-3xl font-bold text-white mb-2">Migration Guides</h1>
+      <p class="text-surface-200 mb-10 text-sm leading-relaxed">
+        Step-by-step instructions to migrate your passwords from other password managers to Ironlox.
+        All guides follow the same pattern: export as CSV from your current manager, then use the Ironlox Import page.
+      </p>
+
+      <div class="space-y-6">
+        <div class="rounded-xl border border-white/6 bg-surface-850/50 p-6">
+          <h2 class="text-lg font-semibold text-white mb-2">1Password &rarr; Ironlox</h2>
+          <ol class="text-surface-200 text-sm space-y-1.5 list-decimal list-inside leading-relaxed">
+            <li>Open 1Password and select the vault you want to export.</li>
+            <li>Go to File &rarr; Export &rarr; All Items.</li>
+            <li>Choose CSV format and save the file to your computer.</li>
+            <li>Open the Ironlox web app at <a href="https://app.ironlox.com/import" class="text-brand-400 hover:underline">app.ironlox.com/import</a>.</li>
+            <li>Upload the CSV file and map the fields to Ironlox item types.</li>
+            <li>Review the import preview and confirm.</li>
+          </ol>
+        </div>
+
+        <div class="rounded-xl border border-white/6 bg-surface-850/50 p-6">
+          <h2 class="text-lg font-semibold text-white mb-2">Bitwarden &rarr; Ironlox</h2>
+          <ol class="text-surface-200 text-sm space-y-1.5 list-decimal list-inside leading-relaxed">
+            <li>Open the Bitwarden web vault or desktop app.</li>
+            <li>Go to Tools &rarr; Export Vault.</li>
+            <li>Select CSV format, enter your master password, and download.</li>
+            <li>Open the Ironlox web app at <a href="https://app.ironlox.com/import" class="text-brand-400 hover:underline">app.ironlox.com/import</a>.</li>
+            <li>Upload the CSV file and map the fields.</li>
+            <li>Confirm the import to add items to your Ironlox vault.</li>
+          </ol>
+        </div>
+
+        <div class="rounded-xl border border-white/6 bg-surface-850/50 p-6">
+          <h2 class="text-lg font-semibold text-white mb-2">LastPass &rarr; Ironlox</h2>
+          <ol class="text-surface-200 text-sm space-y-1.5 list-decimal list-inside leading-relaxed">
+            <li>Log into LastPass and go to Advanced Options &rarr; Export.</li>
+            <li>Choose CSV format. LastPass will email you the export link.</li>
+            <li>Download the CSV file from the email link.</li>
+            <li>Open the Ironlox web app at <a href="https://app.ironlox.com/import" class="text-brand-400 hover:underline">app.ironlox.com/import</a>.</li>
+            <li>Upload the CSV file and map the fields.</li>
+            <li>Confirm the import. All items will be encrypted locally before syncing.</li>
+          </ol>
+        </div>
+
+        <div class="rounded-xl border border-white/6 bg-surface-850/50 p-6">
+          <h2 class="text-lg font-semibold text-white mb-2">Chrome Password Manager &rarr; Ironlox</h2>
+          <ol class="text-surface-200 text-sm space-y-1.5 list-decimal list-inside leading-relaxed">
+            <li>Open Chrome and go to Settings &rarr; Passwords &rarr; three-dot menu &rarr; Export passwords.</li>
+            <li>Save the CSV file to your computer.</li>
+            <li>Open the Ironlox web app at <a href="https://app.ironlox.com/import" class="text-brand-400 hover:underline">app.ironlox.com/import</a>.</li>
+            <li>Upload the CSV file and map the fields.</li>
+            <li>Confirm the import.</li>
+            <li><strong>Recommended:</strong> After verifying your passwords in Ironlox, delete them from Chrome Password Manager.</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="mt-10 rounded-2xl border border-brand-500/10 bg-brand-500/5 p-6 text-center">
+        <p class="text-sm text-surface-200">
+          <strong class="text-white">Data never touches our servers unencrypted.</strong>
+          All imported passwords are encrypted on your device with AES-256-GCM before being uploaded.
+          We cannot see, read, or access your imported data.
+        </p>
+      </div>
+    </div>
+  </main>
+</Layout>

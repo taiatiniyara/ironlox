@@ -1,13 +1,79 @@
 ---
-import LegalPage from "../components/LegalPage.astro";
+import Layout from "../layouts/Layout.astro";
+import NavBar from "../components/NavBar.astro";
 ---
 
-<LegalPage title="Download — Ironlox" canonicalURL="https://ironlox.com/download">
-  <section class="mb-10">
-    <h2 class="text-xl font-semibold text-white mb-3">Download Ironlox</h2>
-    <p class="text-surface-200 leading-relaxed text-sm mb-3">
-      Browser extensions and mobile apps coming soon. For now, use the web app at
-      <a href="https://app.ironlox.com" class="text-brand-400 hover:underline">app.ironlox.com</a>.
-    </p>
-  </section>
-</LegalPage>
+<Layout>
+  <NavBar />
+  <main id="main-content" class="min-h-screen pt-24 pb-16 px-6">
+    <div class="max-w-3xl mx-auto">
+      <h1 class="text-3xl font-bold text-white mb-2">Download Ironlox</h1>
+      <p class="text-surface-200 mb-10 text-sm leading-relaxed">
+        Ironlox is available on the web and as a browser extension. Mobile and desktop apps are coming soon.
+      </p>
+
+      <section class="mb-10">
+        <h2 class="text-xl font-semibold text-white mb-4">Web App</h2>
+        <p class="text-surface-200 text-sm mb-3">
+          The full Ironlox dashboard is available at
+          <a href="https://app.ironlox.com" class="text-brand-400 hover:underline font-medium">app.ironlox.com</a>.
+          Manage your vault, run security reports, import/export, manage billing, and more &mdash; all from your browser.
+        </p>
+        <a href="https://app.ironlox.com" class="inline-block mt-3 px-6 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-semibold text-sm transition-colors">
+          Open Web App &rarr;
+        </a>
+      </section>
+
+      <section class="mb-10">
+        <h2 class="text-xl font-semibold text-white mb-4">Browser Extensions</h2>
+        <p class="text-surface-200 text-sm mb-4">
+          Autofill passwords, generate strong credentials, and access your vault directly from your browser toolbar.
+        </p>
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div class="rounded-xl border border-white/6 bg-surface-850/50 p-6">
+            <div class="flex items-center gap-3 mb-3">
+              <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#4285F4"/><circle cx="12" cy="12" r="5" fill="#fff"/><path d="M12 7v5l3 1.5" stroke="#4285F4" stroke-width="1.5"/></svg>
+              <h3 class="text-sm font-semibold text-white">Chrome</h3>
+            </div>
+            <p class="text-xs text-surface-200 mb-4">Available on the Chrome Web Store. Also works on Edge, Brave, and Arc.</p>
+            <span class="inline-block px-3 py-1.5 rounded-lg border border-brand-500/30 bg-brand-500/10 text-brand-300 text-xs font-medium">
+              Coming to Chrome Web Store soon
+            </span>
+          </div>
+          <div class="rounded-xl border border-white/6 bg-surface-850/50 p-6">
+            <div class="flex items-center gap-3 mb-3">
+              <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#FF6611"/><path d="M12 5v5l3.5 2" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/><path d="M12 10l-3.5 2" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>
+              <h3 class="text-sm font-semibold text-white">Firefox</h3>
+            </div>
+            <p class="text-xs text-surface-200 mb-4">Available on Firefox Add-ons. Built with Manifest V3 for both browsers.</p>
+            <span class="inline-block px-3 py-1.5 rounded-lg border border-brand-500/30 bg-brand-500/10 text-brand-300 text-xs font-medium">
+              Coming to Firefox Add-ons soon
+            </span>
+          </div>
+        </div>
+      </section>
+
+      <section class="mb-10">
+        <h2 class="text-xl font-semibold text-white mb-4">Source Code</h2>
+        <p class="text-surface-200 text-sm mb-3">
+          Ironlox is 100% open source. You can build the extension yourself from source:
+        </p>
+        <div class="bg-surface-900 border border-surface-700 rounded-lg p-4 font-mono text-xs text-surface-200">
+          git clone https://github.com/taiatiniyara/ironlox<br/>
+          cd ironlox<br/>
+          pnpm install<br/>
+          pnpm run build --filter=@ironlox/extension
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-xl font-semibold text-white mb-4">Mobile Apps</h2>
+        <p class="text-surface-200 text-sm">
+          iOS and Android apps are planned for a future release. For now, the web app at
+          <a href="https://app.ironlox.com" class="text-brand-400 hover:underline">app.ironlox.com</a>
+          is fully responsive and works on mobile browsers.
+        </p>
+      </section>
+    </div>
+  </main>
+</Layout>

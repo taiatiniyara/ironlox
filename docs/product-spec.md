@@ -158,7 +158,7 @@ interface IdentityFields {
 
 - TOTP (authenticator app) + recovery codes.
 - Recovery codes are mandatory. Stored as SHA-256 hashes in D1.
-- No SMS. WebAuthn/Passkey supported as additional MFA option (v1).
+- No SMS. WebAuthn/Passkey support in v2 (501 stubs in v1).
 - Passkey gates server-side auth only — vault decryption still requires master password.
 
 ### 6.4 Brute-Force Protection
@@ -410,9 +410,11 @@ Premium-tier feature. All client-side computation.
 | Add/Edit item | Full form |
 | Security dashboard | Vault health reports |
 | Settings | Account, security, preferences, billing |
+| Billing | Stripe Checkout + Customer Portal integration |
 | Import/Export | CSV/JSON import and export |
 | File attachments | Attachment manager (premium) |
 | Recovery key | View/regenerate recovery key |
+| Admin dashboard | User management, stats, audit log, feature flags |
 
 ### 18.5 Accessibility
 
@@ -523,8 +525,9 @@ Premium-tier feature. All client-side computation.
 | Framework | Hono + Hono RPC |
 | Database | Cloudflare D1 (SQLite-compatible) |
 | Blob storage | Cloudflare R2 |
-| KV store | Cloudflare Workers KV (rate limits, sessions) |
+| KV store | Cloudflare Workers KV (rate limits, feature flags) |
 | Auth | JWT + opaque refresh tokens |
+| State management | TanStack Query (server state), React context (auth/vault) |
 | Package manager | pnpm + Turborepo monorepo |
 
 ### 22.2 Monorepo Structure
@@ -566,8 +569,9 @@ ironlox/
 | POST   | /auth/mfa/webauthn/register | JWT | Register passkey as MFA |
 | POST   | /auth/mfa/webauthn/verify   | No  | Verify passkey during login |
 | POST   | /auth/recover          | No  | Recovery key login |
-| GET    | /vault                 | JWT | Get vault (R2 blob URL + version) |
-| PUT    | /vault                 | JWT | Upload new vault blob |
+| GET    | /vault                 | JWT | Get vault (R2 signed URL + version) |
+| GET    | /vault/blob            | JWT | Get raw encrypted vault blob content |
+| PUT    | /vault                 | JWT | Upload new vault blob (optimistic locking) |
 | GET    | /vault/attachment/:id  | JWT | Get attachment (R2 blob URL) |
 | PUT    | /vault/attachment/:id  | JWT | Upload attachment |
 | DELETE | /vault/attachment/:id  | JWT | Delete attachment |
@@ -575,6 +579,8 @@ ironlox/
 | DELETE | /account               | JWT | Initiate account deletion |
 | POST   | /account/undelete      | No  | Cancel deletion (grace period) |
 | PUT    | /account/password      | JWT | Change master password (re-wrap key) |
+| POST   | /billing/checkout      | JWT | Create Stripe Checkout session |
+| POST   | /billing/portal        | JWT | Create Stripe Customer Portal session |
 | POST   | /admin/login           | Admin JWT | Admin authentication with shared secret |
 | GET    | /admin/stats           | Admin JWT | Aggregate system statistics |
 | GET    | /admin/users           | Admin JWT | Paginated user list |
@@ -802,6 +808,7 @@ Each guide: export instructions + CSV field mapping table + import walkthrough.
 - Minimum permissions: `storage`, `activeTab`, `clipboardWrite`, `host_permissions: ["<all_urls>"]`.
 - Open source link in store listings.
 - Beta: "unlisted" on Chrome, self-distributed signed `.xpi` on Firefox.
+- Build artifacts generated for both Chrome and Firefox via CI (`ironlox-chrome.zip`, `ironlox-firefox.zip`).
 - Submit 1-2 weeks before launch (3-5 day review Chrome, 1-3 day Firefox).
 
 ## 44. Security Event Log (User-Visible)
@@ -929,7 +936,7 @@ Sync model (12) → Offline support (12.3) → Read-only cache
 Recovery key (5.2) → Account lifecycle (19)
 Email (30) → MailChannels delivery
 Payments (31) → Stripe webhooks → D1 subscription state
-CI/CD (32) → GitHub Actions → CLoudflare Pages + Workers deploy
+CI/CD (32) → GitHub Actions → Cloudflare Pages + Workers deploy
 Feature flags (42) → KV kill switches + D1 tier + Env vars config
 ```
 

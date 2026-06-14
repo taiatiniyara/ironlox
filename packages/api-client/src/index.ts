@@ -197,6 +197,16 @@ export class ApiClient {
     return this.put("/account/password", body);
   }
 
+  // --- Billing ---
+
+  async createCheckoutSession(cycle: "monthly" | "annual" = "annual"): Promise<{ url: string }> {
+    return this.post("/billing/checkout", { cycle });
+  }
+
+  async createPortalSession(): Promise<{ url: string }> {
+    return this.post("/billing/portal", {});
+  }
+
   // --- HTTP helpers ---
 
   private async get<T>(path: string): Promise<T> {

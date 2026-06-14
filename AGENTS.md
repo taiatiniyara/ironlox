@@ -8,7 +8,7 @@ Ironlox is a zero-knowledge consumer password manager. Users store passwords, cr
 
 **Monorepo**: Turborepo + pnpm workspaces. Apps: `apps/worker`, `apps/web`, `apps/extension`, `apps/marketing`. Packages: `packages/crypto`, `packages/schemas`, `packages/autofill`, `packages/api-client`, `packages/tsconfig`.
 
-**Current state**: Phase 0 (Foundation) done. Phase 1 (Core Backend) done except MFA/recovery endpoints (501 stubs). Phase 2 (Web App) complete — 16 static pages, shadcn/ui, full vault CRUD with server sync, Fuse.js search, security dashboard with HIBP, import/export, file attachments, i18n (EN). Phase 3 (Extension) ~85% — real auth, vault sync, autofill with TOTP, add/edit/delete items, keyboard shortcuts, clipboard auto-clear, PIN unlock, context menu, 5 recents, conflict resolution. Phase 4 (Marketing) content-complete. See `docs/roadmap.md` for per-item status.
+**Current state**: Phase 0 (Foundation) done. Phase 1 (Core Backend) done except MFA/recovery endpoints (501 stubs). Phase 2 (Web App) complete — 16 static pages, shadcn/ui, full vault CRUD with server sync, Fuse.js search, premium tier gating (TOTP, vault health, custom fields, tags, export, 2GB attachments), Stripe Checkout + Customer Portal billing, security dashboard with HIBP, import/export, file attachments, i18n (EN). Phase 3 (Extension) ~85% — real auth, vault sync, autofill with TOTP, add/edit/delete items, keyboard shortcuts, clipboard auto-clear, PIN unlock, context menu, 5 recents, conflict resolution. Phase 4 (Marketing) content-complete. See `docs/roadmap.md` for per-item status.
 
 **Key docs**: `docs/product-spec.md` (full spec), `docs/roadmap.md` (phased plan).
 

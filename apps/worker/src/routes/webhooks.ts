@@ -75,12 +75,16 @@ app.post("/stripe", async (c) => {
   switch (event.type) {
     case "checkout.session.completed": {
       const session = event.data.object;
-      const customerId = session.customer;
+      const customerId = session.customer as string;
+      const subscriptionId = session.subscription as string | undefined;
+      const userId = session.metadata?.user_id as string | undefined;
+
+      if (!userId) break;
 
       await c.env.DB.prepare(
-        "UPDATE users SET tier = 'premium', stripe_customer_id = ?, updated_at = ? WHERE stripe_customer_id = ? OR id = ?",
+        "UPDATE users SET tier = 'premium', stripe_customer_id = ?, stripe_subscription_id = ?, subscription_status = 'active', updated_at = ? WHERE id = ?",
       )
-        .bind(customerId, new Date().toISOString(), customerId, customerId)
+        .bind(customerId, subscriptionId ?? null, new Date().toISOString(), userId)
         .run();
 
       break;
@@ -89,11 +93,12 @@ app.post("/stripe", async (c) => {
     case "customer.subscription.updated": {
       const obj = event.data.object;
       const customerId = obj.customer as string;
+      const subId = obj.id as string | undefined;
 
       await c.env.DB.prepare(
-        "UPDATE users SET subscription_status = ?, updated_at = ? WHERE stripe_customer_id = ?",
+        "UPDATE users SET stripe_subscription_id = COALESCE(?, stripe_subscription_id), subscription_status = ?, updated_at = ? WHERE stripe_customer_id = ?",
       )
-        .bind((obj.status as string) ?? "active", new Date().toISOString(), customerId)
+        .bind(subId ?? null, (obj.status as string) ?? "active", new Date().toISOString(), customerId)
         .run();
 
       break;

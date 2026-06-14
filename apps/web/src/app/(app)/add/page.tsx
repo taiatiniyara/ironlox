@@ -3,6 +3,7 @@
 import { useReducer, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useVault } from "@/lib/vault-context";
+import { usePremium } from "@/hooks/use-premium";
 import { usePageTitle } from "@/lib/utils";
 import { PageHeader } from "@/components/shared/page-header";
 import { FormField } from "@/components/shared/form-field";
@@ -18,7 +19,7 @@ import { PasswordGenerator } from "@/components/vault/password-generator";
 import { UriManager } from "@/components/vault/uri-manager";
 import { CustomFieldsEditor } from "@/components/vault/custom-fields-editor";
 import { toast } from "sonner";
-import { X } from "lucide-react";
+import { X, Crown } from "lucide-react";
 import type { VaultItem } from "@ironlox/schemas";
 
 type ItemType = "login" | "card" | "note" | "identity";
@@ -112,6 +113,7 @@ function fieldsFromExisting(item: VaultItem): Partial<FormState> {
 export default function AddPage() {
   usePageTitle("Add Item");
   const { addItem, updateItem, vault } = useVault();
+  const { isPremium } = usePremium();
   const router = useRouter();
   const searchParams = useSearchParams();
   const editId = searchParams.get("edit");
@@ -365,61 +367,75 @@ export default function AddPage() {
               />
             </FormField>
 
-            <div className="space-y-2">
-              <Label className="text-sm">Tags</Label>
-              {tags.length > 0 && (
-                <div className="flex flex-wrap gap-1.5">
-                  {tags.map((tag) => (
-                    <Badge key={tag} variant="secondary" className="gap-1 pr-1">
-                      {tag}
-                      <button
-                        type="button"
-                        onClick={() => setTags((prev) => prev.filter((t) => t !== tag))}
-                        className="ml-0.5 hover:text-destructive"
-                      >
-                        <X className="size-3" />
-                      </button>
-                    </Badge>
-                  ))}
-                </div>
-              )}
-              <div className="flex gap-1">
-                <Input
-                  value={tagInput}
-                  onChange={(e) => setTagInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && tagInput.trim()) {
-                      e.preventDefault();
+            {isPremium ? (
+              <div className="space-y-2">
+                <Label className="text-sm">Tags</Label>
+                {tags.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5">
+                    {tags.map((tag) => (
+                      <Badge key={tag} variant="secondary" className="gap-1 pr-1">
+                        {tag}
+                        <button
+                          type="button"
+                          onClick={() => setTags((prev) => prev.filter((t) => t !== tag))}
+                          className="ml-0.5 hover:text-destructive"
+                        >
+                          <X className="size-3" />
+                        </button>
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+                <div className="flex gap-1">
+                  <Input
+                    value={tagInput}
+                    onChange={(e) => setTagInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && tagInput.trim()) {
+                        e.preventDefault();
+                        const newTag = tagInput.trim().toLowerCase();
+                        if (!tags.includes(newTag)) {
+                          setTags((prev) => [...prev, newTag]);
+                        }
+                        setTagInput("");
+                      }
+                    }}
+                    placeholder="Add tag..."
+                    className="h-8 text-xs"
+                  />
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    disabled={!tagInput.trim()}
+                    onClick={() => {
                       const newTag = tagInput.trim().toLowerCase();
-                      if (!tags.includes(newTag)) {
+                      if (newTag && !tags.includes(newTag)) {
                         setTags((prev) => [...prev, newTag]);
                       }
                       setTagInput("");
-                    }
-                  }}
-                  placeholder="Add tag..."
-                  className="h-8 text-xs"
-                />
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  disabled={!tagInput.trim()}
-                  onClick={() => {
-                    const newTag = tagInput.trim().toLowerCase();
-                    if (newTag && !tags.includes(newTag)) {
-                      setTags((prev) => [...prev, newTag]);
-                    }
-                    setTagInput("");
-                  }}
-                  className="h-8 text-xs"
-                >
-                  Add
-                </Button>
+                    }}
+                    className="h-8 text-xs"
+                  >
+                    Add
+                  </Button>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="rounded-lg border border-yellow-500/50 bg-yellow-500/5 p-3 text-center space-y-2">
+                <Crown className="size-4 text-yellow-500 mx-auto" />
+                <p className="text-xs text-muted-foreground">Tags are a Premium feature</p>
+              </div>
+            )}
 
-            <CustomFieldsEditor fields={customFields} onChange={setCustomFields} />
+            {isPremium ? (
+              <CustomFieldsEditor fields={customFields} onChange={setCustomFields} />
+            ) : (
+              <div className="rounded-lg border border-yellow-500/50 bg-yellow-500/5 p-3 text-center space-y-2">
+                <Crown className="size-4 text-yellow-500 mx-auto" />
+                <p className="text-xs text-muted-foreground">Custom fields are a Premium feature</p>
+              </div>
+            )}
 
             <div className="flex gap-2">
               <Button

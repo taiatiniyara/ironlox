@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import { useVault } from "@/lib/vault-context";
 import { CopyButton } from "@/components/shared/copy-button";
+import { usePremium } from "@/hooks/use-premium";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -31,6 +32,7 @@ import {
   Key,
   ArrowLeft,
   Trash2,
+  Crown,
 } from "lucide-react";
 import type {
   VaultItem,
@@ -56,6 +58,7 @@ export const ItemDetailView = memo(function ItemDetailView({
 }) {
   const { t } = useTranslation();
   const { removeItem } = useVault();
+  const { isPremium } = usePremium();
   const router = useRouter();
   const Icon = categoryIcons[item.type] ?? FileText;
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -97,11 +100,12 @@ export const ItemDetailView = memo(function ItemDetailView({
             <Badge variant="secondary" className="text-[10px]">
               {typeLabels[item.type] ?? item.type}
             </Badge>
-            {item.tags.map((tag) => (
-              <Badge key={tag} variant="outline" className="text-[10px]">
-                {tag}
-              </Badge>
-            ))}
+            {isPremium &&
+              item.tags.map((tag) => (
+                <Badge key={tag} variant="outline" className="text-[10px]">
+                  {tag}
+                </Badge>
+              ))}
           </div>
         </div>
         <Button variant="outline" size="sm" onClick={() => router.push(`/vault?edit=${item.id}`)}>
@@ -121,7 +125,7 @@ export const ItemDetailView = memo(function ItemDetailView({
         </CardContent>
       </Card>
 
-      {item.customFields && item.customFields.length > 0 && (
+      {isPremium && item.customFields && item.customFields.length > 0 && (
         <Card>
           <CardContent className="space-y-2 pt-4">
             {item.customFields.map((f, i) => (
@@ -183,6 +187,8 @@ export const ItemDetailView = memo(function ItemDetailView({
 
 const LoginFieldsDetail = memo(function LoginFieldsDetail({ item }: { item: VaultItem }) {
   const { t } = useTranslation();
+  const router = useRouter();
+  const { isPremium, isLoading: premiumLoading } = usePremium();
   const f = item.fields as LoginFields;
   return (
     <div className="space-y-3">
@@ -224,11 +230,27 @@ const LoginFieldsDetail = memo(function LoginFieldsDetail({ item }: { item: Vaul
           <CopyButton value={f.password} />
         </div>
       </div>
-      {f.totpSecret ? (
-        <div className="space-y-1">
-          <Label className="text-xs text-muted-foreground">{t("vault.totpCode")}</Label>
-          <TotpDisplay secret={f.totpSecret} />
-        </div>
+      {f.totpSecret && !premiumLoading ? (
+        isPremium ? (
+          <div className="space-y-1">
+            <Label className="text-xs text-muted-foreground">{t("vault.totpCode")}</Label>
+            <TotpDisplay secret={f.totpSecret} />
+          </div>
+        ) : (
+          <div className="rounded-lg border border-yellow-500 bg-yellow-500/5 p-3 text-center space-y-2">
+            <Crown className="size-4 text-yellow-500 mx-auto" />
+            <p className="text-xs text-muted-foreground">TOTP 2FA is a Premium feature</p>
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1"
+              onClick={() => router.push("/settings/billing")}
+            >
+              <Crown className="size-3" />
+              Upgrade
+            </Button>
+          </div>
+        )
       ) : null}
       {f.notes ? (
         <p className="text-sm text-muted-foreground whitespace-pre-wrap">{f.notes}</p>

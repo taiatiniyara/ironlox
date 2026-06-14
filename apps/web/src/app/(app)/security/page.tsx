@@ -3,10 +3,12 @@
 import { useMemo, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useVault } from "@/lib/vault-context";
+import { usePremium } from "@/hooks/use-premium";
 import { usePageTitle } from "@/lib/utils";
 import { EmptyState } from "@/components/shared/empty-state";
 import { LoadingButton } from "@/components/shared/loading-button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -17,7 +19,9 @@ import {
   CheckCircle2,
   Key,
   Clock,
+  Crown,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 interface LoginItem {
@@ -57,7 +61,9 @@ async function checkHibp(password: string): Promise<number> {
 export default function SecurityPage() {
   const { t } = useTranslation();
   usePageTitle(t("security.title"));
+  const router = useRouter();
   const { vault } = useVault();
+  const { isPremium, isLoading: premiumLoading } = usePremium();
   const [hibpRunning, setHibpRunning] = useState(false);
   const [hibpResults, setHibpResults] = useState<Array<{ name: string; count: number }>>([]);
   const [hibpDone, setHibpDone] = useState(false);
@@ -147,138 +153,162 @@ export default function SecurityPage() {
   return (
     <div className="max-w-lg mx-auto p-4 space-y-4">
       <h1 className="text-xl font-semibold">{t("security.title")}</h1>
-      <Card>
-        <CardContent className="pt-6">
-          <div className="flex items-center gap-4 mb-4">
-            <div
-              className={`rounded-full p-3 ${score >= 80 ? "bg-green-500/10" : score >= 50 ? "bg-yellow-500/10" : "bg-red-500/10"}`}
-            >
-              {score >= 80 ? (
-                <ShieldCheck className="size-6 text-green-500" />
-              ) : score >= 50 ? (
-                <ShieldAlert className="size-6 text-yellow-500" />
-              ) : (
-                <ShieldX className="size-6 text-red-500" />
-              )}
-            </div>
+
+      {!premiumLoading && !isPremium && (
+        <Card className="border-yellow-500 bg-yellow-500/5">
+          <CardContent className="pt-6 text-center space-y-3">
+            <Crown className="size-8 text-yellow-500 mx-auto" />
             <div>
-              <p className="text-2xl font-bold">{score}%</p>
-              <p className="text-xs text-muted-foreground">{t("security.vaultHealth")}</p>
+              <p className="text-sm font-medium">Vault Health is a Premium feature</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Upgrade to Premium to unlock breach monitoring, password health reports, and 2FA
+                audit.
+              </p>
             </div>
-          </div>
-          <Progress value={score} />
-          <p className="text-xs text-muted-foreground mt-2">
-            {t("security.basedOn", {
-              count: logins.length,
-              itemText: logins.length === 1 ? "item" : "items",
-            })}
-          </p>
-        </CardContent>
-      </Card>
-
-      {weak.length > 0 && (
-        <IssueCard
-          icon={AlertTriangle}
-          color="yellow"
-          title={t("security.weakPasswords")}
-          count={weak.length}
-          items={weak.map(
-            (l) => `${l.name} (${t("security.chars", { count: l.password.length })})`,
-          )}
-          andMoreText={
-            weak.length > 5 ? t("security.andMore", { count: weak.length - 5 }) : undefined
-          }
-        />
-      )}
-      {reused.length > 0 && (
-        <IssueCard
-          icon={Key}
-          color="red"
-          title={t("security.reusedPasswords")}
-          count={reused.length}
-          items={reused.map((l) => l.name)}
-          andMoreText={
-            reused.length > 5 ? t("security.andMore", { count: reused.length - 5 }) : undefined
-          }
-        />
-      )}
-      {old.length > 0 && (
-        <IssueCard
-          icon={Clock}
-          color="yellow"
-          title={t("security.agingPasswords")}
-          count={old.length}
-          items={old.map((l) => `${l.name} (${t("security.agingDesc")})`)}
-          andMoreText={
-            old.length > 5 ? t("security.andMore", { count: old.length - 5 }) : undefined
-          }
-        />
-      )}
-      {missing2fa.length > 0 && (
-        <IssueCard
-          icon={ShieldAlert}
-          color="yellow"
-          title={t("security.missing2fa")}
-          count={missing2fa.length}
-          items={missing2fa.map((l) => l.name)}
-          andMoreText={
-            missing2fa.length > 5
-              ? t("security.andMore", { count: missing2fa.length - 5 })
-              : undefined
-          }
-        />
-      )}
-      {hibpResults.length > 0 && (
-        <IssueCard
-          icon={AlertTriangle}
-          color="red"
-          title={t("security.foundInBreaches")}
-          count={hibpResults.length}
-          items={hibpResults.map(
-            (r) => `${r.name} (${r.count.toLocaleString()} ${t("security.times")})`,
-          )}
-          andMoreText={
-            hibpResults.length > 5
-              ? t("security.andMore", { count: hibpResults.length - 5 })
-              : undefined
-          }
-        />
-      )}
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-sm flex items-center gap-2">
-            <AlertTriangle className="size-4 text-yellow-500" />
-            {t("security.breachCheck")}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-xs text-muted-foreground mb-2">{t("security.breachDesc")}</p>
-          {hibpDone && hibpResults.length === 0 && (
-            <p className="text-xs text-green-600 mb-2">{t("security.allSafe")}</p>
-          )}
-          <LoadingButton
-            variant="outline"
-            size="sm"
-            className="w-full"
-            onClick={runHibpCheck}
-            loading={hibpRunning}
-            loadingText={t("security.checking")}
-          >
-            {hibpDone ? t("security.rerunCheck") : t("security.runCheck")}
-          </LoadingButton>
-        </CardContent>
-      </Card>
-
-      {issues === 0 && hibpDone && (
-        <Card>
-          <CardContent className="py-6 text-center">
-            <CheckCircle2 className="size-10 text-green-500 mx-auto mb-3" />
-            <p className="text-sm font-medium">{t("security.allGreat")}</p>
-            <p className="text-xs text-muted-foreground">{t("security.allGreatDesc")}</p>
+            <Button className="gap-2" onClick={() => router.push("/settings/billing")}>
+              <Crown className="size-4" />
+              Upgrade to Premium
+            </Button>
           </CardContent>
         </Card>
       )}
+
+      {isPremium ? (
+        <>
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-4 mb-4">
+                <div
+                  className={`rounded-full p-3 ${score >= 80 ? "bg-green-500/10" : score >= 50 ? "bg-yellow-500/10" : "bg-red-500/10"}`}
+                >
+                  {score >= 80 ? (
+                    <ShieldCheck className="size-6 text-green-500" />
+                  ) : score >= 50 ? (
+                    <ShieldAlert className="size-6 text-yellow-500" />
+                  ) : (
+                    <ShieldX className="size-6 text-red-500" />
+                  )}
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">{score}%</p>
+                  <p className="text-xs text-muted-foreground">{t("security.vaultHealth")}</p>
+                </div>
+              </div>
+              <Progress value={score} />
+              <p className="text-xs text-muted-foreground mt-2">
+                {t("security.basedOn", {
+                  count: logins.length,
+                  itemText: logins.length === 1 ? "item" : "items",
+                })}
+              </p>
+            </CardContent>
+          </Card>
+
+          {weak.length > 0 && (
+            <IssueCard
+              icon={AlertTriangle}
+              color="yellow"
+              title={t("security.weakPasswords")}
+              count={weak.length}
+              items={weak.map(
+                (l) => `${l.name} (${t("security.chars", { count: l.password.length })})`,
+              )}
+              andMoreText={
+                weak.length > 5 ? t("security.andMore", { count: weak.length - 5 }) : undefined
+              }
+            />
+          )}
+          {reused.length > 0 && (
+            <IssueCard
+              icon={Key}
+              color="red"
+              title={t("security.reusedPasswords")}
+              count={reused.length}
+              items={reused.map((l) => l.name)}
+              andMoreText={
+                reused.length > 5 ? t("security.andMore", { count: reused.length - 5 }) : undefined
+              }
+            />
+          )}
+          {old.length > 0 && (
+            <IssueCard
+              icon={Clock}
+              color="yellow"
+              title={t("security.agingPasswords")}
+              count={old.length}
+              items={old.map((l) => `${l.name} (${t("security.agingDesc")})`)}
+              andMoreText={
+                old.length > 5 ? t("security.andMore", { count: old.length - 5 }) : undefined
+              }
+            />
+          )}
+          {missing2fa.length > 0 && (
+            <IssueCard
+              icon={ShieldAlert}
+              color="yellow"
+              title={t("security.missing2fa")}
+              count={missing2fa.length}
+              items={missing2fa.map((l) => l.name)}
+              andMoreText={
+                missing2fa.length > 5
+                  ? t("security.andMore", { count: missing2fa.length - 5 })
+                  : undefined
+              }
+            />
+          )}
+          {hibpResults.length > 0 && (
+            <IssueCard
+              icon={AlertTriangle}
+              color="red"
+              title={t("security.foundInBreaches")}
+              count={hibpResults.length}
+              items={hibpResults.map(
+                (r) => `${r.name} (${r.count.toLocaleString()} ${t("security.times")})`,
+              )}
+              andMoreText={
+                hibpResults.length > 5
+                  ? t("security.andMore", { count: hibpResults.length - 5 })
+                  : undefined
+              }
+            />
+          )}
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-sm flex items-center gap-2">
+                <AlertTriangle className="size-4 text-yellow-500" />
+                {t("security.breachCheck")}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-xs text-muted-foreground mb-2">{t("security.breachDesc")}</p>
+              {hibpDone && hibpResults.length === 0 && (
+                <p className="text-xs text-green-600 mb-2">{t("security.allSafe")}</p>
+              )}
+              <LoadingButton
+                variant="outline"
+                size="sm"
+                className="w-full"
+                onClick={runHibpCheck}
+                loading={hibpRunning}
+                loadingText={t("security.checking")}
+              >
+                {hibpDone ? t("security.rerunCheck") : t("security.runCheck")}
+              </LoadingButton>
+            </CardContent>
+          </Card>
+
+          {issues === 0 && hibpDone && (
+            <Card>
+              <CardContent className="py-6 text-center">
+                <CheckCircle2 className="size-10 text-green-500 mx-auto mb-3" />
+                <p className="text-sm font-medium">{t("security.allGreat")}</p>
+                <p className="text-xs text-muted-foreground">{t("security.allGreatDesc")}</p>
+              </CardContent>
+            </Card>
+          )}
+        </>
+      ) : null}
     </div>
   );
 }

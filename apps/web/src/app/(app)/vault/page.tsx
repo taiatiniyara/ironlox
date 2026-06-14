@@ -4,6 +4,7 @@ import { useState, useMemo, memo, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useVault } from "@/lib/vault-context";
+import { usePremium } from "@/hooks/use-premium";
 import { useDebounce, usePageTitle } from "@/lib/utils";
 import { EmptyState } from "@/components/shared/empty-state";
 import { LoadingButton } from "@/components/shared/loading-button";
@@ -29,6 +30,7 @@ import {
   Pin,
   SearchX,
   Key,
+  Crown,
 } from "lucide-react";
 import Fuse from "fuse.js";
 import type { VaultItem, LoginFields } from "@ironlox/schemas";
@@ -81,6 +83,7 @@ export default function VaultPage() {
   usePageTitle("Vault");
   const { t } = useTranslation();
   const { vault, isAuthenticated, unlockVault } = useVault();
+  const { isPremium } = usePremium();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [search, setSearch] = useState("");
@@ -350,7 +353,7 @@ export default function VaultPage() {
             </Badge>
           ))}
         </div>
-        {allTags.length > 0 && (
+        {isPremium && allTags.length > 0 && (
           <div className="flex gap-1.5 overflow-x-auto pb-1">
             {allTags.map((tag) => (
               <Badge
@@ -362,6 +365,14 @@ export default function VaultPage() {
                 {tag}
               </Badge>
             ))}
+          </div>
+        )}
+        {!isPremium && allTags.length > 0 && (
+          <div className="flex items-center gap-1">
+            <Badge variant="outline" className="text-[10px] opacity-50">
+              <Crown className="size-3 mr-0.5" />
+              Tags
+            </Badge>
           </div>
         )}
       </div>

@@ -11,7 +11,7 @@ import {
 import type { Vault, VaultItem } from "@ironlox/schemas";
 import { vaultSync } from "./sync";
 import logoUrl from "data-url:~assets/logo.svg";
-import "~style.css";
+import "./style.css";
 
 // ── App shell — owns only auth, vault, and view routing ──
 

@@ -72,6 +72,9 @@ importers:
       '@ironlox/tsconfig':
         specifier: workspace:*
         version: link:../../packages/tsconfig
+      '@parcel/transformer-inline-string':
+        specifier: ^2.9.3
+        version: 2.9.3(@parcel/core@2.9.3)
       '@types/chrome':
         specifier: ^0.1.43
         version: 0.1.43

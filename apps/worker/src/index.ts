@@ -8,6 +8,7 @@ import { healthRoute } from "./routes/health.js";
 import { webhookRoutes } from "./routes/webhooks.js";
 import { mfaRoutes } from "./routes/mfa.js";
 import { adminRoutes } from "./routes/admin.js";
+import { billingRoutes } from "./routes/billing.js";
 import { errorHandler } from "./middleware/error.js";
 import { logger } from "./middleware/logger.js";
 import { securityHeaders } from "./middleware/security.js";
@@ -21,6 +22,8 @@ export type Env = {
   ADMIN_SECRET: string;
   TURNSTILE_SECRET_KEY: string;
   STRIPE_SECRET_KEY: string;
+  STRIPE_PRICE_MONTHLY: string;
+  STRIPE_PRICE_ANNUAL: string;
   STRIPE_WEBHOOK_SECRET: string;
   MAILCHANNELS_API_KEY: string;
   SENTRY_DSN: string;
@@ -58,5 +61,6 @@ app.route("/vault", vaultRoutes);
 app.route("/account", accountRoutes);
 app.route("/webhooks", webhookRoutes);
 app.route("/admin", adminRoutes);
+app.route("/billing", billingRoutes);
 
 export default app;

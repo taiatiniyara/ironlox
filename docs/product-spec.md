@@ -189,10 +189,19 @@ interface IdentityFields {
 
 ### 7.2 Tags
 
+- Premium-tier feature.
 - Free-form tags for cross-category organization.
 - Multiple tags per item.
+- Tag filtering on vault list view.
 
-### 7.3 v2 Extensions
+### 7.3 Custom Fields
+
+- Premium-tier feature.
+- Key-value pairs per item (text or hidden type).
+- Up to 50 custom fields per item.
+- Editor with add/remove and type toggle in item forms.
+
+### 7.4 v2 Extensions
 
 - Nested folders. Collections. Custom field types.
 
@@ -303,8 +312,11 @@ Configurable match detection per login:
 
 ### 13.2 Export (v1)
 
+Premium-tier feature.
+
 - Plaintext CSV (with loud security warning).
-- Password-protected JSON (encrypted with user-chosen password, not master password).
+- Plaintext JSON.
+- Password-protected JSON (AES-256-GCM encrypted with user-chosen password, not master password).
 
 ## 14. File Attachments
 
@@ -466,18 +478,31 @@ Premium-tier feature. All client-side computation.
 
 ### 20.1 Tiers
 
-| Feature | Free | Premium ($3/month or $30/year) |
-|---------|------|-------------------------------|
+| Feature | Free | Premium ($4/mo monthly or $3/mo annual billed $36/yr) |
+|---------|------|------------------------------------------------------|
 | Unlimited passwords | Yes | Yes |
 | Unlimited devices | Yes | Yes |
 | Autofill | Yes | Yes |
 | Password generator | Yes | Yes |
+| Import | Yes | Yes |
+| Tags & organization | No | Yes |
+| Custom fields | No | Yes |
+| Export (CSV, JSON, encrypted) | No | Yes |
 | TOTP 2FA codes | No | Yes |
 | File attachments | 250MB | 2GB |
 | Vault health reports | No | Yes |
 | Priority support | No | Yes |
 
-### 20.2 Future
+### 20.2 Billing
+
+- Stripe Checkout + Customer Portal + webhooks.
+- Monthly and annual cycles, toggleable in billing UI.
+- Free users see premium features with upgrade CTAs (in-app upselling).
+- On downgrade from Premium to Free, access to Premium-only features is immediately revoked.
+- Stored file attachments exceeding 250MB may be deleted after a 30-day grace period.
+- 30-day money-back guarantee.
+
+### 20.3 Future
 
 - Family plan (vault sharing).
 
@@ -663,7 +688,7 @@ Notable error codes:
 - Stripe (Checkout + Customer Portal + webhooks).
 - Workers handle Stripe webhooks, D1 stores subscription state.
 - Stripe Tax for VAT/GST compliance.
-- Premium tier: $3/month or $30/year.
+- Premium tier: $4/month or $3/month billed annually ($36/year).
 
 ## 32. CI/CD
 

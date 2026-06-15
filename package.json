@@ -31,8 +31,8 @@
   "devDependencies": {
     "@axe-core/playwright": "^4.11.3",
     "@eslint/js": "^10.0.1",
-    "@playwright/test": "^1.60.0",
-    "eslint": "^10.4.1",
+    "@playwright/test": "^1.61.0",
+    "eslint": "^10.5.0",
     "husky": "^9.1.7",
     "lint-staged": "^17.0.7",
     "prettier": "^3.8.4",

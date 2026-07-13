@@ -35,8 +35,8 @@
   },
   "devDependencies": {
     "@ironlox/tsconfig": "workspace:*",
-    "eslint": "^10.4.1",
-    "vitest": "^4.1.8",
-    "typescript": "^6.0.3"
+    "eslint": "^10.7.0",
+    "vitest": "^4.1.10",
+    "typescript": "^7.0.2"
   }
 }

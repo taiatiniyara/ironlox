@@ -27,8 +27,8 @@
   "dependencies": {
     "@ironlox/schemas": "workspace:*",
     "@ironlox/crypto": "workspace:*",
-    "hono": "^4.7.0",
-    "@hono/zod-openapi": "^1.4.0",
+    "hono": "^4.12.32",
+    "@hono/zod-openapi": "^1.5.1",
     "zod": "^4.4.3"
   },
   "devDependencies": {
